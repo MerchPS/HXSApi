@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ocean Blue | Login & Register</title>
+    <title>HXSApi - Premium API Downloader</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -16,6 +16,7 @@
             --gradient-dark: linear-gradient(135deg, #0a192f 0%, #112240 100%);
             --gradient-ocean: linear-gradient(135deg, #112240 0%, #1e3a5f 100%);
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
 
         * {
@@ -29,14 +30,107 @@
             background: var(--gradient-dark);
             color: var(--text-light);
             min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-dark);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loading-logo {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .loading-logo h1 {
+            font-size: 3rem;
+            background: linear-gradient(90deg, var(--accent-blue), var(--text-white));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+        }
+
+        .loading-logo p {
+            color: var(--accent-light-blue);
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+
+        .loading-bar {
+            width: 300px;
+            height: 4px;
+            background: rgba(100, 255, 218, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .loading-progress {
+            height: 100%;
+            width: 0%;
+            background: var(--accent-blue);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .loading-dots {
+            display: flex;
+            margin-top: 20px;
+        }
+
+        .loading-dots span {
+            width: 10px;
+            height: 10px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+            margin: 0 5px;
+            animation: loadingDots 1.5s infinite ease-in-out;
+        }
+
+        .loading-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes loadingDots {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+        }
+
+        /* Login & Register Styles */
+        .auth-container {
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow-x: hidden;
+            padding: 20px;
             position: relative;
+            overflow: hidden;
         }
 
-        body::before {
+        .auth-container::before {
             content: '';
             position: absolute;
             top: 0;
@@ -50,16 +144,16 @@
             z-index: -1;
         }
 
-        .container {
+        .auth-box {
             width: 100%;
-            max-width: 1200px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            max-width: 420px;
+            background: var(--gradient-ocean);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
             opacity: 0;
             transform: translateY(20px);
-            animation: fadeInUp 1s ease forwards;
+            animation: fadeInUp 0.8s ease forwards;
         }
 
         @keyframes fadeInUp {
@@ -69,133 +163,46 @@
             }
         }
 
-        .logo {
-            margin-bottom: 30px;
+        .auth-header {
+            padding: 30px;
             text-align: center;
+            background: rgba(10, 25, 47, 0.5);
         }
 
-        .logo h1 {
-            font-size: 2.5rem;
+        .auth-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .auth-logo h1 {
+            font-size: 2.2rem;
             background: linear-gradient(90deg, var(--accent-blue), var(--text-white));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            margin-bottom: 10px;
-            letter-spacing: 2px;
+            margin-left: 10px;
+            letter-spacing: 1px;
         }
 
-        .logo p {
+        .auth-header p {
             color: var(--accent-light-blue);
-            font-size: 1.1rem;
         }
 
-        .form-container {
-            display: flex;
-            width: 100%;
-            max-width: 900px;
-            background: var(--gradient-ocean);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            min-height: 550px;
-            position: relative;
+        .auth-body {
+            padding: 30px;
         }
 
-        .form-side {
-            flex: 1;
-            padding: 40px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .form-side::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(10, 25, 47, 0.7);
-            z-index: -1;
-        }
-
-        .welcome-side {
-            flex: 1;
-            background: var(--gradient-ocean);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 40px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .welcome-side::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%2364ffda" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,208C1248,224,1344,192,1392,176L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
-            background-size: cover;
-            opacity: 0.3;
-        }
-
-        .welcome-content {
-            position: relative;
-            z-index: 1;
-        }
-
-        .welcome-side h2 {
-            font-size: 2rem;
-            margin-bottom: 20px;
+        .auth-title {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
             color: var(--text-white);
         }
 
-        .welcome-side p {
+        .auth-subtitle {
             color: var(--accent-light-blue);
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-
-        .btn {
-            padding: 12px 30px;
-            border: none;
-            border-radius: 30px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            outline: none;
-        }
-
-        .btn-transparent {
-            background: transparent;
-            border: 2px solid var(--accent-blue);
-            color: var(--accent-blue);
-        }
-
-        .btn-transparent:hover {
-            background: rgba(100, 255, 218, 0.1);
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.2);
-        }
-
-        .form-title {
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-            color: var(--text-white);
-        }
-
-        .form-subtitle {
-            color: var(--accent-light-blue);
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .form-group {
@@ -231,6 +238,33 @@
             color: var(--accent-light-blue);
         }
 
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 40px;
+            color: var(--accent-light-blue);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .toggle-password:hover {
+            color: var(--accent-blue);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .btn-primary {
             background: var(--accent-blue);
             color: var(--primary-dark);
@@ -247,19 +281,26 @@
             box-shadow: 0 5px 15px rgba(100, 255, 218, 0.4);
         }
 
-        .form-footer {
+        .btn-primary:disabled {
+            background: var(--accent-light-blue);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .auth-footer {
             margin-top: 20px;
             text-align: center;
             color: var(--accent-light-blue);
         }
 
-        .form-footer a {
+        .auth-footer a {
             color: var(--accent-blue);
             text-decoration: none;
             transition: color 0.3s ease;
         }
 
-        .form-footer a:hover {
+        .auth-footer a:hover {
             color: var(--text-white);
             text-decoration: underline;
         }
@@ -284,62 +325,6 @@
             color: #ff6464;
         }
 
-        .toggle-password {
-            position: absolute;
-            right: 15px;
-            top: 40px;
-            color: var(--accent-light-blue);
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .toggle-password:hover {
-            color: var(--accent-blue);
-        }
-
-        /* Responsive Styles */
-        @media (max-width: 768px) {
-            .form-container {
-                flex-direction: column;
-                max-width: 500px;
-            }
-            
-            .welcome-side {
-                padding: 30px 20px;
-            }
-            
-            .form-side {
-                padding: 30px 20px;
-            }
-            
-            .logo h1 {
-                font-size: 2rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 10px;
-            }
-            
-            .form-side {
-                padding: 25px 15px;
-            }
-            
-            .welcome-side {
-                padding: 25px 15px;
-            }
-            
-            .form-title {
-                font-size: 1.5rem;
-            }
-            
-            .welcome-side h2 {
-                font-size: 1.5rem;
-            }
-        }
-
-        /* Animation for form switching */
         .form-page {
             display: none;
             animation: fadeIn 0.5s ease forwards;
@@ -360,9 +345,193 @@
             }
         }
 
+        /* Dashboard Styles */
+        .dashboard {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: var(--gradient-ocean);
+            box-shadow: var(--shadow);
+        }
+
+        .dashboard-logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .dashboard-logo h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(90deg, var(--accent-blue), var(--text-white));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-left: 10px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-info span {
+            margin-right: 15px;
+            color: var(--accent-light-blue);
+        }
+
+        .btn-logout {
+            background: transparent;
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: rgba(100, 255, 218, 0.1);
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 50px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        .welcome-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--text-white);
+        }
+
+        .welcome-section p {
+            color: var(--accent-light-blue);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .service-card {
+            background: var(--gradient-ocean);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 1s ease forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent-blue);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .service-card:nth-child(1) { animation-delay: 0.2s; }
+        .service-card:nth-child(2) { animation-delay: 0.4s; }
+        .service-card:nth-child(3) { animation-delay: 0.6s; }
+        .service-card:nth-child(4) { animation-delay: 0.8s; }
+        .service-card:nth-child(5) { animation-delay: 1s; }
+        .service-card:nth-child(6) { animation-delay: 1.2s; }
+
+        .service-icon {
+            font-size: 2.5rem;
+            color: var(--accent-blue);
+            margin-bottom: 20px;
+        }
+
+        .service-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--text-white);
+        }
+
+        .service-card p {
+            color: var(--accent-light-blue);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .service-features {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .service-features li {
+            color: var(--accent-light-blue);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .service-features li i {
+            color: var(--accent-blue);
+            margin-right: 10px;
+            font-size: 0.8rem;
+        }
+
+        .btn-service {
+            background: transparent;
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-service:hover {
+            background: rgba(100, 255, 218, 0.1);
+        }
+
         /* Ocean animation */
         .ocean {
-            position: absolute;
+            position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
@@ -398,21 +567,88 @@
                 transform: translateX(-50%);
             }
         }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .dashboard-header {
+                padding: 15px 20px;
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .user-info {
+                margin-top: 15px;
+            }
+            
+            .welcome-section h2 {
+                font-size: 2rem;
+            }
+            
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .auth-box {
+                max-width: 100%;
+            }
+            
+            .loading-logo h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-container {
+                padding: 0 15px;
+            }
+            
+            .service-card {
+                padding: 20px;
+            }
+            
+            .welcome-section h2 {
+                font-size: 1.8rem;
+            }
+            
+            .auth-body {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">
-            <h1><i class="fas fa-water"></i> OceanBlue</h1>
-            <p>Masuk ke dunia digital yang elegan</p>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-logo">
+            <h1>HXSApi</h1>
+            <p>Premium API Downloader</p>
         </div>
-        
-        <div class="form-container">
-            <div class="form-side">
+        <div class="loading-bar">
+            <div class="loading-progress" id="loadingProgress"></div>
+        </div>
+        <div class="loading-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+
+    <!-- Auth Section (Login & Register) -->
+    <div class="auth-container" id="authContainer">
+        <div class="auth-box">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <i class="fas fa-code fa-2x" style="color: #64ffda;"></i>
+                    <h1>HXSApi</h1>
+                </div>
+                <p>Premium API Downloader Services</p>
+            </div>
+            
+            <div class="auth-body">
                 <!-- Login Form -->
                 <div class="form-page active" id="login-page">
-                    <h2 class="form-title">Selamat Datang Kembali</h2>
-                    <p class="form-subtitle">Silakan masuk ke akun Anda</p>
+                    <h2 class="auth-title">Selamat Datang Kembali</h2>
+                    <p class="auth-subtitle">Masuk ke akun HXSApi Anda</p>
                     
                     <div class="message" id="login-message"></div>
                     
@@ -438,15 +674,15 @@
                         </button>
                     </form>
                     
-                    <div class="form-footer">
+                    <div class="auth-footer">
                         <p>Belum punya akun? <a href="#" id="show-register">Daftar di sini</a></p>
                     </div>
                 </div>
                 
                 <!-- Register Form -->
                 <div class="form-page" id="register-page">
-                    <h2 class="form-title">Buat Akun Baru</h2>
-                    <p class="form-subtitle">Bergabunglah dengan komunitas kami</p>
+                    <h2 class="auth-title">Buat Akun Baru</h2>
+                    <p class="auth-subtitle">Bergabung dengan HXSApi sekarang</p>
                     
                     <div class="message" id="register-message"></div>
                     
@@ -485,35 +721,151 @@
                         </button>
                     </form>
                     
-                    <div class="form-footer">
+                    <div class="auth-footer">
                         <p>Sudah punya akun? <a href="#" id="show-login">Masuk di sini</a></p>
                     </div>
                 </div>
             </div>
-            
-            <div class="welcome-side">
-                <div class="welcome-content">
-                    <h2 id="welcome-title">Selamat Datang di OceanBlue</h2>
-                    <p id="welcome-text">Platform digital yang elegan dengan pengalaman pengguna yang luar biasa. Jelajahi fitur-fitur kami dan rasakan kemudahan dalam setiap langkah.</p>
-                    <button class="btn btn-transparent" id="toggle-welcome">Pelajari Lebih Lanjut</button>
+        </div>
+    </div>
+
+    <!-- Dashboard Section -->
+    <div class="dashboard" id="dashboard">
+        <header class="dashboard-header">
+            <div class="dashboard-logo">
+                <i class="fas fa-code" style="color: #64ffda;"></i>
+                <h1>HXSApi</h1>
+            </div>
+            <div class="user-info">
+                <span id="user-name">Pengguna</span>
+                <button class="btn-logout" id="logout-btn">Keluar</button>
+            </div>
+        </header>
+
+        <div class="dashboard-container">
+            <section class="welcome-section">
+                <h2 id="welcome-user">Selamat Datang di HXSApi!</h2>
+                <p>Platform API downloader premium untuk berbagai layanan media. Akses API berkualitas tinggi dengan dokumentasi lengkap dan dukungan 24/7.</p>
+            </section>
+
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fab fa-youtube"></i>
+                    </div>
+                    <h3>YouTube MP4 Downloader</h3>
+                    <p>Download video YouTube dalam format MP4 dengan kualitas hingga 4K. Mendukung semua resolusi dan format video.</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> Kualitas hingga 4K</li>
+                        <li><i class="fas fa-check"></i> Semua resolusi didukung</li>
+                        <li><i class="fas fa-check"></i> Tanpa watermark</li>
+                        <li><i class="fas fa-check"></i> Batch download</li>
+                    </ul>
+                    <button class="btn-service">Lihat Dokumentasi API</button>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fab fa-youtube"></i>
+                    </div>
+                    <h3>YouTube MP3 Downloader</h3>
+                    <p>Ekstrak audio dari video YouTube dalam format MP3 dengan kualitas tinggi. Pilih bitrate sesuai kebutuhan.</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> Kualitas hingga 320kbps</li>
+                        <li><i class="fas fa-check"></i> Metadata ID3 tags</li>
+                        <li><i class="fas fa-check"></i> Thumbnail extraction</li>
+                        <li><i class="fas fa-check"></i> Batch conversion</li>
+                    </ul>
+                    <button class="btn-service">Lihat Dokumentasi API</button>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fab fa-tiktok"></i>
+                    </div>
+                    <h3>TikTok MP4 Downloader</h3>
+                    <p>Download video TikTok tanpa watermark dalam format MP4. Mendukung video dengan dan tanpa watermark.</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> Tanpa watermark</li>
+                        <li><i class="fas fa-check"></i> Original quality</li>
+                        <li><i class="fas fa-check"></i> Metadata included</li>
+                        <li><i class="fas fa-check"></i> Fast processing</li>
+                    </ul>
+                    <button class="btn-service">Lihat Dokumentasi API</button>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fab fa-tiktok"></i>
+                    </div>
+                    <h3>TikTok MP3 Downloader</h3>
+                    <p>Ekstrak audio dari video TikTok dalam format MP3. Dapatkan audio berkualitas tinggi dari video TikTok favorit.</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> High quality audio</li>
+                        <li><i class="fas fa-check"></i> Preserve metadata</li>
+                        <li><i class="fas fa-check"></i> Fast conversion</li>
+                        <li><i class="fas fa-check"></i> Batch processing</li>
+                    </ul>
+                    <button class="btn-service">Lihat Dokumentasi API</button>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fab fa-instagram"></i>
+                    </div>
+                    <h3>Instagram Downloader</h3>
+                    <p>Download foto, video, dan reel dari Instagram dengan kualitas terbaik. Mendukung semua jenis konten Instagram.</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> Posts, stories, reels</li>
+                        <li><i class="fas fa-check"></i> High resolution</li>
+                        <li><i class="fas fa-check"></i> Private account support</li>
+                        <li><i class="fas fa-check"></i> Bulk download</li>
+                    </ul>
+                    <button class="btn-service">Lihat Dokumentasi API</button>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <h3>Spotify Downloader</h3>
+                    <p>Download lagu dan playlist dari Spotify dalam format MP3. Nikmati musik favorit Anda secara offline.</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> 320kbps quality</li>
+                        <li><i class="fas fa-check"></i> Full metadata</li>
+                        <li><i class="fas fa-check"></i> Playlist support</li>
+                        <li><i class="fas fa-check"></i> Album art included</li>
+                    </ul>
+                    <button class="btn-service">Lihat Dokumentasi API</button>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <div class="ocean">
         <div class="wave"></div>
         <div class="wave"></div>
     </div>
 
     <script>
-        // API Configuration
-        const API_BASE_URL = 'https://api.jsonbin.io/v3/b';
-        const API_ACCESS_KEY = '$2a$10$5h7N1GoDlqh7oGuPAF7a1e8YFIOeMaU8I2phwCAVziyKRVIKqCQOK';
-        const API_MASTER_KEY = '$2a$10$t9rRybPASWD8ZC//W4fDuOOBbwmwCI0iC9P.X5GXdFOF3dpMVsnoS';
-        let BIN_ID = ''; // Will be created on first registration
+        // API Configuration - Environment variables would be set in Vercel
+        // These would be replaced with process.env.API_BASE_URL etc. in production
+        const API_CONFIG = {
+            BASE_URL: 'https://api.jsonbin.io/v3/b',
+            // These would be set as environment variables in Vercel
+            ACCESS_KEY: 'YOUR_ACCESS_KEY_HERE', // Set in Vercel environment
+            MASTER_KEY: 'YOUR_MASTER_KEY_HERE'  // Set in Vercel environment
+        };
+
+        // Application state
+        let currentUser = null;
+        let sessionToken = null;
 
         // DOM Elements
+        const loadingScreen = document.getElementById('loadingScreen');
+        const loadingProgress = document.getElementById('loadingProgress');
+        const authContainer = document.getElementById('authContainer');
+        const dashboard = document.getElementById('dashboard');
         const loginPage = document.getElementById('login-page');
         const registerPage = document.getElementById('register-page');
         const showRegisterBtn = document.getElementById('show-register');
@@ -522,62 +874,147 @@
         const registerForm = document.getElementById('register-form');
         const loginMessage = document.getElementById('login-message');
         const registerMessage = document.getElementById('register-message');
-        const welcomeTitle = document.getElementById('welcome-title');
-        const welcomeText = document.getElementById('welcome-text');
-        const toggleWelcomeBtn = document.getElementById('toggle-welcome');
+        const userName = document.getElementById('user-name');
+        const welcomeUser = document.getElementById('welcome-user');
+        const logoutBtn = document.getElementById('logout-btn');
 
-        // Toggle between login and register forms
-        showRegisterBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            loginPage.classList.remove('active');
-            registerPage.classList.add('active');
-            welcomeTitle.textContent = "Bergabunglah Dengan Kami";
-            welcomeText.textContent = "Daftar sekarang untuk mendapatkan akses penuh ke semua fitur kami. Nikmati pengalaman digital yang tak terlupakan dengan OceanBlue.";
-        });
-
-        showLoginBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            registerPage.classList.remove('active');
-            loginPage.classList.add('active');
-            welcomeTitle.textContent = "Selamat Datang di OceanBlue";
-            welcomeText.textContent = "Platform digital yang elegan dengan pengalaman pengguna yang luar biasa. Jelajahi fitur-fitur kami dan rasakan kemudahan dalam setiap langkah.";
-        });
-
-        // Toggle password visibility
-        document.querySelectorAll('.toggle-password').forEach(toggle => {
-            toggle.addEventListener('click', function() {
-                const input = this.parentElement.querySelector('input');
-                const icon = this.querySelector('i');
-                
-                if (input.type === 'password') {
-                    input.type = 'text';
-                    icon.classList.remove('fa-eye');
-                    icon.classList.add('fa-eye-slash');
-                } else {
-                    input.type = 'password';
-                    icon.classList.remove('fa-eye-slash');
-                    icon.classList.add('fa-eye');
+        // Initialize the application
+        function initApp() {
+            // Simulate loading progress
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    // Hide loading screen after a short delay
+                    setTimeout(() => {
+                        loadingScreen.classList.add('hidden');
+                        checkAuthStatus();
+                    }, 500);
                 }
-            });
-        });
+                loadingProgress.style.width = `${progress}%`;
+            }, 200);
 
-        // Toggle welcome content
-        let welcomeState = 1;
-        toggleWelcomeBtn.addEventListener('click', () => {
-            if (welcomeState === 1) {
-                welcomeTitle.textContent = "Keamanan Terjamin";
-                welcomeText.textContent = "Dengan teknologi enkripsi terkini, data Anda akan selalu aman bersama kami. OceanBlue menjaga privasi Anda dengan serius.";
-                welcomeState = 2;
-            } else if (welcomeState === 2) {
-                welcomeTitle.textContent = "Desain Responsif";
-                welcomeText.textContent = "Akses OceanBlue dari perangkat apapun. Desain kami dioptimalkan untuk semua ukuran layar, dari smartphone hingga desktop.";
-                welcomeState = 3;
-            } else {
-                welcomeTitle.textContent = "Selamat Datang di OceanBlue";
-                welcomeText.textContent = "Platform digital yang elegan dengan pengalaman pengguna yang luar biasa. Jelajahi fitur-fitur kami dan rasakan kemudahan dalam setiap langkah.";
-                welcomeState = 1;
+            // Setup event listeners
+            setupEventListeners();
+        }
+
+        // Setup all event listeners
+        function setupEventListeners() {
+            // Toggle between login and register forms
+            showRegisterBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                loginPage.classList.remove('active');
+                registerPage.classList.add('active');
+            });
+
+            showLoginBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                registerPage.classList.remove('active');
+                loginPage.classList.add('active');
+            });
+
+            // Toggle password visibility
+            document.querySelectorAll('.toggle-password').forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const input = this.parentElement.querySelector('input');
+                    const icon = this.querySelector('i');
+                    
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    }
+                });
+            });
+
+            // Register form submission
+            registerForm.addEventListener('submit', handleRegister);
+
+            // Login form submission
+            loginForm.addEventListener('submit', handleLogin);
+
+            // Logout button
+            logoutBtn.addEventListener('click', handleLogout);
+        }
+
+        // Check if user is already authenticated
+        async function checkAuthStatus() {
+            // Check if we have a session token
+            const savedSession = await getSessionFromStorage();
+            
+            if (savedSession) {
+                // Verify the session is still valid
+                const isValid = await verifySession(savedSession);
+                
+                if (isValid) {
+                    sessionToken = savedSession;
+                    currentUser = await getUserBySession(savedSession);
+                    
+                    if (currentUser) {
+                        showDashboard();
+                        return;
+                    }
+                }
             }
-        });
+            
+            // No valid session, show auth
+            showAuth();
+        }
+
+        // Get session from secure storage (using JSONBin)
+        async function getSessionFromStorage() {
+            try {
+                // In a real app, you'd store sessions in your database
+                // For this demo, we'll use a simple approach
+                const sessionData = localStorage.getItem('hxsapi_session');
+                return sessionData ? JSON.parse(sessionData) : null;
+            } catch (error) {
+                console.error('Error getting session:', error);
+                return null;
+            }
+        }
+
+        // Save session to storage
+        async function saveSessionToStorage(session) {
+            try {
+                localStorage.setItem('hxsapi_session', JSON.stringify(session));
+            } catch (error) {
+                console.error('Error saving session:', error);
+            }
+        }
+
+        // Verify session validity
+        async function verifySession(session) {
+            try {
+                // In a real app, you'd verify against your database
+                // For this demo, we'll check if the user exists
+                const user = await getUserBySession(session);
+                return user !== null;
+            } catch (error) {
+                console.error('Error verifying session:', error);
+                return false;
+            }
+        }
+
+        // Get user by session (simplified for demo)
+        async function getUserBySession(session) {
+            try {
+                // In a real app, you'd have a proper session system
+                // For this demo, we'll get all users and find by email
+                const users = await getAllUsers();
+                return users.find(user => user.email === session.email) || null;
+            } catch (error) {
+                console.error('Error getting user by session:', error);
+                return null;
+            }
+        }
 
         // Show message function
         function showMessage(element, message, type) {
@@ -590,8 +1027,124 @@
             }, 5000);
         }
 
-        // Register form submission
-        registerForm.addEventListener('submit', async (e) => {
+        // Show dashboard
+        function showDashboard() {
+            userName.textContent = currentUser.name;
+            welcomeUser.textContent = `Selamat Datang, ${currentUser.name}!`;
+            authContainer.style.display = 'none';
+            dashboard.style.display = 'block';
+        }
+
+        // Show auth forms
+        function showAuth() {
+            authContainer.style.display = 'flex';
+            dashboard.style.display = 'none';
+            loginForm.reset();
+            registerForm.reset();
+            registerPage.classList.remove('active');
+            loginPage.classList.add('active');
+        }
+
+        // Get all users from JSONBin
+        async function getAllUsers() {
+            try {
+                // First, get the main app data bin
+                const appData = await getAppData();
+                return appData.users || [];
+            } catch (error) {
+                console.error('Error getting users:', error);
+                return [];
+            }
+        }
+
+        // Get main app data from JSONBin
+        async function getAppData() {
+            try {
+                // In production, you'd have a fixed bin ID for your app data
+                const binId = await getAppBinId();
+                
+                const response = await fetch(`${API_CONFIG.BASE_URL}/${binId}/latest`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Master-Key': API_CONFIG.MASTER_KEY,
+                        'X-Access-Key': API_CONFIG.ACCESS_KEY
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch app data');
+                }
+                
+                const data = await response.json();
+                return data.record;
+            } catch (error) {
+                console.error('Error getting app data:', error);
+                return { users: [] };
+            }
+        }
+
+        // Get or create app bin ID
+        async function getAppBinId() {
+            // In production, you'd have a fixed bin ID
+            // For this demo, we'll create one if it doesn't exist
+            let binId = localStorage.getItem('hxsapi_app_bin_id');
+            
+            if (!binId) {
+                // Create a new bin for the app data
+                const response = await fetch(API_CONFIG.BASE_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': API_CONFIG.MASTER_KEY,
+                        'X-Access-Key': API_CONFIG.ACCESS_KEY
+                    },
+                    body: JSON.stringify({
+                        users: [],
+                        sessions: [],
+                        createdAt: new Date().toISOString()
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to create app data bin');
+                }
+                
+                const data = await response.json();
+                binId = data.metadata.id;
+                localStorage.setItem('hxsapi_app_bin_id', binId);
+            }
+            
+            return binId;
+        }
+
+        // Update app data in JSONBin
+        async function updateAppData(appData) {
+            try {
+                const binId = await getAppBinId();
+                
+                const response = await fetch(`${API_CONFIG.BASE_URL}/${binId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': API_CONFIG.MASTER_KEY,
+                        'X-Access-Key': API_CONFIG.ACCESS_KEY
+                    },
+                    body: JSON.stringify(appData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to update app data');
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error('Error updating app data:', error);
+                throw error;
+            }
+        }
+
+        // Handle user registration
+        async function handleRegister(e) {
             e.preventDefault();
             
             const name = document.getElementById('register-name').value;
@@ -613,55 +1166,19 @@
             // Show loading state
             document.getElementById('register-text').style.display = 'none';
             document.getElementById('register-loading').style.display = 'inline';
+            document.getElementById('register-btn').disabled = true;
             
             try {
-                // Check if we already have a bin ID, if not create one
-                if (!BIN_ID) {
-                    const createBinResponse = await fetch(`${API_BASE_URL}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Master-Key': API_MASTER_KEY,
-                            'X-Access-Key': API_ACCESS_KEY
-                        },
-                        body: JSON.stringify({ users: [] })
-                    });
-                    
-                    if (!createBinResponse.ok) {
-                        throw new Error('Gagal membuat penyimpanan data');
-                    }
-                    
-                    const createBinData = await createBinResponse.json();
-                    BIN_ID = createBinData.metadata.id;
-                    
-                    // Store the bin ID in localStorage for future use
-                    localStorage.setItem('oceanblue_bin_id', BIN_ID);
-                } else {
-                    // Get the bin ID from localStorage if it exists
-                    BIN_ID = localStorage.getItem('oceanblue_bin_id') || BIN_ID;
-                }
-                
                 // Get existing users
-                const getUsersResponse = await fetch(`${API_BASE_URL}/${BIN_ID}/latest`, {
-                    method: 'GET',
-                    headers: {
-                        'X-Master-Key': API_MASTER_KEY,
-                        'X-Access-Key': API_ACCESS_KEY
-                    }
-                });
-                
-                if (!getUsersResponse.ok) {
-                    throw new Error('Gagal mengambil data pengguna');
-                }
-                
-                const usersData = await getUsersResponse.json();
-                const users = usersData.record.users || [];
+                const appData = await getAppData();
+                const users = appData.users || [];
                 
                 // Check if email already exists
                 if (users.find(user => user.email === email)) {
                     showMessage(registerMessage, "Email sudah terdaftar", "error");
                     document.getElementById('register-text').style.display = 'inline';
                     document.getElementById('register-loading').style.display = 'none';
+                    document.getElementById('register-btn').disabled = false;
                     return;
                 }
                 
@@ -671,25 +1188,16 @@
                     name,
                     email,
                     password, // In a real app, this should be hashed
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    plan: 'starter',
+                    apiCalls: 0
                 };
                 
                 users.push(newUser);
+                appData.users = users;
                 
-                // Update the bin with new user data
-                const updateResponse = await fetch(`${API_BASE_URL}/${BIN_ID}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': API_MASTER_KEY,
-                        'X-Access-Key': API_ACCESS_KEY
-                    },
-                    body: JSON.stringify({ users })
-                });
-                
-                if (!updateResponse.ok) {
-                    throw new Error('Gagal menyimpan data pengguna');
-                }
+                // Update the app data
+                await updateAppData(appData);
                 
                 showMessage(registerMessage, "Pendaftaran berhasil! Silakan masuk.", "success");
                 registerForm.reset();
@@ -698,8 +1206,6 @@
                 setTimeout(() => {
                     registerPage.classList.remove('active');
                     loginPage.classList.add('active');
-                    welcomeTitle.textContent = "Selamat Datang di OceanBlue";
-                    welcomeText.textContent = "Platform digital yang elegan dengan pengalaman pengguna yang luar biasa. Jelajahi fitur-fitur kami dan rasakan kemudahan dalam setiap langkah.";
                 }, 2000);
                 
             } catch (error) {
@@ -708,11 +1214,12 @@
             } finally {
                 document.getElementById('register-text').style.display = 'inline';
                 document.getElementById('register-loading').style.display = 'none';
+                document.getElementById('register-btn').disabled = false;
             }
-        });
+        }
 
-        // Login form submission
-        loginForm.addEventListener('submit', async (e) => {
+        // Handle user login
+        async function handleLogin(e) {
             e.preventDefault();
             
             const email = document.getElementById('login-email').value;
@@ -721,33 +1228,12 @@
             // Show loading state
             document.getElementById('login-text').style.display = 'none';
             document.getElementById('login-loading').style.display = 'inline';
+            document.getElementById('login-btn').disabled = true;
             
             try {
-                // Get the bin ID from localStorage
-                BIN_ID = localStorage.getItem('oceanblue_bin_id');
-                
-                if (!BIN_ID) {
-                    showMessage(loginMessage, "Tidak ada pengguna terdaftar. Silakan daftar terlebih dahulu.", "error");
-                    document.getElementById('login-text').style.display = 'inline';
-                    document.getElementById('login-loading').style.display = 'none';
-                    return;
-                }
-                
                 // Get users data
-                const getUsersResponse = await fetch(`${API_BASE_URL}/${BIN_ID}/latest`, {
-                    method: 'GET',
-                    headers: {
-                        'X-Master-Key': API_MASTER_KEY,
-                        'X-Access-Key': API_ACCESS_KEY
-                    }
-                });
-                
-                if (!getUsersResponse.ok) {
-                    throw new Error('Gagal mengambil data pengguna');
-                }
-                
-                const usersData = await getUsersResponse.json();
-                const users = usersData.record.users || [];
+                const appData = await getAppData();
+                const users = appData.users || [];
                 
                 // Find user by email and password
                 const user = users.find(u => u.email === email && u.password === password);
@@ -755,12 +1241,22 @@
                 if (user) {
                     showMessage(loginMessage, "Login berhasil! Mengarahkan ke dashboard...", "success");
                     
-                    // Store user session
-                    localStorage.setItem('oceanblue_user', JSON.stringify(user));
+                    // Create session
+                    const session = {
+                        email: user.email,
+                        userId: user.id,
+                        createdAt: new Date().toISOString(),
+                        token: generateSessionToken()
+                    };
+                    
+                    // Save session
+                    await saveSessionToStorage(session);
+                    sessionToken = session;
+                    currentUser = user;
                     
                     // Redirect to dashboard after a short delay
                     setTimeout(() => {
-                        window.location.href = 'dashboard.html';
+                        showDashboard();
                     }, 1500);
                 } else {
                     showMessage(loginMessage, "Email atau kata sandi salah", "error");
@@ -772,20 +1268,26 @@
             } finally {
                 document.getElementById('login-text').style.display = 'inline';
                 document.getElementById('login-loading').style.display = 'none';
+                document.getElementById('login-btn').disabled = false;
             }
-        });
+        }
 
-        // Check if user is already logged in
-        window.addEventListener('DOMContentLoaded', () => {
-            const user = localStorage.getItem('oceanblue_user');
-            if (user) {
-                // User is already logged in, redirect to dashboard
-                window.location.href = 'dashboard.html';
-            }
-            
-            // Try to get the existing bin ID from localStorage
-            BIN_ID = localStorage.getItem('oceanblue_bin_id') || '';
-        });
+        // Generate session token
+        function generateSessionToken() {
+            return 'session_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+        }
+
+        // Handle user logout
+        function handleLogout() {
+            // Clear session
+            sessionToken = null;
+            currentUser = null;
+            localStorage.removeItem('hxsapi_session');
+            showAuth();
+        }
+
+        // Initialize the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
