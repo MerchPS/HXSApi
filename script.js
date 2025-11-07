@@ -1,5 +1,5 @@
 // Configuration
-const API_BASE_URL = 'https://your-api.vercel.app'; // Ganti dengan URL API Anda
+const API_BASE_URL = 'https://hxs-apis.vercel.app'; // Ganti dengan URL API Anda
 
 // Theme Management
 function initTheme() {
