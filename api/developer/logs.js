@@ -1,4 +1,4 @@
-import { getLogs, clearLogs, addLog } from '../../../lib/logger.js';
+import { getLogs, clearLogs, addLog } from '../../lib/logger.js';
 
 const DEVELOPER_PASSWORD = 'hxs2023'; // Ganti dengan password yang lebih aman
 
