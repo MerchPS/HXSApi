@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HXS API - Powerful Website Screenshot API</title>
+    <title>HXS API - Powerful API Platform by Hans & Stret</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -365,69 +365,123 @@
             color: var(--text-light);
         }
 
-        /* Quick Demo Section */
-        .demo {
+        /* APIs Section */
+        .apis {
             padding: 5rem 0;
             background: var(--background);
         }
 
-        .demo-content {
+        .apis-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: center;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
         }
 
-        .demo-text h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
+        .api-card {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .api-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .api-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary);
+        }
+
+        .api-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .api-icon {
+            width: 3rem;
+            height: 3rem;
+            background: var(--primary);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .api-info h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .api-status {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .status-live {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-dev {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-soon {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .api-description {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+        }
+
+        .api-features {
+            list-style: none;
             margin-bottom: 1.5rem;
         }
 
-        .demo-text p {
-            font-size: 1.125rem;
-            color: var(--text-light);
-            margin-bottom: 2rem;
-        }
-
-        .demo-visual {
-            background: var(--card);
-            border-radius: var(--radius);
-            padding: 2rem;
-            box-shadow: var(--shadow-lg);
-            border: 1px solid var(--border);
-        }
-
-        .demo-form {
+        .api-features li {
             display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
+            align-items: center;
             gap: 0.5rem;
-        }
-
-        .form-label {
-            font-weight: 600;
+            margin-bottom: 0.5rem;
             font-size: 0.875rem;
+            color: var(--text-light);
         }
 
-        .form-input {
-            padding: 0.75rem 1rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            background: var(--surface);
-            color: var(--text);
-            font-size: 0.875rem;
-            transition: border-color 0.3s ease;
+        .api-features li i {
+            color: var(--success);
+            font-size: 0.75rem;
         }
 
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
+        .api-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
         }
 
         /* Stats Section */
@@ -569,11 +623,6 @@
                 padding: 0 1rem;
             }
             
-            .demo-content {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-            
             .header-content {
                 flex-wrap: wrap;
             }
@@ -607,6 +656,10 @@
                 width: 100%;
                 justify-content: center;
             }
+
+            .api-actions {
+                flex-direction: column;
+            }
         }
 
         @media (max-width: 480px) {
@@ -625,6 +678,10 @@
             .feature-card {
                 padding: 2rem 1.5rem;
             }
+
+            .api-card {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -637,7 +694,7 @@
                     <i class="fas fa-code"></i>
                     <div>
                         <h1>HXS API</h1>
-                        <span>by Hans Dan Stret</span>
+                        <span>by Hans & Stret</span>
                     </div>
                 </div>
                 
@@ -655,7 +712,7 @@
                 <nav class="nav" id="nav">
                     <ul>
                         <li><a href="#features" class="nav-link">Features</a></li>
-                        <li><a href="#demo" class="nav-link">Demo</a></li>
+                        <li><a href="#apis" class="nav-link">APIs</a></li>
                         <li><a href="/docs.html" class="nav-link">Documentation</a></li>
                         <li><a href="#cta" class="nav-link">Get Started</a></li>
                     </ul>
@@ -668,19 +725,19 @@
     <section class="hero">
         <div class="container">
             <div class="hero-content">
-                <h1>Powerful Website Screenshot API</h1>
+                <h1>HXS API Platform</h1>
                 <p class="hero-subtitle">
-                    Capture high-quality screenshots of any website with our reliable API. 
-                    Fast, scalable, and easy to integrate.
+                    Powerful API ecosystem by Hans & Stret. From website screenshots to media downloaders, 
+                    we provide reliable APIs for developers worldwide.
                 </p>
                 <div class="hero-buttons">
                     <a href="/docs.html" class="btn btn-primary">
                         <i class="fas fa-book"></i>
                         View Documentation
                     </a>
-                    <a href="#demo" class="btn btn-secondary">
-                        <i class="fas fa-play"></i>
-                        Try Demo
+                    <a href="#apis" class="btn btn-secondary">
+                        <i class="fas fa-rocket"></i>
+                        Explore APIs
                     </a>
                 </div>
             </div>
@@ -692,7 +749,7 @@
         <div class="container">
             <div class="section-header">
                 <h2>Why Choose HXS API?</h2>
-                <p>Built for developers who need reliable website screenshot capabilities</p>
+                <p>Enterprise-grade API platform built for modern developers</p>
             </div>
 
             <div class="features-grid">
@@ -700,8 +757,8 @@
                     <div class="feature-icon">
                         <i class="fas fa-bolt"></i>
                     </div>
-                    <h3>Lightning Fast</h3>
-                    <p>Capture screenshots in milliseconds with our optimized infrastructure and global CDN.</p>
+                    <h3>High Performance</h3>
+                    <p>Lightning-fast response times with global CDN and optimized infrastructure.</p>
                 </div>
 
                 <div class="feature-card">
@@ -730,59 +787,201 @@
 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <i class="fas fa-mobile-alt"></i>
+                        <i class="fas fa-infinity"></i>
                     </div>
-                    <h3>Responsive Screenshots</h3>
-                    <p>Capture websites in different device views - desktop, tablet, and mobile.</p>
+                    <h3>Scalable Infrastructure</h3>
+                    <p>Handle thousands of concurrent requests with our auto-scaling cloud infrastructure.</p>
                 </div>
 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <i class="fas fa-rocket"></i>
+                        <i class="fas fa-headset"></i>
                     </div>
-                    <h3>High Performance</h3>
-                    <p>Handle thousands of concurrent requests with our scalable cloud infrastructure.</p>
+                    <h3>24/7 Support</h3>
+                    <p>Dedicated support team and comprehensive documentation for all your needs.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Quick Demo Section -->
-    <section id="demo" class="demo">
+    <!-- APIs Section -->
+    <section id="apis" class="apis">
         <div class="container">
-            <div class="demo-content">
-                <div class="demo-text">
-                    <h2>Try It Yourself</h2>
-                    <p>
-                        Enter any website URL below and see the power of HXS API in action. 
-                        Get instant screenshots with just one API call.
+            <div class="section-header">
+                <h2>Our API Services</h2>
+                <p>Comprehensive suite of APIs for all your development needs</p>
+            </div>
+
+            <div class="apis-grid">
+                <!-- SSWeb API -->
+                <div class="api-card">
+                    <div class="api-header">
+                        <div class="api-icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <div class="api-info">
+                            <h3>SSWeb API</h3>
+                            <div class="api-status status-live">Live</div>
+                        </div>
+                    </div>
+                    <p class="api-description">
+                        Capture high-quality screenshots of any website. Perfect for preview generation, 
+                        monitoring, and content creation.
                     </p>
-                    <div class="hero-buttons">
-                        <a href="/docs.html" class="btn btn-primary">
-                            <i class="fas fa-book"></i>
-                            Full Documentation
+                    <ul class="api-features">
+                        <li><i class="fas fa-check"></i> High-resolution screenshots</li>
+                        <li><i class="fas fa-check"></i> Mobile & desktop views</li>
+                        <li><i class="fas fa-check"></i> Fast rendering</li>
+                        <li><i class="fas fa-check"></i> Custom dimensions</li>
+                    </ul>
+                    <div class="api-actions">
+                        <a href="/docs.html#ssweb" class="btn btn-primary btn-small">
+                            <i class="fas fa-book"></i> Docs
                         </a>
-                        <a href="#cta" class="btn btn-secondary">
-                            <i class="fas fa-key"></i>
-                            Get API Key
-                        </a>
+                        <button class="btn btn-secondary btn-small" onclick="testSSWeb()">
+                            <i class="fas fa-play"></i> Try Demo
+                        </button>
                     </div>
                 </div>
 
-                <div class="demo-visual">
-                    <h3 style="margin-bottom: 1.5rem;">Quick Demo</h3>
-                    <div class="demo-form">
-                        <div class="form-group">
-                            <label class="form-label">Website URL</label>
-                            <input type="url" class="form-input" id="demoUrl" 
-                                   placeholder="https://example.com" value="https://google.com">
+                <!-- YouTube Downloader API -->
+                <div class="api-card">
+                    <div class="api-header">
+                        <div class="api-icon">
+                            <i class="fab fa-youtube"></i>
                         </div>
-                        <button class="btn btn-primary" onclick="testDemo()">
-                            <i class="fas fa-camera"></i>
-                            Capture Screenshot
+                        <div class="api-info">
+                            <h3>YouTube Downloader</h3>
+                            <div class="api-status status-dev">In Development</div>
+                        </div>
+                    </div>
+                    <p class="api-description">
+                        Download YouTube videos and audio in multiple formats. High-quality downloads 
+                        with fast processing speeds.
+                    </p>
+                    <ul class="api-features">
+                        <li><i class="fas fa-check"></i> MP4 video download</li>
+                        <li><i class="fas fa-check"></i> MP3 audio extraction</li>
+                        <li><i class="fas fa-check"></i> Multiple quality options</li>
+                        <li><i class="fas fa-check"></i> Batch processing</li>
+                    </ul>
+                    <div class="api-actions">
+                        <button class="btn btn-secondary btn-small" disabled>
+                            <i class="fas fa-clock"></i> Coming Soon
                         </button>
                     </div>
-                    <div id="demoResult" style="margin-top: 1.5rem;"></div>
+                </div>
+
+                <!-- Image Processing API -->
+                <div class="api-card">
+                    <div class="api-header">
+                        <div class="api-icon">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <div class="api-info">
+                            <h3>Image Processing</h3>
+                            <div class="api-status status-dev">In Development</div>
+                        </div>
+                    </div>
+                    <p class="api-description">
+                        Advanced image manipulation and processing. Resize, compress, convert formats, 
+                        and apply filters.
+                    </p>
+                    <ul class="api-features">
+                        <li><i class="fas fa-check"></i> Format conversion</li>
+                        <li><i class="fas fa-check"></i> Smart compression</li>
+                        <li><i class="fas fa-check"></i> Filter effects</li>
+                        <li><i class="fas fa-check"></i> Batch processing</li>
+                    </ul>
+                    <div class="api-actions">
+                        <button class="btn btn-secondary btn-small" disabled>
+                            <i class="fas fa-clock"></i> Coming Soon
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Document Converter API -->
+                <div class="api-card">
+                    <div class="api-header">
+                        <div class="api-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="api-info">
+                            <h3>Document Converter</h3>
+                            <div class="api-status status-soon">Planning</div>
+                        </div>
+                    </div>
+                    <p class="api-description">
+                        Convert between document formats seamlessly. PDF, DOCX, HTML, and more with 
+                        perfect formatting.
+                    </p>
+                    <ul class="api-features">
+                        <li><i class="fas fa-check"></i> PDF conversion</li>
+                        <li><i class="fas fa-check"></i> Office documents</li>
+                        <li><i class="fas fa-check"></i> HTML to PDF</li>
+                        <li><i class="fas fa-check"></i> Batch processing</li>
+                    </ul>
+                    <div class="api-actions">
+                        <button class="btn btn-secondary btn-small" disabled>
+                            <i class="fas fa-clock"></i> Planned
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Text Analysis API -->
+                <div class="api-card">
+                    <div class="api-header">
+                        <div class="api-icon">
+                            <i class="fas fa-language"></i>
+                        </div>
+                        <div class="api-info">
+                            <h3>Text Analysis</h3>
+                            <div class="api-status status-soon">Planning</div>
+                        </div>
+                    </div>
+                    <p class="api-description">
+                        Advanced text processing and analysis. Sentiment analysis, keyword extraction, 
+                        and language detection.
+                    </p>
+                    <ul class="api-features">
+                        <li><i class="fas fa-check"></i> Sentiment analysis</li>
+                        <li><i class="fas fa-check"></i> Keyword extraction</li>
+                        <li><i class="fas fa-check"></i> Language detection</li>
+                        <li><i class="fas fa-check"></i> Text summarization</li>
+                    </ul>
+                    <div class="api-actions">
+                        <button class="btn btn-secondary btn-small" disabled>
+                            <i class="fas fa-clock"></i> Planned
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Weather API -->
+                <div class="api-card">
+                    <div class="api-header">
+                        <div class="api-icon">
+                            <i class="fas fa-cloud-sun"></i>
+                        </div>
+                        <div class="api-info">
+                            <h3>Weather Data</h3>
+                            <div class="api-status status-soon">Planning</div>
+                        </div>
+                    </div>
+                    <p class="api-description">
+                        Global weather data and forecasts. Accurate, real-time weather information 
+                        for any location worldwide.
+                    </p>
+                    <ul class="api-features">
+                        <li><i class="fas fa-check"></i> Real-time data</li>
+                        <li><i class="fas fa-check"></i> Global coverage</li>
+                        <li><i class="fas fa-check"></i> Forecasts</li>
+                        <li><i class="fas fa-check"></i> Historical data</li>
+                    </ul>
+                    <div class="api-actions">
+                        <button class="btn btn-secondary btn-small" disabled>
+                            <i class="fas fa-clock"></i> Planned
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -794,11 +993,11 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-number" id="totalRequests">10M+</div>
-                    <div class="stat-label">Screenshots Served</div>
+                    <div class="stat-label">API Requests</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number" id="avgResponse">240ms</div>
-                    <div class="stat-label">Average Response Time</div>
+                    <div class="stat-label">Avg Response Time</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number" id="uptime">99.9%</div>
@@ -815,10 +1014,10 @@
     <!-- CTA Section -->
     <section id="cta" class="cta">
         <div class="container">
-            <h2>Ready to Get Started?</h2>
+            <h2>Start Building with HXS API</h2>
             <p>
-                Join thousands of developers who trust HXS API for their website screenshot needs. 
-                Start building amazing applications today.
+                Join thousands of developers who trust HXS API for their projects. 
+                From startups to enterprises, we've got you covered.
             </p>
             <div class="cta-buttons">
                 <a href="/docs.html" class="btn btn-primary">
@@ -827,7 +1026,7 @@
                 </a>
                 <a href="/docs.html#endpoints" class="btn btn-secondary">
                     <i class="fas fa-code"></i>
-                    View API Reference
+                    API Reference
                 </a>
             </div>
         </div>
@@ -842,10 +1041,10 @@
                         <i class="fas fa-code"></i>
                         <div>
                             <h3>HXS API</h3>
-                            <span>by Hans Dan Stret</span>
+                            <span>by Hans & Stret</span>
                         </div>
                     </div>
-                    <p>Powerful API services for developers worldwide.</p>
+                    <p>Powerful API platform for modern developers. Reliable, scalable, and easy to use.</p>
                     <div class="social-links">
                         <a href="#"><i class="fab fa-github"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
@@ -858,7 +1057,7 @@
                     <h4>Product</h4>
                     <ul>
                         <li><a href="/docs.html">Documentation</a></li>
-                        <li><a href="/docs.html#examples">Examples</a></li>
+                        <li><a href="#apis">API Services</a></li>
                         <li><a href="/docs.html#status">API Status</a></li>
                         <li><a href="/docs.html#logs">Developer Logs</a></li>
                     </ul>
@@ -886,7 +1085,7 @@
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2023 HXS API. All rights reserved. | Developed by Hans Dan Stret</p>
+                <p>&copy; 2023 HXS API Platform. All rights reserved. | Developed by Hans & Stret</p>
             </div>
         </div>
     </footer>
@@ -935,23 +1134,18 @@
             });
         }
 
-        // Demo Function
-        async function testDemo() {
-            const url = document.getElementById('demoUrl').value;
-            const resultDiv = document.getElementById('demoResult');
-            
-            if (!url) {
-                resultDiv.innerHTML = '<p style="color: var(--error);">Please enter a website URL</p>';
-                return;
-            }
+        // SSWeb Demo Function
+        async function testSSWeb() {
+            const url = prompt('Enter website URL to capture:', 'https://google.com');
+            if (!url) return;
 
             try {
-                resultDiv.innerHTML = `
-                    <div style="text-align: center; padding: 2rem;">
-                        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary);"></i>
-                        <p style="margin-top: 1rem;">Capturing screenshot...</p>
-                    </div>
-                `;
+                Swal.fire({
+                    title: 'Taking Screenshot...',
+                    text: 'Please wait while we capture the website',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
 
                 const response = await fetch(`/api/ssweb?url=${encodeURIComponent(url)}`);
                 
@@ -959,31 +1153,21 @@
                     const blob = await response.blob();
                     const imgUrl = URL.createObjectURL(blob);
                     
-                    resultDiv.innerHTML = `
-                        <div style="text-align: center;">
-                            <p style="margin-bottom: 1rem; color: var(--success);">
-                                <i class="fas fa-check-circle"></i> Screenshot captured successfully!
-                            </p>
-                            <img src="${imgUrl}" alt="Screenshot" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--border);">
-                            <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-light);">
-                                Screenshot of: ${url}
-                            </p>
-                        </div>
-                    `;
+                    Swal.fire({
+                        title: 'Screenshot Captured!',
+                        html: `
+                            <p>Successfully captured screenshot of:</p>
+                            <p><strong>${url}</strong></p>
+                            <img src="${imgUrl}" alt="Screenshot" style="max-width: 100%; margin: 15px 0; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        `,
+                        confirmButtonText: 'Close'
+                    });
                 } else {
                     const error = await response.json();
-                    resultDiv.innerHTML = `
-                        <p style="color: var(--error);">
-                            <i class="fas fa-exclamation-circle"></i> ${error.message || 'Failed to capture screenshot'}
-                        </p>
-                    `;
+                    Swal.fire('Error!', error.message || 'Failed to capture screenshot', 'error');
                 }
             } catch (error) {
-                resultDiv.innerHTML = `
-                    <p style="color: var(--error);">
-                        <i class="fas fa-exclamation-circle"></i> Failed to capture screenshot: ${error.message}
-                    </p>
-                `;
+                Swal.fire('Error!', 'Failed to capture screenshot: ' + error.message, 'error');
             }
         }
 
@@ -1024,7 +1208,7 @@
 
         // Global functions
         window.toggleTheme = toggleTheme;
-        window.testDemo = testDemo;
+        window.testSSWeb = testSSWeb;
     </script>
 </body>
 </html>
