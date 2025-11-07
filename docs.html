@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        /* CSS yang sama seperti sebelumnya, tidak ada perubahan */
         :root {
             --primary: #2563eb;
             --primary-dark: #1d4ed8;
@@ -1294,7 +1293,10 @@
                     <ul>
                         <li><a href="/" class="nav-link">Home</a></li>
                         <li><a href="#introduction" class="nav-link">Introduction</a></li>
-                        <li><a href="#apis" class="nav-link">APIs</a></li>
+                        <li><a href="#getting-started" class="nav-link">Getting Started</a></li>
+                        <li><a href="#authentication" class="nav-link">Authentication</a></li>
+                        <li><a href="#ssweb-api" class="nav-link">SSWeb API</a></li>
+                        <li><a href="#youtube-api" class="nav-link">YouTube API</a></li>
                         <li><a href="#status" class="nav-link">Status</a></li>
                         <li><a href="#" onclick="openDeveloperConsole()" class="nav-link">Developer Logs</a></li>
                     </ul>
@@ -1317,7 +1319,7 @@
                         <i class="fas fa-rocket"></i>
                         Quick Start
                     </a>
-                    <a href="#apis" class="btn btn-secondary">
+                    <a href="#ssweb-api" class="btn btn-secondary">
                         <i class="fas fa-code"></i>
                         API Reference
                     </a>
@@ -1458,6 +1460,16 @@
                             <div class="api-description">
                                 <p>HXS API uses API keys to authenticate requests. You can view and manage your API keys in the Developer Console.</p>
                                 
+                                <h4 style="margin-top: 2rem; margin-bottom: 1rem;">Getting Your API Key</h4>
+                                <p>Access the Developer Console to generate and manage your API keys:</p>
+                                
+                                <div class="endpoint-actions">
+                                    <button class="btn btn-primary" onclick="openDeveloperConsole()">
+                                        <i class="fas fa-terminal"></i>
+                                        Developer Console
+                                    </button>
+                                </div>
+
                                 <h4 style="margin-top: 2rem; margin-bottom: 1rem;">Using Your API Key</h4>
                                 <p>Include your API key in the request header:</p>
                                 <div class="code-block" style="margin: 1rem 0;">
@@ -1472,15 +1484,39 @@
 .then(response => response.json())
 .then(data => console.log(data));</code></pre>
                                 </div>
+                            </div>
+                        </div>
+                    </section>
 
-                                <h4 style="margin-top: 2rem; margin-bottom: 1rem;">Getting Your API Key</h4>
-                                <p>Access the Developer Console to generate and manage your API keys:</p>
+                    <!-- Rate Limiting Section -->
+                    <section id="rate-limiting" class="content-section">
+                        <div class="section-header">
+                            <h2><i class="fas fa-tachometer-alt"></i> Rate Limiting</h2>
+                            <p>Fair usage policies to ensure service stability</p>
+                        </div>
+
+                        <div class="api-card">
+                            <div class="api-description">
+                                <p>To ensure fair usage and maintain service stability, HXS API implements rate limiting on all endpoints.</p>
                                 
-                                <div class="endpoint-actions">
-                                    <button class="btn btn-primary" onclick="openDeveloperConsole()">
-                                        <i class="fas fa-terminal"></i>
-                                        Developer Console
+                                <div style="margin-top: 2rem;">
+                                    <h4 style="margin-bottom: 1rem;">Rate Limits</h4>
+                                    <ul style="color: var(--text-light); line-height: 1.8;">
+                                        <li><strong>Free Tier:</strong> 100 requests per hour per API key</li>
+                                        <li><strong>Pro Tier:</strong> 1,000 requests per hour per API key</li>
+                                        <li><strong>Enterprise:</strong> Custom limits based on needs</li>
+                                    </ul>
+                                </div>
+
+                                <h4 style="margin-top: 2rem; margin-bottom: 1rem;">Rate Limit Headers</h4>
+                                <p>All API responses include rate limit headers:</p>
+                                <div class="code-block" style="margin: 1rem 0;">
+                                    <button class="copy-btn" onclick="copyCode('rate-headers')">
+                                        <i class="far fa-copy"></i>
                                     </button>
+                                    <pre id="rate-headers"><code>X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1640995200</code></pre>
                                 </div>
                             </div>
                         </div>
@@ -1537,6 +1573,24 @@
                                                 <div class="param-type">String</div>
                                                 <div class="param-required">Yes</div>
                                                 <div class="param-desc">Website URL to capture (include http:// or https://)</div>
+                                            </div>
+                                            <div class="param-row">
+                                                <div class="param-name">width</div>
+                                                <div class="param-type">Number</div>
+                                                <div class="param-required">No</div>
+                                                <div class="param-desc">Viewport width in pixels (default: 1280)</div>
+                                            </div>
+                                            <div class="param-row">
+                                                <div class="param-name">height</div>
+                                                <div class="param-type">Number</div>
+                                                <div class="param-required">No</div>
+                                                <div class="param-desc">Viewport height in pixels (default: 720)</div>
+                                            </div>
+                                            <div class="param-row">
+                                                <div class="param-name">fullPage</div>
+                                                <div class="param-type">Boolean</div>
+                                                <div class="param-required">No</div>
+                                                <div class="param-desc">Capture full page screenshot (default: false)</div>
                                             </div>
                                         </div>
                                     </div>
