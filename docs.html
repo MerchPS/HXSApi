@@ -1,0 +1,2025 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HXS API Documentation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            /* Light Theme */
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #06b6d4;
+            --accent: #3b82f6;
+            --background: #ffffff;
+            --surface: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --text-lighter: #94a3b8;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --online: #10b981;
+            --offline: #ef4444;
+            --maintenance: #f59e0b;
+        }
+
+        [data-theme="dark"] {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #06b6d4;
+            --accent: #60a5fa;
+            --background: #0f172a;
+            --surface: #1e293b;
+            --card: #1e293b;
+            --text: #f1f5f9;
+            --text-light: #cbd5e1;
+            --text-lighter: #64748b;
+            --border: #334155;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo span {
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            width: 3rem;
+            height: 3rem;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--primary);
+        }
+
+        .theme-toggle i {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle .fa-sun {
+            opacity: 0;
+        }
+
+        [data-theme="dark"] .theme-toggle .fa-moon {
+            opacity: 0;
+        }
+
+        [data-theme="dark"] .theme-toggle .fa-sun {
+            opacity: 1;
+        }
+
+        .mobile-menu {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav a:hover {
+            color: var(--primary);
+        }
+
+        .nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 120px 0 80px;
+            background: linear-gradient(135deg, var(--surface) 0%, var(--background) 100%);
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .hero-visual {
+            display: flex;
+            justify-content: center;
+        }
+
+        .code-window {
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .window-header {
+            background: var(--surface);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .window-controls span {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--text-lighter);
+        }
+
+        .window-title {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .code-content {
+            padding: 1.5rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .code-content code {
+            color: var(--text);
+        }
+
+        /* Quick Stats */
+        .quick-stats {
+            padding: 4rem 0;
+            background: var(--surface);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--card);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 3rem;
+            height: 3rem;
+            background: var(--primary);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .stat-info h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-info p {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        /* Sections */
+        section {
+            padding: 5rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            font-size: 1.125rem;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Endpoint Cards */
+        .endpoint-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .method-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .method-badge.get {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        [data-theme="dark"] .method-badge.get {
+            background: #1e3a8a;
+            color: #dbeafe;
+        }
+
+        .method-badge.post {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        [data-theme="dark"] .method-badge.post {
+            background: #14532d;
+            color: #dcfce7;
+        }
+
+        .endpoint-path {
+            font-family: 'Fira Code', monospace;
+            background: var(--surface);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            flex: 1;
+        }
+
+        .endpoint-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .endpoint-status.public {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .endpoint-status.protected {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .endpoint-description {
+            margin-bottom: 2rem;
+            color: var(--text-light);
+            font-size: 1.125rem;
+        }
+
+        .endpoint-parameters {
+            margin-bottom: 2rem;
+        }
+
+        .endpoint-parameters h4 {
+            margin-bottom: 1rem;
+            font-size: 1.125rem;
+        }
+
+        .parameters-table {
+            background: var(--surface);
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .param-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 2fr;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .param-row.header {
+            background: var(--card);
+            font-weight: 600;
+        }
+
+        .param-row:last-child {
+            border-bottom: none;
+        }
+
+        .param-name {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.875rem;
+        }
+
+        .param-type {
+            color: var(--primary);
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .param-required {
+            font-size: 0.875rem;
+        }
+
+        .param-desc {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .endpoint-example {
+            margin-bottom: 2rem;
+        }
+
+        .endpoint-example h4 {
+            margin-bottom: 1rem;
+            font-size: 1.125rem;
+        }
+
+        .code-block {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            position: relative;
+            border: 1px solid var(--border);
+        }
+
+        .code-block.small {
+            padding: 1rem;
+        }
+
+        .code-block pre {
+            margin: 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: var(--text);
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-light);
+        }
+
+        .copy-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .endpoint-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Examples Grid */
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .example-card {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease;
+        }
+
+        .example-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .example-icon {
+            width: 4rem;
+            height: 4rem;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .example-card h3 {
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+        }
+
+        /* Status Section */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .status-card {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+        }
+
+        .status-icon.online {
+            background: var(--online);
+        }
+
+        .status-icon.offline {
+            background: var(--offline);
+        }
+
+        .status-icon.maintenance {
+            background: var(--maintenance);
+        }
+
+        .status-info {
+            flex: 1;
+        }
+
+        .status-info h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-badge.online {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-badge.offline {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .status-badge.maintenance {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-details {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .status-metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .status-metric:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--surface);
+            padding: 4rem 0 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h3,
+        .footer-section h4 {
+            margin-bottom: 1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        /* Developer Console Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--card);
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            background: var(--surface);
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--error);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .password-section {
+            margin-bottom: 2rem;
+        }
+
+        .password-input-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .password-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--surface);
+            color: var(--text);
+            font-size: 0.875rem;
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .logs-section {
+            margin-top: 2rem;
+        }
+
+        .logs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .logs-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .logs-container {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+
+        .log-entry {
+            background: var(--card);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border: 1px solid var(--border);
+        }
+
+        .log-entry:last-child {
+            margin-bottom: 0;
+        }
+
+        .log-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .log-time {
+            color: var(--text-light);
+            font-size: 0.75rem;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .log-ip {
+            color: var(--primary);
+            font-size: 0.75rem;
+            font-family: 'Fira Code', monospace;
+            background: var(--surface);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .log-method {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .log-method.get {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .log-method.post {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .log-method.delete {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .log-status {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .log-status.status-200,
+        .log-status.status-201 {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .log-status.status-400,
+        .log-status.status-401,
+        .log-status.status-404 {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .log-status.status-500 {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .log-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .log-endpoint {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.875rem;
+            color: var(--text);
+        }
+
+        .log-url {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            word-break: break-all;
+        }
+
+        .log-ua {
+            font-size: 0.7rem;
+            color: var(--text-lighter);
+            font-style: italic;
+        }
+
+        .log-error {
+            font-size: 0.75rem;
+            color: var(--error);
+            background: #fee2e2;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            margin-top: 0.25rem;
+        }
+
+        .log-response {
+            font-size: 0.75rem;
+            color: var(--success);
+            background: #dcfce7;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+            width: fit-content;
+        }
+
+        .no-logs {
+            text-align: center;
+            color: var(--text-light);
+            padding: 2rem;
+            font-style: italic;
+        }
+
+        /* Responsive Design for Mobile */
+        @media (max-width: 768px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                text-align: center;
+            }
+            
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+            
+            .header-content {
+                flex-wrap: wrap;
+            }
+            
+            .nav {
+                display: none;
+                width: 100%;
+                margin-top: 1rem;
+            }
+            
+            .nav.active {
+                display: block;
+            }
+            
+            .nav ul {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .mobile-menu {
+                display: block;
+            }
+            
+            .param-row {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            
+            .param-row.header {
+                display: none;
+            }
+            
+            .password-input-group {
+                flex-direction: column;
+            }
+            
+            .logs-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .log-header {
+                gap: 0.5rem;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .hero-text h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .endpoint-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .endpoint-path {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-code"></i>
+                    <div>
+                        <h1>HXS API</h1>
+                        <span>by Hans Dan Stret</span>
+                    </div>
+                </div>
+                
+                <div class="header-actions">
+                    <button class="theme-toggle" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                        <i class="fas fa-sun"></i>
+                    </button>
+                    
+                    <button class="mobile-menu" id="mobileMenu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+
+                <nav class="nav" id="nav">
+                    <ul>
+                        <li><a href="#home" class="nav-link">Home</a></li>
+                        <li><a href="#endpoints" class="nav-link">Endpoints</a></li>
+                        <li><a href="#examples" class="nav-link">Examples</a></li>
+                        <li><a href="#status" class="nav-link">Status</a></li>
+                        <li><a href="#logs" class="nav-link">Developer Logs</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>HXS API Documentation</h1>
+                    <p class="hero-subtitle">Powerful website screenshot API with real-time monitoring and Telegram logging</p>
+                    <div class="hero-buttons">
+                        <a href="#endpoints" class="btn btn-primary">
+                            <i class="fas fa-rocket"></i>
+                            Get Started
+                        </a>
+                        <a href="#status" class="btn btn-secondary">
+                            <i class="fas fa-chart-bar"></i>
+                            View Status
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="code-window">
+                        <div class="window-header">
+                            <div class="window-controls">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                            <span class="window-title">api.js</span>
+                        </div>
+                        <div class="code-content">
+                            <pre><code>// Capture website screenshot
+const screenshot = await fetch(
+  '/api/ssweb?url=https://example.com'
+);
+
+// Use the image directly
+const img = document.createElement('img');
+img.src = URL.createObjectURL(
+  await screenshot.blob()
+);</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Stats -->
+    <section class="quick-stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="responseTime">240ms</h3>
+                        <p>Avg Response</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="uptime">99.8%</h3>
+                        <p>Uptime</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="requestsToday">1,243</h3>
+                        <p>Today's Requests</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>24/7</h3>
+                        <p>Monitoring</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Endpoints Section -->
+    <section id="endpoints" class="endpoints">
+        <div class="container">
+            <div class="section-header">
+                <h2>API Endpoints</h2>
+                <p>Complete documentation for all available endpoints</p>
+            </div>
+
+            <!-- SSWeb Endpoint -->
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <div class="method-badge get">GET</div>
+                    <div class="endpoint-path">/api/ssweb</div>
+                    <div class="endpoint-status public">Public</div>
+                </div>
+                
+                <div class="endpoint-description">
+                    <p>Capture screenshots of any website and receive the image directly.</p>
+                </div>
+
+                <div class="endpoint-parameters">
+                    <h4>Parameters</h4>
+                    <div class="parameters-table">
+                        <div class="param-row header">
+                            <div class="param-name">Name</div>
+                            <div class="param-type">Type</div>
+                            <div class="param-required">Required</div>
+                            <div class="param-desc">Description</div>
+                        </div>
+                        <div class="param-row">
+                            <div class="param-name">url</div>
+                            <div class="param-type">String</div>
+                            <div class="param-required">Yes</div>
+                            <div class="param-desc">Website URL to capture (include http:// or https://)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint-example">
+                    <h4>Example Request</h4>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode('ssweb-request')">
+                            <i class="far fa-copy"></i>
+                        </button>
+                        <pre id="ssweb-request"><code>fetch('https://your-api.vercel.app/api/ssweb?url=https://google.com')
+  .then(response => response.blob())
+  .then(blob => {
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(blob);
+    document.body.appendChild(img);
+  });</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint-actions">
+                    <button class="btn btn-primary" onclick="testEndpoint('ssweb')">
+                        <i class="fas fa-play"></i>
+                        Test Endpoint
+                    </button>
+                </div>
+            </div>
+
+            <!-- Health Endpoint -->
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <div class="method-badge get">GET</div>
+                    <div class="endpoint-path">/api/health</div>
+                    <div class="endpoint-status public">Public</div>
+                </div>
+                
+                <div class="endpoint-description">
+                    <p>Check API health status and server information.</p>
+                </div>
+
+                <div class="endpoint-example">
+                    <h4>Example Response</h4>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode('health-response')">
+                            <i class="far fa-copy"></i>
+                        </button>
+                        <pre id="health-response"><code>{
+  "success": true,
+  "message": "API berjalan dengan baik",
+  "timestamp": "2023-11-15T10:30:00.000Z",
+  "version": "1.0.0"
+}</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint-actions">
+                    <button class="btn btn-primary" onclick="testEndpoint('health')">
+                        <i class="fas fa-play"></i>
+                        Test Endpoint
+                    </button>
+                </div>
+            </div>
+
+            <!-- Developer Logs Endpoint -->
+            <div class="endpoint-card">
+                <div class="endpoint-header">
+                    <div class="method-badge post">POST</div>
+                    <div class="endpoint-path">/api/developer/logs</div>
+                    <div class="endpoint-status protected">Protected</div>
+                </div>
+                
+                <div class="endpoint-description">
+                    <p>Access detailed API logs and monitoring data. Requires authentication.</p>
+                </div>
+
+                <div class="endpoint-parameters">
+                    <h4>Parameters</h4>
+                    <div class="parameters-table">
+                        <div class="param-row header">
+                            <div class="param-name">Name</div>
+                            <div class="param-type">Type</div>
+                            <div class="param-required">Required</div>
+                            <div class="param-desc">Description</div>
+                        </div>
+                        <div class="param-row">
+                            <div class="param-name">password</div>
+                            <div class="param-type">String</div>
+                            <div class="param-required">Yes</div>
+                            <div class="param-desc">Developer password for authentication</div>
+                        </div>
+                        <div class="param-row">
+                            <div class="param-name">limit</div>
+                            <div class="param-type">Number</div>
+                            <div class="param-required">No</div>
+                            <div class="param-desc">Number of log entries to return (default: 50)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="endpoint-example">
+                    <h4>Example Request</h4>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode('logs-request')">
+                            <i class="far fa-copy"></i>
+                        </button>
+                        <pre id="logs-request"><code>fetch('/api/developer/logs', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    password: 'your_password',
+    limit: 100
+  })
+})
+.then(response => response.json())
+.then(data => console.log(data));</code></pre>
+                    </div>
+                </div>
+
+                <div class="endpoint-actions">
+                    <button class="btn btn-primary" onclick="openDeveloperConsole()">
+                        <i class="fas fa-terminal"></i>
+                        Access Logs
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Examples Section -->
+    <section id="examples" class="examples">
+        <div class="container">
+            <div class="section-header">
+                <h2>Usage Examples</h2>
+                <p>Practical examples for integrating HXS API into your projects</p>
+            </div>
+
+            <div class="examples-grid">
+                <div class="example-card">
+                    <div class="example-icon">
+                        <i class="fab fa-js"></i>
+                    </div>
+                    <h3>JavaScript</h3>
+                    <div class="code-block small">
+                        <pre><code>// Basic usage
+const imgUrl = 
+  '/api/ssweb?url='
+  + encodeURIComponent(url);
+
+document.getElementById('screenshot')
+  .src = imgUrl;</code></pre>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div class="example-icon">
+                        <i class="fab fa-html5"></i>
+                    </div>
+                    <h3>HTML Direct</h3>
+                    <div class="code-block small">
+                        <pre><code>&lt;img src="/api/ssweb?url=https://example.com" 
+     alt="Website Screenshot"
+     onerror="this.style.display='none'"&gt;</code></pre>
+                    </div>
+                </div>
+
+                <div class="example-card">
+                    <div class="example-icon">
+                        <i class="fab fa-react"></i>
+                    </div>
+                    <h3>React Component</h3>
+                    <div class="code-block small">
+                        <pre><code>function Screenshot({ url }) {
+  const [src, setSrc] = useState('');
+  
+  useEffect(() => {
+    setSrc(`/api/ssweb?url=${
+      encodeURIComponent(url)
+    }`);
+  }, [url]);
+
+  return &lt;img src={src} /&gt;;
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Status Section -->
+    <section id="status" class="status">
+        <div class="container">
+            <div class="section-header">
+                <h2>API Status</h2>
+                <p>Real-time monitoring of API services and performance</p>
+            </div>
+
+            <div class="status-grid">
+                <div class="status-card">
+                    <div class="status-header">
+                        <div class="status-icon online">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <div class="status-info">
+                            <h3>SSWeb API</h3>
+                            <div class="status-badge online">Online</div>
+                        </div>
+                    </div>
+                    <div class="status-details">
+                        <div class="status-metric">
+                            <span class="metric-label">Response Time</span>
+                            <span class="metric-value" id="ssweb-response">240ms</span>
+                        </div>
+                        <div class="status-metric">
+                            <span class="metric-label">Uptime</span>
+                            <span class="metric-value" id="ssweb-uptime">99.8%</span>
+                        </div>
+                        <div class="status-metric">
+                            <span class="metric-label">Requests Today</span>
+                            <span class="metric-value" id="ssweb-requests">1,243</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <div class="status-header">
+                        <div class="status-icon online">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="status-info">
+                            <h3>Auth API</h3>
+                            <div class="status-badge online">Online</div>
+                        </div>
+                    </div>
+                    <div class="status-details">
+                        <div class="status-metric">
+                            <span class="metric-label">Response Time</span>
+                            <span class="metric-value" id="auth-response">180ms</span>
+                        </div>
+                        <div class="status-metric">
+                            <span class="metric-label">Uptime</span>
+                            <span class="metric-value" id="auth-uptime">99.9%</span>
+                        </div>
+                        <div class="status-metric">
+                            <span class="metric-label">Active Users</span>
+                            <span class="metric-value" id="auth-users">856</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Developer Console Modal -->
+    <div class="modal" id="developerConsole">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-terminal"></i> Developer Console</h3>
+                <button class="close-modal" onclick="closeDeveloperConsole()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="password-section">
+                    <p>Enter developer password to access real-time API logs:</p>
+                    <div class="password-input-group">
+                        <input type="password" 
+                               class="password-input" 
+                               id="devPassword" 
+                               placeholder="Enter password...">
+                        <button class="btn btn-primary" onclick="accessRealLogs()">
+                            <i class="fas fa-unlock"></i>
+                            Access Logs
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="logs-section" id="logsSection" style="display: none;">
+                    <div class="logs-header">
+                        <h4>Real-time API Logs</h4>
+                        <div class="logs-actions">
+                            <button class="btn btn-small" onclick="refreshLogs()">
+                                <i class="fas fa-sync-alt"></i>
+                                Refresh
+                            </button>
+                            <button class="btn btn-small btn-danger" onclick="clearLogs()">
+                                <i class="fas fa-trash"></i>
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                    <div class="logs-container" id="logsContainer">
+                        <!-- Logs will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">
+                        <i class="fas fa-code"></i>
+                        <div>
+                            <h3>HXS API</h3>
+                            <span>by Hans Dan Stret</span>
+                        </div>
+                    </div>
+                    <p>Powerful API services for developers worldwide.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#endpoints">Documentation</a></li>
+                        <li><a href="#examples">Examples</a></li>
+                        <li><a href="#status">Status</a></li>
+                        <li><a href="#" onclick="openDeveloperConsole()">Developer Logs</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="#">GitHub</a></li>
+                        <li><a href="#">Telegram</a></li>
+                        <li><a href="#">Report Issue</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2023 HXS API. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Configuration
+        const API_BASE_URL = window.location.origin; // Auto detect current domain
+
+        // Theme Management
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeToggle(savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeToggle(newTheme);
+        }
+
+        function updateThemeToggle(theme) {
+            const toggle = document.getElementById('themeToggle');
+            if (theme === 'dark') {
+                toggle.querySelector('.fa-moon').style.opacity = '0';
+                toggle.querySelector('.fa-sun').style.opacity = '1';
+            } else {
+                toggle.querySelector('.fa-moon').style.opacity = '1';
+                toggle.querySelector('.fa-sun').style.opacity = '0';
+            }
+        }
+
+        // Mobile Menu
+        function initMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const nav = document.getElementById('nav');
+            
+            mobileMenu.addEventListener('click', () => {
+                nav.classList.toggle('active');
+            });
+            
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    nav.classList.remove('active');
+                });
+            });
+        }
+
+        // Real-time Status Monitoring
+        async function fetchRealTimeStatus() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/status`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateStatusDisplay(data.data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch status:', error);
+                setOfflineStatus();
+            }
+        }
+
+        function updateStatusDisplay(statusData) {
+            // Update SSWeb API status
+            if (statusData.ssweb) {
+                document.getElementById('ssweb-response').textContent = `${statusData.ssweb.responseTime}ms`;
+                document.getElementById('ssweb-uptime').textContent = `${statusData.ssweb.uptime}%`;
+                document.getElementById('ssweb-requests').textContent = statusData.ssweb.requestsToday.toLocaleString();
+                updateStatusCard('ssweb', statusData.ssweb.status);
+            }
+            
+            // Update Auth API status
+            if (statusData.auth) {
+                document.getElementById('auth-response').textContent = `${statusData.auth.responseTime}ms`;
+                document.getElementById('auth-uptime').textContent = `${statusData.auth.uptime}%`;
+                document.getElementById('auth-users').textContent = statusData.auth.activeUsers.toLocaleString();
+                updateStatusCard('auth', statusData.auth.status);
+            }
+            
+            // Update quick stats
+            updateQuickStats(statusData);
+        }
+
+        function updateStatusCard(api, status) {
+            const cards = document.querySelectorAll('.status-card');
+            cards.forEach(card => {
+                if (card.querySelector('h3').textContent.includes(api.toUpperCase())) {
+                    const badge = card.querySelector('.status-badge');
+                    const icon = card.querySelector('.status-icon');
+                    
+                    badge.className = 'status-badge';
+                    icon.className = 'status-icon';
+                    
+                    badge.classList.add(status);
+                    badge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+                    
+                    icon.classList.add(status);
+                }
+            });
+        }
+
+        function updateQuickStats(statusData) {
+            if (statusData.ssweb && statusData.auth) {
+                const avgResponse = Math.round(
+                    (statusData.ssweb.responseTime + statusData.auth.responseTime) / 2
+                );
+                document.getElementById('responseTime').textContent = `${avgResponse}ms`;
+                
+                const minUptime = Math.min(statusData.ssweb.uptime, statusData.auth.uptime);
+                document.getElementById('uptime').textContent = `${minUptime}%`;
+                
+                document.getElementById('requestsToday').textContent = 
+                    statusData.ssweb.requestsToday.toLocaleString();
+            }
+        }
+
+        function setOfflineStatus() {
+            document.querySelectorAll('.status-badge').forEach(badge => {
+                badge.className = 'status-badge offline';
+                badge.textContent = 'Offline';
+            });
+            
+            document.querySelectorAll('.status-icon').forEach(icon => {
+                icon.className = 'status-icon offline';
+            });
+        }
+
+        // Real API Testing
+        async function testEndpoint(endpoint) {
+            switch(endpoint) {
+                case 'ssweb':
+                    await testSSWebEndpoint();
+                    break;
+                case 'health':
+                    await testHealthEndpoint();
+                    break;
+                default:
+                    console.warn('Unknown endpoint:', endpoint);
+            }
+        }
+
+        async function testSSWebEndpoint() {
+            const url = prompt('Enter website URL to capture:', 'https://google.com');
+            if (!url) return;
+            
+            try {
+                Swal.fire({
+                    title: 'Taking Screenshot...',
+                    text: 'Please wait while we capture the website',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+                
+                const response = await fetch(`${API_BASE_URL}/api/ssweb?url=${encodeURIComponent(url)}`);
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const imgUrl = URL.createObjectURL(blob);
+                    
+                    Swal.fire({
+                        title: 'Screenshot Captured!',
+                        html: `
+                            <p>Successfully captured screenshot of:</p>
+                            <p><strong>${url}</strong></p>
+                            <img src="${imgUrl}" alt="Screenshot" style="max-width: 100%; margin: 15px 0; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        `,
+                        confirmButtonText: 'Close'
+                    });
+                } else {
+                    const error = await response.json();
+                    Swal.fire('Error!', error.message || 'Failed to capture screenshot', 'error');
+                }
+            } catch (error) {
+                Swal.fire('Error!', 'Failed to capture screenshot: ' + error.message, 'error');
+            }
+        }
+
+        async function testHealthEndpoint() {
+            try {
+                Swal.fire({
+                    title: 'Checking API Health...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+                
+                const startTime = Date.now();
+                const response = await fetch(`${API_BASE_URL}/api/health`);
+                const responseTime = Date.now() - startTime;
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    Swal.fire({
+                        title: 'API Health Status',
+                        html: `
+                            <div style="text-align: left;">
+                                <p><strong>Status:</strong> <span style="color: #10b981;">✓ Healthy</span></p>
+                                <p><strong>Response Time:</strong> ${responseTime}ms</p>
+                                <p><strong>Message:</strong> ${data.message}</p>
+                                <p><strong>Version:</strong> ${data.version}</p>
+                                <p><strong>Timestamp:</strong> ${new Date(data.timestamp).toLocaleString()}</p>
+                            </div>
+                        `,
+                        icon: 'success'
+                    });
+                } else {
+                    Swal.fire('Error!', 'API health check failed', 'error');
+                }
+            } catch (error) {
+                Swal.fire('Error!', 'Failed to check API health: ' + error.message, 'error');
+            }
+        }
+
+        // Developer Console Functions
+        function openDeveloperConsole() {
+            document.getElementById('developerConsole').style.display = 'block';
+            document.getElementById('logsSection').style.display = 'none';
+            document.getElementById('devPassword').value = '';
+        }
+
+        function closeDeveloperConsole() {
+            document.getElementById('developerConsole').style.display = 'none';
+        }
+
+        async function accessRealLogs() {
+            const password = document.getElementById('devPassword').value;
+            
+            if (!password) {
+                Swal.fire('Error!', 'Please enter password', 'error');
+                return;
+            }
+            
+            try {
+                Swal.fire({
+                    title: 'Accessing Logs...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+                
+                const response = await fetch(`${API_BASE_URL}/api/developer/logs`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: password, limit: 100 })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    Swal.close();
+                    document.getElementById('logsSection').style.display = 'block';
+                    displayLogs(data.logs);
+                    
+                    Swal.fire('Success!', `Loaded ${data.logs.length} log entries`, 'success');
+                } else {
+                    const error = await response.json();
+                    Swal.fire('Error!', error.message || 'Failed to access logs', 'error');
+                }
+            } catch (error) {
+                Swal.fire('Error!', 'Failed to access logs: ' + error.message, 'error');
+            }
+        }
+
+        function displayLogs(logs) {
+            const container = document.getElementById('logsContainer');
+            
+            if (!logs || logs.length === 0) {
+                container.innerHTML = '<div class="no-logs">No logs available</div>';
+                return;
+            }
+            
+            const logsHTML = logs.map(log => `
+                <div class="log-entry">
+                    <div class="log-header">
+                        <span class="log-time">${new Date(log.timestamp).toLocaleString()}</span>
+                        <span class="log-ip">${log.ip}</span>
+                        <span class="log-method ${log.method.toLowerCase()}">${log.method}</span>
+                        <span class="log-status status-${log.status}">${log.status}</span>
+                    </div>
+                    <div class="log-details">
+                        <span class="log-endpoint">${log.endpoint}</span>
+                        ${log.url ? `<span class="log-url">${log.url}</span>` : ''}
+                        ${log.userAgent ? `<span class="log-ua">${log.userAgent}</span>` : ''}
+                        ${log.error ? `<span class="log-error">Error: ${log.error}</span>` : ''}
+                        ${log.responseTime ? `<span class="log-response">${log.responseTime}ms</span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = logsHTML;
+        }
+
+        async function refreshLogs() {
+            const password = document.getElementById('devPassword').value;
+            if (!password) {
+                Swal.fire('Error!', 'Please enter password first', 'error');
+                return;
+            }
+            await accessRealLogs();
+        }
+
+        async function clearLogs() {
+            const password = document.getElementById('devPassword').value;
+            
+            if (!password) {
+                Swal.fire('Error!', 'Please enter password first', 'error');
+                return;
+            }
+            
+            try {
+                const result = await Swal.fire({
+                    title: 'Clear Logs?',
+                    text: 'This will permanently delete all log entries',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, clear all!',
+                    cancelButtonText: 'Cancel'
+                });
+                
+                if (result.isConfirmed) {
+                    const response = await fetch(`${API_BASE_URL}/api/developer/logs`, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ password: password })
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        document.getElementById('logsContainer').innerHTML = '<div class="no-logs">No logs available</div>';
+                        Swal.fire('Success!', data.message, 'success');
+                    } else {
+                        Swal.fire('Error!', 'Failed to clear logs', 'error');
+                    }
+                }
+            } catch (error) {
+                Swal.fire('Error!', 'Failed to clear logs: ' + error.message, 'error');
+            }
+        }
+
+        // Copy Code Function
+        function copyCode(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent || element.innerText;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const button = element.parentElement.querySelector('.copy-btn');
+                const originalIcon = button.innerHTML;
+                
+                button.innerHTML = '<i class="fas fa-check"></i>';
+                button.style.background = 'var(--success)';
+                button.style.color = 'white';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalIcon;
+                    button.style.background = '';
+                    button.style.color = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+
+        // Smooth Scrolling
+        function initSmoothScroll() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+        }
+
+        // Auto-refresh status
+        function startAutoRefresh() {
+            fetchRealTimeStatus();
+            setInterval(fetchRealTimeStatus, 30000);
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', function() {
+            initTheme();
+            initMobileMenu();
+            initSmoothScroll();
+            startAutoRefresh();
+            
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+        });
+
+        // Export functions for global access
+        window.toggleTheme = toggleTheme;
+        window.testEndpoint = testEndpoint;
+        window.openDeveloperConsole = openDeveloperConsole;
+        window.closeDeveloperConsole = closeDeveloperConsole;
+        window.accessRealLogs = accessRealLogs;
+        window.refreshLogs = refreshLogs;
+        window.clearLogs = clearLogs;
+        window.copyCode = copyCode;
+    </script>
+</body>
+</html>
