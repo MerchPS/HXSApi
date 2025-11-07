@@ -3,20 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HXSApi - Premium API Downloader</title>
+    <title>HXS API - Developed by Hans Dan Stret</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
-            --primary-dark: #0a192f;
-            --primary-blue: #112240;
-            --accent-blue: #64ffda;
-            --accent-light-blue: #8892b0;
-            --text-light: #ccd6f6;
-            --text-white: #e6f1ff;
-            --gradient-dark: linear-gradient(135deg, #0a192f 0%, #112240 100%);
-            --gradient-ocean: linear-gradient(135deg, #112240 0%, #1e3a5f 100%);
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            --card-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            --primary: #1a73e8;
+            --primary-dark: #0d47a1;
+            --secondary: #00bcd4;
+            --accent: #4fc3f7;
+            --light: #e3f2fd;
+            --dark: #0a3d62;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --text: #333;
+            --text-light: #666;
+            --white: #ffffff;
+            --gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            --gradient-dark: linear-gradient(135deg, var(--primary-dark) 0%, var(--dark) 100%);
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
         }
 
         * {
@@ -27,1267 +34,850 @@
         }
 
         body {
-            background: var(--gradient-dark);
-            color: var(--text-light);
-            min-height: 100vh;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            color: var(--text);
+            line-height: 1.6;
             overflow-x: hidden;
         }
 
-        /* Loading Screen */
-        .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .container {
             width: 100%;
-            height: 100%;
-            background: var(--gradient-dark);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-        }
-
-        .loading-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .loading-logo {
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .loading-logo h1 {
-            font-size: 3rem;
-            background: linear-gradient(90deg, var(--accent-blue), var(--text-white));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 10px;
-            letter-spacing: 3px;
-        }
-
-        .loading-logo p {
-            color: var(--accent-light-blue);
-            font-size: 1.2rem;
-            letter-spacing: 2px;
-        }
-
-        .loading-bar {
-            width: 300px;
-            height: 4px;
-            background: rgba(100, 255, 218, 0.2);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 20px;
-        }
-
-        .loading-progress {
-            height: 100%;
-            width: 0%;
-            background: var(--accent-blue);
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-
-        .loading-dots {
-            display: flex;
-            margin-top: 20px;
-        }
-
-        .loading-dots span {
-            width: 10px;
-            height: 10px;
-            background: var(--accent-blue);
-            border-radius: 50%;
-            margin: 0 5px;
-            animation: loadingDots 1.5s infinite ease-in-out;
-        }
-
-        .loading-dots span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .loading-dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes loadingDots {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.7; }
-        }
-
-        /* Login & Register Styles */
-        .auth-container {
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .auth-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%2364ffda" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,208C1248,224,1344,192,1392,176L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
-            background-size: cover;
-            background-position: bottom;
-            opacity: 0.5;
-            z-index: -1;
-        }
-
-        .auth-box {
-            width: 100%;
-            max-width: 420px;
-            background: var(--gradient-ocean);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 0.8s ease forwards;
-        }
-
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .auth-header {
-            padding: 30px;
-            text-align: center;
-            background: rgba(10, 25, 47, 0.5);
-        }
-
-        .auth-logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 15px;
-        }
-
-        .auth-logo h1 {
-            font-size: 2.2rem;
-            background: linear-gradient(90deg, var(--accent-blue), var(--text-white));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-left: 10px;
-            letter-spacing: 1px;
-        }
-
-        .auth-header p {
-            color: var(--accent-light-blue);
-        }
-
-        .auth-body {
-            padding: 30px;
-        }
-
-        .auth-title {
-            font-size: 1.5rem;
-            margin-bottom: 5px;
-            color: var(--text-white);
-        }
-
-        .auth-subtitle {
-            color: var(--accent-light-blue);
-            margin-bottom: 25px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-light);
-            font-weight: 500;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            background: rgba(17, 34, 64, 0.7);
-            border: 1px solid rgba(100, 255, 218, 0.2);
-            border-radius: 8px;
-            color: var(--text-white);
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-control:focus {
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 0 2px rgba(100, 255, 218, 0.2);
-            outline: none;
-        }
-
-        .form-control::placeholder {
-            color: var(--accent-light-blue);
-        }
-
-        .toggle-password {
-            position: absolute;
-            right: 15px;
-            top: 40px;
-            color: var(--accent-light-blue);
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .toggle-password:hover {
-            color: var(--accent-blue);
-        }
-
-        .btn {
-            padding: 12px 30px;
-            border: none;
-            border-radius: 30px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            outline: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-primary {
-            background: var(--accent-blue);
-            color: var(--primary-dark);
-            width: 100%;
-            padding: 14px;
-            font-size: 1rem;
-            font-weight: 600;
-            margin-top: 10px;
-        }
-
-        .btn-primary:hover {
-            background: #52e0c4;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.4);
-        }
-
-        .btn-primary:disabled {
-            background: var(--accent-light-blue);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .auth-footer {
-            margin-top: 20px;
-            text-align: center;
-            color: var(--accent-light-blue);
-        }
-
-        .auth-footer a {
-            color: var(--accent-blue);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .auth-footer a:hover {
-            color: var(--text-white);
-            text-decoration: underline;
-        }
-
-        .message {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-            display: none;
-        }
-
-        .message.success {
-            background: rgba(100, 255, 218, 0.1);
-            border: 1px solid var(--accent-blue);
-            color: var(--accent-blue);
-        }
-
-        .message.error {
-            background: rgba(255, 100, 100, 0.1);
-            border: 1px solid #ff6464;
-            color: #ff6464;
-        }
-
-        .form-page {
-            display: none;
-            animation: fadeIn 0.5s ease forwards;
-        }
-
-        .form-page.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateX(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        /* Dashboard Styles */
-        .dashboard {
-            display: none;
-            min-height: 100vh;
-        }
-
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 40px;
-            background: var(--gradient-ocean);
-            box-shadow: var(--shadow);
-        }
-
-        .dashboard-logo {
-            display: flex;
-            align-items: center;
-        }
-
-        .dashboard-logo h1 {
-            font-size: 1.8rem;
-            background: linear-gradient(90deg, var(--accent-blue), var(--text-white));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-left: 10px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-        }
-
-        .user-info span {
-            margin-right: 15px;
-            color: var(--accent-light-blue);
-        }
-
-        .btn-logout {
-            background: transparent;
-            border: 1px solid var(--accent-blue);
-            color: var(--accent-blue);
-            padding: 8px 20px;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-logout:hover {
-            background: rgba(100, 255, 218, 0.1);
-        }
-
-        .dashboard-container {
             max-width: 1200px;
-            margin: 40px auto;
+            margin: 0 auto;
             padding: 0 20px;
         }
 
-        .welcome-section {
+        /* Header Styles */
+        header {
+            background: var(--gradient-dark);
+            color: var(--white);
+            padding: 20px 0;
+            box-shadow: var(--shadow);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        header.scrolled {
+            padding: 10px 0;
+            background: var(--gradient);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 28px;
+            color: var(--accent);
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .logo span {
+            font-weight: 300;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+
+        nav a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 5px 0;
+        }
+
+        nav a:hover {
+            color: var(--accent);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .mobile-menu {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 180px 0 100px;
             text-align: center;
-            margin-bottom: 50px;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 1s ease forwards;
-        }
-
-        .welcome-section h2 {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: var(--text-white);
-        }
-
-        .welcome-section p {
-            color: var(--accent-light-blue);
-            font-size: 1.1rem;
-            max-width: 600px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
-        }
-
-        .service-card {
-            background: var(--gradient-ocean);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: var(--card-shadow);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 1s ease forwards;
+            background: var(--gradient);
+            color: var(--white);
+            margin-top: 70px;
+            border-radius: 0 0 30px 30px;
             position: relative;
             overflow: hidden;
         }
 
-        .service-card::before {
+        .hero::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 4px;
-            background: var(--accent-blue);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.3s ease;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,197.3C1248,203,1344,149,1392,122.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+            background-size: cover;
+            background-position: bottom;
         }
 
-        .service-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
-        .service-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .service-card:nth-child(1) { animation-delay: 0.2s; }
-        .service-card:nth-child(2) { animation-delay: 0.4s; }
-        .service-card:nth-child(3) { animation-delay: 0.6s; }
-        .service-card:nth-child(4) { animation-delay: 0.8s; }
-        .service-card:nth-child(5) { animation-delay: 1s; }
-        .service-card:nth-child(6) { animation-delay: 1.2s; }
-
-        .service-icon {
-            font-size: 2.5rem;
-            color: var(--accent-blue);
+        .hero h2 {
+            font-size: 48px;
             margin-bottom: 20px;
+            font-weight: 800;
         }
 
-        .service-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            color: var(--text-white);
+        .hero p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            opacity: 0.9;
         }
 
-        .service-card p {
-            color: var(--accent-light-blue);
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .service-features {
-            list-style: none;
-            margin-bottom: 25px;
-        }
-
-        .service-features li {
-            color: var(--accent-light-blue);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-        }
-
-        .service-features li i {
-            color: var(--accent-blue);
-            margin-right: 10px;
-            font-size: 0.8rem;
-        }
-
-        .btn-service {
-            background: transparent;
-            border: 1px solid var(--accent-blue);
-            color: var(--accent-blue);
-            padding: 10px 20px;
-            border-radius: 30px;
-            font-size: 0.9rem;
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: var(--accent);
+            color: var(--dark);
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
             cursor: pointer;
             transition: all 0.3s ease;
-            width: 100%;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .btn-service:hover {
-            background: rgba(100, 255, 218, 0.1);
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+            background: var(--white);
         }
 
-        /* Ocean animation */
-        .ocean {
-            position: fixed;
-            bottom: 0;
+        /* API Status Section */
+        .api-status {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title h2 {
+            font-size: 36px;
+            color: var(--dark);
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--gradient);
+            border-radius: 2px;
+        }
+
+        .section-title p {
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .status-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .status-card {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
             left: 0;
             width: 100%;
-            height: 100px;
-            overflow: hidden;
-            z-index: -1;
+            height: 5px;
+            background: var(--gradient);
         }
 
-        .wave {
+        .status-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .status-icon {
+            font-size: 40px;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .status-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .status-card p {
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+        }
+
+        .status-online {
+            background: rgba(76, 175, 80, 0.15);
+            color: var(--success);
+        }
+
+        .status-offline {
+            background: rgba(244, 67, 54, 0.15);
+            color: var(--danger);
+        }
+
+        .indicator-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .online-dot {
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        .offline-dot {
+            background: var(--danger);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* API Documentation */
+        .api-docs {
+            padding: 80px 0;
+            background: var(--white);
+            border-radius: 30px 30px 0 0;
+        }
+
+        .docs-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .endpoint-card {
+            background: var(--light);
+            border-radius: var(--radius);
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .endpoint-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .method {
+            padding: 6px 15px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .method.get {
+            background: rgba(26, 115, 232, 0.15);
+            color: var(--primary);
+        }
+
+        .endpoint-url {
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 8px 15px;
+            border-radius: 6px;
+            flex-grow: 1;
+            font-size: 16px;
+        }
+
+        .endpoint-description {
+            margin-bottom: 20px;
+            color: var(--text-light);
+        }
+
+        .params-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .params-table th, .params-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .params-table th {
+            background: rgba(0, 0, 0, 0.03);
+            font-weight: 600;
+        }
+
+        .code-example {
+            background: var(--dark);
+            color: var(--white);
+            padding: 20px;
+            border-radius: var(--radius);
+            font-family: monospace;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        .try-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .try-button:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--gradient-dark);
+            color: var(--white);
+            padding: 60px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-column h3::after {
+            content: '';
             position: absolute;
             bottom: 0;
             left: 0;
-            width: 200%;
-            height: 100%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%2364ffda" fill-opacity="0.2" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,208C1248,224,1344,192,1392,176L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
-            background-size: 50% 100%;
-            animation: wave 15s linear infinite;
+            width: 40px;
+            height: 3px;
+            background: var(--accent);
         }
 
-        .wave:nth-child(2) {
-            animation: wave 12s linear infinite;
-            opacity: 0.5;
+        .footer-column p {
+            margin-bottom: 15px;
+            opacity: 0.8;
         }
 
-        @keyframes wave {
-            0% {
-                transform: translateX(0);
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: var(--accent);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.7;
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero h2 {
+                font-size: 36px;
             }
-            50% {
-                transform: translateX(-25%);
+            
+            .hero p {
+                font-size: 18px;
             }
-            100% {
-                transform: translateX(-50%);
+            
+            nav ul {
+                gap: 15px;
             }
         }
 
-        /* Responsive Styles */
         @media (max-width: 768px) {
-            .dashboard-header {
-                padding: 15px 20px;
+            .mobile-menu {
+                display: block;
+            }
+            
+            nav {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background: var(--gradient);
+                padding: 20px;
+                transform: translateY(-100%);
+                opacity: 0;
+                transition: all 0.3s ease;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            }
+            
+            nav.active {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            
+            nav ul {
                 flex-direction: column;
-                text-align: center;
+                gap: 15px;
             }
             
-            .user-info {
-                margin-top: 15px;
+            .hero {
+                padding: 150px 0 80px;
             }
             
-            .welcome-section h2 {
-                font-size: 2rem;
-            }
-            
-            .services-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .auth-box {
-                max-width: 100%;
-            }
-            
-            .loading-logo h1 {
-                font-size: 2.5rem;
+            .hero h2 {
+                font-size: 32px;
             }
         }
 
-        @media (max-width: 480px) {
-            .dashboard-container {
-                padding: 0 15px;
+        @media (max-width: 576px) {
+            .hero h2 {
+                font-size: 28px;
             }
             
-            .service-card {
-                padding: 20px;
+            .hero p {
+                font-size: 16px;
             }
             
-            .welcome-section h2 {
-                font-size: 1.8rem;
+            .section-title h2 {
+                font-size: 28px;
             }
             
-            .auth-body {
+            .status-card, .endpoint-card {
                 padding: 20px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div class="loading-screen" id="loadingScreen">
-        <div class="loading-logo">
-            <h1>HXSApi</h1>
-            <p>Premium API Downloader</p>
-        </div>
-        <div class="loading-bar">
-            <div class="loading-progress" id="loadingProgress"></div>
-        </div>
-        <div class="loading-dots">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    </div>
-
-    <!-- Auth Section (Login & Register) -->
-    <div class="auth-container" id="authContainer">
-        <div class="auth-box">
-            <div class="auth-header">
-                <div class="auth-logo">
-                    <i class="fas fa-code fa-2x" style="color: #64ffda;"></i>
-                    <h1>HXSApi</h1>
-                </div>
-                <p>Premium API Downloader Services</p>
-            </div>
-            
-            <div class="auth-body">
-                <!-- Login Form -->
-                <div class="form-page active" id="login-page">
-                    <h2 class="auth-title">Selamat Datang Kembali</h2>
-                    <p class="auth-subtitle">Masuk ke akun HXSApi Anda</p>
-                    
-                    <div class="message" id="login-message"></div>
-                    
-                    <form id="login-form">
-                        <div class="form-group">
-                            <label for="login-email">Email</label>
-                            <input type="email" id="login-email" class="form-control" placeholder="nama@email.com" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="login-password">Kata Sandi</label>
-                            <input type="password" id="login-password" class="form-control" placeholder="Masukkan kata sandi" required>
-                            <span class="toggle-password" id="toggle-login-password">
-                                <i class="far fa-eye"></i>
-                            </span>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary" id="login-btn">
-                            <span id="login-text">Masuk</span>
-                            <span id="login-loading" style="display: none;">
-                                <i class="fas fa-spinner fa-spin"></i> Memproses...
-                            </span>
-                        </button>
-                    </form>
-                    
-                    <div class="auth-footer">
-                        <p>Belum punya akun? <a href="#" id="show-register">Daftar di sini</a></p>
+    <!-- Header -->
+    <header id="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-code"></i>
+                    <div>
+                        <h1>HXS API</h1>
+                        <span>by Hans Dan Stret</span>
                     </div>
+                </div>
+                <div class="mobile-menu" id="mobileMenu">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <nav id="nav">
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#status">Status</a></li>
+                        <li><a href="#docs">Documentation</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content fade-in">
+                <h2>HXS API Documentation</h2>
+                <p>Powerful and easy-to-use APIs for developers. Build amazing applications with our reliable services.</p>
+                <a href="#docs" class="btn">Get Started</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Status Section -->
+    <section class="api-status" id="status">
+        <div class="container">
+            <div class="section-title fade-in">
+                <h2>API Status</h2>
+                <p>Check the current status of all our API services</p>
+            </div>
+            <div class="status-cards">
+                <div class="status-card fade-in">
+                    <div class="status-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <h3>SSWeb API</h3>
+                    <p>Take screenshots of any website with our powerful screenshot API</p>
+                    <div class="status-indicator status-online">
+                        <div class="indicator-dot online-dot"></div>
+                        <span>Online</span>
+                    </div>
+                </div>
+                <div class="status-card fade-in">
+                    <div class="status-icon">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <h3>Image Processing API</h3>
+                    <p>Process and manipulate images with our advanced image API</p>
+                    <div class="status-indicator status-online">
+                        <div class="indicator-dot online-dot"></div>
+                        <span>Online</span>
+                    </div>
+                </div>
+                <div class="status-card fade-in">
+                    <div class="status-icon">
+                        <i class="fas fa-file-text"></i>
+                    </div>
+                    <h3>Document API</h3>
+                    <p>Convert and process documents with our document API</p>
+                    <div class="status-indicator status-offline">
+                        <div class="indicator-dot offline-dot"></div>
+                        <span>Maintenance</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Documentation -->
+    <section class="api-docs" id="docs">
+        <div class="container">
+            <div class="section-title fade-in">
+                <h2>API Documentation</h2>
+                <p>Complete documentation for all available endpoints</p>
+            </div>
+            <div class="docs-container">
+                <div class="endpoint-card fade-in">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <div class="endpoint-url">/api/ssweb?url={website_url}</div>
+                    </div>
+                    <div class="endpoint-description">
+                        <p>This endpoint captures a screenshot of the specified website and returns it as an image.</p>
+                    </div>
+                    <table class="params-table">
+                        <thead>
+                            <tr>
+                                <th>Parameter</th>
+                                <th>Type</th>
+                                <th>Required</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>url</td>
+                                <td>String</td>
+                                <td>Yes</td>
+                                <td>The URL of the website to capture (must include http:// or https://)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="code-example">
+                        // Example usage<br>
+                        fetch('https://generich.my.id/api/ssweb?url=https://google.com')<br>
+                        .then(response => response.blob())<br>
+                        .then(blob => {<br>
+                        &nbsp;&nbsp;const img = document.createElement('img');<br>
+                        &nbsp;&nbsp;img.src = URL.createObjectURL(blob);<br>
+                        &nbsp;&nbsp;document.body.appendChild(img);<br>
+                        });
+                    </div>
+                    <button class="try-button" onclick="testSSWebAPI()">
+                        <i class="fas fa-play-circle"></i> Try It Now
+                    </button>
                 </div>
                 
-                <!-- Register Form -->
-                <div class="form-page" id="register-page">
-                    <h2 class="auth-title">Buat Akun Baru</h2>
-                    <p class="auth-subtitle">Bergabung dengan HXSApi sekarang</p>
-                    
-                    <div class="message" id="register-message"></div>
-                    
-                    <form id="register-form">
-                        <div class="form-group">
-                            <label for="register-name">Nama Lengkap</label>
-                            <input type="text" id="register-name" class="form-control" placeholder="Nama lengkap Anda" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="register-email">Email</label>
-                            <input type="email" id="register-email" class="form-control" placeholder="nama@email.com" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="register-password">Kata Sandi</label>
-                            <input type="password" id="register-password" class="form-control" placeholder="Buat kata sandi yang kuat" required>
-                            <span class="toggle-password" id="toggle-register-password">
-                                <i class="far fa-eye"></i>
-                            </span>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="register-confirm-password">Konfirmasi Kata Sandi</label>
-                            <input type="password" id="register-confirm-password" class="form-control" placeholder="Ulangi kata sandi" required>
-                            <span class="toggle-password" id="toggle-register-confirm-password">
-                                <i class="far fa-eye"></i>
-                            </span>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary" id="register-btn">
-                            <span id="register-text">Daftar</span>
-                            <span id="register-loading" style="display: none;">
-                                <i class="fas fa-spinner fa-spin"></i> Memproses...
-                            </span>
-                        </button>
-                    </form>
-                    
-                    <div class="auth-footer">
-                        <p>Sudah punya akun? <a href="#" id="show-login">Masuk di sini</a></p>
+                <div class="endpoint-card fade-in">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <div class="endpoint-url">/api/health</div>
                     </div>
+                    <div class="endpoint-description">
+                        <p>Check the status and health of the API service.</p>
+                    </div>
+                    <div class="code-example">
+                        // Example response<br>
+                        {<br>
+                        &nbsp;&nbsp;"success": true,<br>
+                        &nbsp;&nbsp;"message": "API berjalan dengan baik",<br>
+                        &nbsp;&nbsp;"timestamp": "2023-06-15T10:30:00.000Z"<br>
+                        }
+                    </div>
+                    <button class="try-button" onclick="testHealthAPI()">
+                        <i class="fas fa-play-circle"></i> Try It Now
+                    </button>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Dashboard Section -->
-    <div class="dashboard" id="dashboard">
-        <header class="dashboard-header">
-            <div class="dashboard-logo">
-                <i class="fas fa-code" style="color: #64ffda;"></i>
-                <h1>HXSApi</h1>
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>About HXS API</h3>
+                    <p>HXS API provides powerful and reliable APIs for developers to build amazing applications.</p>
+                    <p>Developed by Hans Dan Stret with passion for technology and innovation.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <p><a href="#home" style="color: white; text-decoration: none;">Home</a></p>
+                    <p><a href="#status" style="color: white; text-decoration: none;">API Status</a></p>
+                    <p><a href="#docs" style="color: white; text-decoration: none;">Documentation</a></p>
+                    <p><a href="#about" style="color: white; text-decoration: none;">About</a></p>
+                </div>
+                <div class="footer-column">
+                    <h3>Connect With Us</h3>
+                    <p>Have questions or need support?</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-github"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-discord"></i></a>
+                    </div>
+                </div>
             </div>
-            <div class="user-info">
-                <span id="user-name">Pengguna</span>
-                <button class="btn-logout" id="logout-btn">Keluar</button>
-            </div>
-        </header>
-
-        <div class="dashboard-container">
-            <section class="welcome-section">
-                <h2 id="welcome-user">Selamat Datang di HXSApi!</h2>
-                <p>Platform API downloader premium untuk berbagai layanan media. Akses API berkualitas tinggi dengan dokumentasi lengkap dan dukungan 24/7.</p>
-            </section>
-
-            <div class="services-grid">
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fab fa-youtube"></i>
-                    </div>
-                    <h3>YouTube MP4 Downloader</h3>
-                    <p>Download video YouTube dalam format MP4 dengan kualitas hingga 4K. Mendukung semua resolusi dan format video.</p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> Kualitas hingga 4K</li>
-                        <li><i class="fas fa-check"></i> Semua resolusi didukung</li>
-                        <li><i class="fas fa-check"></i> Tanpa watermark</li>
-                        <li><i class="fas fa-check"></i> Batch download</li>
-                    </ul>
-                    <button class="btn-service">Lihat Dokumentasi API</button>
-                </div>
-
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fab fa-youtube"></i>
-                    </div>
-                    <h3>YouTube MP3 Downloader</h3>
-                    <p>Ekstrak audio dari video YouTube dalam format MP3 dengan kualitas tinggi. Pilih bitrate sesuai kebutuhan.</p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> Kualitas hingga 320kbps</li>
-                        <li><i class="fas fa-check"></i> Metadata ID3 tags</li>
-                        <li><i class="fas fa-check"></i> Thumbnail extraction</li>
-                        <li><i class="fas fa-check"></i> Batch conversion</li>
-                    </ul>
-                    <button class="btn-service">Lihat Dokumentasi API</button>
-                </div>
-
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fab fa-tiktok"></i>
-                    </div>
-                    <h3>TikTok MP4 Downloader</h3>
-                    <p>Download video TikTok tanpa watermark dalam format MP4. Mendukung video dengan dan tanpa watermark.</p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> Tanpa watermark</li>
-                        <li><i class="fas fa-check"></i> Original quality</li>
-                        <li><i class="fas fa-check"></i> Metadata included</li>
-                        <li><i class="fas fa-check"></i> Fast processing</li>
-                    </ul>
-                    <button class="btn-service">Lihat Dokumentasi API</button>
-                </div>
-
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fab fa-tiktok"></i>
-                    </div>
-                    <h3>TikTok MP3 Downloader</h3>
-                    <p>Ekstrak audio dari video TikTok dalam format MP3. Dapatkan audio berkualitas tinggi dari video TikTok favorit.</p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> High quality audio</li>
-                        <li><i class="fas fa-check"></i> Preserve metadata</li>
-                        <li><i class="fas fa-check"></i> Fast conversion</li>
-                        <li><i class="fas fa-check"></i> Batch processing</li>
-                    </ul>
-                    <button class="btn-service">Lihat Dokumentasi API</button>
-                </div>
-
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fab fa-instagram"></i>
-                    </div>
-                    <h3>Instagram Downloader</h3>
-                    <p>Download foto, video, dan reel dari Instagram dengan kualitas terbaik. Mendukung semua jenis konten Instagram.</p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> Posts, stories, reels</li>
-                        <li><i class="fas fa-check"></i> High resolution</li>
-                        <li><i class="fas fa-check"></i> Private account support</li>
-                        <li><i class="fas fa-check"></i> Bulk download</li>
-                    </ul>
-                    <button class="btn-service">Lihat Dokumentasi API</button>
-                </div>
-
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-music"></i>
-                    </div>
-                    <h3>Spotify Downloader</h3>
-                    <p>Download lagu dan playlist dari Spotify dalam format MP3. Nikmati musik favorit Anda secara offline.</p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> 320kbps quality</li>
-                        <li><i class="fas fa-check"></i> Full metadata</li>
-                        <li><i class="fas fa-check"></i> Playlist support</li>
-                        <li><i class="fas fa-check"></i> Album art included</li>
-                    </ul>
-                    <button class="btn-service">Lihat Dokumentasi API</button>
-                </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 HXS API. Developed by Hans Dan Stret. All rights reserved.</p>
             </div>
         </div>
-    </div>
-
-    <div class="ocean">
-        <div class="wave"></div>
-        <div class="wave"></div>
-    </div>
+    </footer>
 
     <script>
-        // API Configuration - Environment variables would be set in Vercel
-        // These would be replaced with process.env.API_BASE_URL etc. in production
-        const API_CONFIG = {
-            BASE_URL: 'https://api.jsonbin.io/v3/b',
-            // These would be set as environment variables in Vercel
-            ACCESS_KEY: 'YOUR_ACCESS_KEY_HERE', // Set in Vercel environment
-            MASTER_KEY: 'YOUR_MASTER_KEY_HERE'  // Set in Vercel environment
+        // Mobile Menu Toggle
+        document.getElementById('mobileMenu').addEventListener('click', function() {
+            document.getElementById('nav').classList.toggle('active');
+        });
+
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Fade in animation on scroll
+        const fadeElements = document.querySelectorAll('.fade-in');
+        
+        const fadeInOnScroll = function() {
+            fadeElements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('visible');
+                }
+            });
         };
+        
+        window.addEventListener('scroll', fadeInOnScroll);
+        // Initial check
+        fadeInOnScroll();
 
-        // Application state
-        let currentUser = null;
-        let sessionToken = null;
-
-        // DOM Elements
-        const loadingScreen = document.getElementById('loadingScreen');
-        const loadingProgress = document.getElementById('loadingProgress');
-        const authContainer = document.getElementById('authContainer');
-        const dashboard = document.getElementById('dashboard');
-        const loginPage = document.getElementById('login-page');
-        const registerPage = document.getElementById('register-page');
-        const showRegisterBtn = document.getElementById('show-register');
-        const showLoginBtn = document.getElementById('show-login');
-        const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
-        const loginMessage = document.getElementById('login-message');
-        const registerMessage = document.getElementById('register-message');
-        const userName = document.getElementById('user-name');
-        const welcomeUser = document.getElementById('welcome-user');
-        const logoutBtn = document.getElementById('logout-btn');
-
-        // Initialize the application
-        function initApp() {
-            // Simulate loading progress
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += Math.random() * 15;
-                if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(interval);
-                    
-                    // Hide loading screen after a short delay
-                    setTimeout(() => {
-                        loadingScreen.classList.add('hidden');
-                        checkAuthStatus();
-                    }, 500);
-                }
-                loadingProgress.style.width = `${progress}%`;
-            }, 200);
-
-            // Setup event listeners
-            setupEventListeners();
-        }
-
-        // Setup all event listeners
-        function setupEventListeners() {
-            // Toggle between login and register forms
-            showRegisterBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                loginPage.classList.remove('active');
-                registerPage.classList.add('active');
-            });
-
-            showLoginBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                registerPage.classList.remove('active');
-                loginPage.classList.add('active');
-            });
-
-            // Toggle password visibility
-            document.querySelectorAll('.toggle-password').forEach(toggle => {
-                toggle.addEventListener('click', function() {
-                    const input = this.parentElement.querySelector('input');
-                    const icon = this.querySelector('i');
-                    
-                    if (input.type === 'password') {
-                        input.type = 'text';
-                        icon.classList.remove('fa-eye');
-                        icon.classList.add('fa-eye-slash');
-                    } else {
-                        input.type = 'password';
-                        icon.classList.remove('fa-eye-slash');
-                        icon.classList.add('fa-eye');
+        // API Test Functions
+        function testSSWebAPI() {
+            Swal.fire({
+                title: 'Test SSWeb API',
+                html: `
+                    <p>Enter a URL to test the screenshot API:</p>
+                    <input type="text" id="websiteUrl" class="swal2-input" placeholder="https://example.com" value="https://google.com">
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Take Screenshot',
+                cancelButtonText: 'Cancel',
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                    const url = document.getElementById('websiteUrl').value;
+                    if (!url) {
+                        Swal.showValidationMessage('Please enter a URL');
+                        return false;
                     }
+                    
+                    // In a real implementation, you would call your API here
+                    // For demo purposes, we'll simulate an API call
+                    return new Promise((resolve) => {
+                        setTimeout(() => {
+                            resolve({
+                                success: true,
+                                message: 'Screenshot captured successfully!',
+                                imageUrl: 'https://via.placeholder.com/800x600/1a73e8/ffffff?text=Screenshot+of+' + encodeURIComponent(url)
+                            });
+                        }, 2000);
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed && result.value) {
+                    Swal.fire({
+                        title: 'Success!',
+                        html: `
+                            <p>${result.value.message}</p>
+                            <img src="${result.value.imageUrl}" style="max-width: 100%; margin-top: 20px; border-radius: 8px;">
+                        `,
+                        icon: 'success'
+                    });
+                }
+            });
+        }
+
+        function testHealthAPI() {
+            // Simulate API health check
+            Swal.fire({
+                title: 'Checking API Health...',
+                timer: 1500,
+                timerProgressBar: true,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            }).then(() => {
+                Swal.fire({
+                    title: 'API Status: Online',
+                    html: `
+                        <div style="text-align: left; margin-top: 20px;">
+                            <p><strong>Response:</strong></p>
+                            <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; text-align: left;">
+{
+  "success": true,
+  "message": "API berjalan dengan baik",
+  "timestamp": "${new Date().toISOString()}"
+}</pre>
+                        </div>
+                    `,
+                    icon: 'success'
                 });
             });
-
-            // Register form submission
-            registerForm.addEventListener('submit', handleRegister);
-
-            // Login form submission
-            loginForm.addEventListener('submit', handleLogin);
-
-            // Logout button
-            logoutBtn.addEventListener('click', handleLogout);
         }
 
-        // Check if user is already authenticated
-        async function checkAuthStatus() {
-            // Check if we have a session token
-            const savedSession = await getSessionFromStorage();
-            
-            if (savedSession) {
-                // Verify the session is still valid
-                const isValid = await verifySession(savedSession);
-                
-                if (isValid) {
-                    sessionToken = savedSession;
-                    currentUser = await getUserBySession(savedSession);
-                    
-                    if (currentUser) {
-                        showDashboard();
-                        return;
-                    }
-                }
-            }
-            
-            // No valid session, show auth
-            showAuth();
-        }
-
-        // Get session from secure storage (using JSONBin)
-        async function getSessionFromStorage() {
-            try {
-                // In a real app, you'd store sessions in your database
-                // For this demo, we'll use a simple approach
-                const sessionData = localStorage.getItem('hxsapi_session');
-                return sessionData ? JSON.parse(sessionData) : null;
-            } catch (error) {
-                console.error('Error getting session:', error);
-                return null;
-            }
-        }
-
-        // Save session to storage
-        async function saveSessionToStorage(session) {
-            try {
-                localStorage.setItem('hxsapi_session', JSON.stringify(session));
-            } catch (error) {
-                console.error('Error saving session:', error);
-            }
-        }
-
-        // Verify session validity
-        async function verifySession(session) {
-            try {
-                // In a real app, you'd verify against your database
-                // For this demo, we'll check if the user exists
-                const user = await getUserBySession(session);
-                return user !== null;
-            } catch (error) {
-                console.error('Error verifying session:', error);
-                return false;
-            }
-        }
-
-        // Get user by session (simplified for demo)
-        async function getUserBySession(session) {
-            try {
-                // In a real app, you'd have a proper session system
-                // For this demo, we'll get all users and find by email
-                const users = await getAllUsers();
-                return users.find(user => user.email === session.email) || null;
-            } catch (error) {
-                console.error('Error getting user by session:', error);
-                return null;
-            }
-        }
-
-        // Show message function
-        function showMessage(element, message, type) {
-            element.textContent = message;
-            element.className = `message ${type}`;
-            element.style.display = 'block';
-            
-            setTimeout(() => {
-                element.style.display = 'none';
-            }, 5000);
-        }
-
-        // Show dashboard
-        function showDashboard() {
-            userName.textContent = currentUser.name;
-            welcomeUser.textContent = `Selamat Datang, ${currentUser.name}!`;
-            authContainer.style.display = 'none';
-            dashboard.style.display = 'block';
-        }
-
-        // Show auth forms
-        function showAuth() {
-            authContainer.style.display = 'flex';
-            dashboard.style.display = 'none';
-            loginForm.reset();
-            registerForm.reset();
-            registerPage.classList.remove('active');
-            loginPage.classList.add('active');
-        }
-
-        // Get all users from JSONBin
-        async function getAllUsers() {
-            try {
-                // First, get the main app data bin
-                const appData = await getAppData();
-                return appData.users || [];
-            } catch (error) {
-                console.error('Error getting users:', error);
-                return [];
-            }
-        }
-
-        // Get main app data from JSONBin
-        async function getAppData() {
-            try {
-                // In production, you'd have a fixed bin ID for your app data
-                const binId = await getAppBinId();
-                
-                const response = await fetch(`${API_CONFIG.BASE_URL}/${binId}/latest`, {
-                    method: 'GET',
-                    headers: {
-                        'X-Master-Key': API_CONFIG.MASTER_KEY,
-                        'X-Access-Key': API_CONFIG.ACCESS_KEY
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Failed to fetch app data');
-                }
-                
-                const data = await response.json();
-                return data.record;
-            } catch (error) {
-                console.error('Error getting app data:', error);
-                return { users: [] };
-            }
-        }
-
-        // Get or create app bin ID
-        async function getAppBinId() {
-            // In production, you'd have a fixed bin ID
-            // For this demo, we'll create one if it doesn't exist
-            let binId = localStorage.getItem('hxsapi_app_bin_id');
-            
-            if (!binId) {
-                // Create a new bin for the app data
-                const response = await fetch(API_CONFIG.BASE_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': API_CONFIG.MASTER_KEY,
-                        'X-Access-Key': API_CONFIG.ACCESS_KEY
-                    },
-                    body: JSON.stringify({
-                        users: [],
-                        sessions: [],
-                        createdAt: new Date().toISOString()
-                    })
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Failed to create app data bin');
-                }
-                
-                const data = await response.json();
-                binId = data.metadata.id;
-                localStorage.setItem('hxsapi_app_bin_id', binId);
-            }
-            
-            return binId;
-        }
-
-        // Update app data in JSONBin
-        async function updateAppData(appData) {
-            try {
-                const binId = await getAppBinId();
-                
-                const response = await fetch(`${API_CONFIG.BASE_URL}/${binId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': API_CONFIG.MASTER_KEY,
-                        'X-Access-Key': API_CONFIG.ACCESS_KEY
-                    },
-                    body: JSON.stringify(appData)
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Failed to update app data');
-                }
-                
-                return await response.json();
-            } catch (error) {
-                console.error('Error updating app data:', error);
-                throw error;
-            }
-        }
-
-        // Handle user registration
-        async function handleRegister(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('register-name').value;
-            const email = document.getElementById('register-email').value;
-            const password = document.getElementById('register-password').value;
-            const confirmPassword = document.getElementById('register-confirm-password').value;
-            
-            // Validation
-            if (password !== confirmPassword) {
-                showMessage(registerMessage, "Kata sandi tidak cocok", "error");
-                return;
-            }
-            
-            if (password.length < 6) {
-                showMessage(registerMessage, "Kata sandi harus minimal 6 karakter", "error");
-                return;
-            }
-            
-            // Show loading state
-            document.getElementById('register-text').style.display = 'none';
-            document.getElementById('register-loading').style.display = 'inline';
-            document.getElementById('register-btn').disabled = true;
-            
-            try {
-                // Get existing users
-                const appData = await getAppData();
-                const users = appData.users || [];
-                
-                // Check if email already exists
-                if (users.find(user => user.email === email)) {
-                    showMessage(registerMessage, "Email sudah terdaftar", "error");
-                    document.getElementById('register-text').style.display = 'inline';
-                    document.getElementById('register-loading').style.display = 'none';
-                    document.getElementById('register-btn').disabled = false;
-                    return;
-                }
-                
-                // Add new user
-                const newUser = {
-                    id: Date.now().toString(),
-                    name,
-                    email,
-                    password, // In a real app, this should be hashed
-                    createdAt: new Date().toISOString(),
-                    plan: 'starter',
-                    apiCalls: 0
-                };
-                
-                users.push(newUser);
-                appData.users = users;
-                
-                // Update the app data
-                await updateAppData(appData);
-                
-                showMessage(registerMessage, "Pendaftaran berhasil! Silakan masuk.", "success");
-                registerForm.reset();
-                
-                // Switch to login form after successful registration
-                setTimeout(() => {
-                    registerPage.classList.remove('active');
-                    loginPage.classList.add('active');
-                }, 2000);
-                
-            } catch (error) {
-                console.error('Registration error:', error);
-                showMessage(registerMessage, "Terjadi kesalahan saat mendaftar. Silakan coba lagi.", "error");
-            } finally {
-                document.getElementById('register-text').style.display = 'inline';
-                document.getElementById('register-loading').style.display = 'none';
-                document.getElementById('register-btn').disabled = false;
-            }
-        }
-
-        // Handle user login
-        async function handleLogin(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            
-            // Show loading state
-            document.getElementById('login-text').style.display = 'none';
-            document.getElementById('login-loading').style.display = 'inline';
-            document.getElementById('login-btn').disabled = true;
-            
-            try {
-                // Get users data
-                const appData = await getAppData();
-                const users = appData.users || [];
-                
-                // Find user by email and password
-                const user = users.find(u => u.email === email && u.password === password);
-                
-                if (user) {
-                    showMessage(loginMessage, "Login berhasil! Mengarahkan ke dashboard...", "success");
-                    
-                    // Create session
-                    const session = {
-                        email: user.email,
-                        userId: user.id,
-                        createdAt: new Date().toISOString(),
-                        token: generateSessionToken()
-                    };
-                    
-                    // Save session
-                    await saveSessionToStorage(session);
-                    sessionToken = session;
-                    currentUser = user;
-                    
-                    // Redirect to dashboard after a short delay
-                    setTimeout(() => {
-                        showDashboard();
-                    }, 1500);
-                } else {
-                    showMessage(loginMessage, "Email atau kata sandi salah", "error");
-                }
-                
-            } catch (error) {
-                console.error('Login error:', error);
-                showMessage(loginMessage, "Terjadi kesalahan saat login. Silakan coba lagi.", "error");
-            } finally {
-                document.getElementById('login-text').style.display = 'inline';
-                document.getElementById('login-loading').style.display = 'none';
-                document.getElementById('login-btn').disabled = false;
-            }
-        }
-
-        // Generate session token
-        function generateSessionToken() {
-            return 'session_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
-        }
-
-        // Handle user logout
-        function handleLogout() {
-            // Clear session
-            sessionToken = null;
-            currentUser = null;
-            localStorage.removeItem('hxsapi_session');
-            showAuth();
-        }
-
-        // Initialize the application when DOM is loaded
-        document.addEventListener('DOMContentLoaded', initApp);
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('nav').classList.remove('active');
+            });
+        });
     </script>
 </body>
 </html>
