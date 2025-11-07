@@ -1,4 +1,4 @@
-import { getAPIStatus, addLog } from '../../lib/logger.js';
+import { getAPIStatus, addLog } from '../lib/logger.js';
 
 export default async function handler(req, res) {
     const clientIP = req.headers['x-forwarded-for'] || 
