@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
+        /* CSS yang sama seperti sebelumnya, tidak ada perubahan */
         :root {
             --primary: #2563eb;
             --primary-dark: #1d4ed8;
@@ -1446,6 +1447,45 @@
                         </div>
                     </section>
 
+                    <!-- Authentication Section -->
+                    <section id="authentication" class="content-section">
+                        <div class="section-header">
+                            <h2><i class="fas fa-key"></i> Authentication</h2>
+                            <p>Secure your API requests with authentication</p>
+                        </div>
+
+                        <div class="api-card">
+                            <div class="api-description">
+                                <p>HXS API uses API keys to authenticate requests. You can view and manage your API keys in the Developer Console.</p>
+                                
+                                <h4 style="margin-top: 2rem; margin-bottom: 1rem;">Using Your API Key</h4>
+                                <p>Include your API key in the request header:</p>
+                                <div class="code-block" style="margin: 1rem 0;">
+                                    <button class="copy-btn" onclick="copyCode('auth-example')">
+                                        <i class="far fa-copy"></i>
+                                    </button>
+                                    <pre id="auth-example"><code>fetch('https://your-domain.vercel.app/api/endpoint', {
+  headers: {
+    'Authorization': 'Bearer YOUR_API_KEY'
+  }
+})
+.then(response => response.json())
+.then(data => console.log(data));</code></pre>
+                                </div>
+
+                                <h4 style="margin-top: 2rem; margin-bottom: 1rem;">Getting Your API Key</h4>
+                                <p>Access the Developer Console to generate and manage your API keys:</p>
+                                
+                                <div class="endpoint-actions">
+                                    <button class="btn btn-primary" onclick="openDeveloperConsole()">
+                                        <i class="fas fa-terminal"></i>
+                                        Developer Console
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
                     <!-- SSWeb API Section -->
                     <section id="ssweb-api" class="content-section">
                         <div class="section-header">
@@ -1544,6 +1584,88 @@
                         </div>
                     </section>
 
+                    <!-- YouTube API Section -->
+                    <section id="youtube-api" class="content-section">
+                        <div class="section-header">
+                            <h2><i class="fab fa-youtube"></i> YouTube API</h2>
+                            <p>Extract data and information from YouTube videos</p>
+                        </div>
+
+                        <div class="api-card">
+                            <div class="api-header">
+                                <div class="api-icon">
+                                    <i class="fab fa-youtube"></i>
+                                </div>
+                                <div class="api-info">
+                                    <h3>YouTube Data API
+                                        <span class="api-status status-live">Live</span>
+                                    </h3>
+                                    <p class="api-description">
+                                        Get video information, download videos, and extract metadata from YouTube.
+                                        Perfect for content analysis, archiving, or integration with your applications.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Video Info Endpoint -->
+                            <div class="endpoint-section">
+                                <h4><i class="fas fa-info-circle"></i> Get Video Information</h4>
+                                
+                                <div class="endpoint-card">
+                                    <div class="endpoint-header">
+                                        <div class="method-badge get">GET</div>
+                                        <div class="endpoint-path">/api/youtube/info</div>
+                                    </div>
+                                    
+                                    <div class="endpoint-description">
+                                        <p>Retrieve detailed information about a YouTube video including title, description, duration, and more.</p>
+                                    </div>
+
+                                    <div class="parameters-section">
+                                        <h5>Query Parameters</h5>
+                                        <div class="parameters-table">
+                                            <div class="param-row header">
+                                                <div class="param-name">Name</div>
+                                                <div class="param-type">Type</div>
+                                                <div class="param-required">Required</div>
+                                                <div class="param-desc">Description</div>
+                                            </div>
+                                            <div class="param-row">
+                                                <div class="param-name">url</div>
+                                                <div class="param-type">String</div>
+                                                <div class="param-required">Yes</div>
+                                                <div class="param-desc">YouTube video URL or ID</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="code-example">
+                                        <h5>Example Request</h5>
+                                        <div class="code-block">
+                                            <button class="copy-btn" onclick="copyCode('youtube-example')">
+                                                <i class="far fa-copy"></i>
+                                            </button>
+                                            <pre id="youtube-example"><code>fetch('https://your-domain.vercel.app/api/youtube/info?url=https://youtube.com/watch?v=VIDEO_ID')
+  .then(response => response.json())
+  .then(data => console.log(data));</code></pre>
+                                        </div>
+                                    </div>
+
+                                    <div class="endpoint-actions">
+                                        <button class="btn btn-primary" onclick="testYouTubeEndpoint()">
+                                            <i class="fas fa-play"></i>
+                                            Test Endpoint
+                                        </button>
+                                        <a href="#status" class="btn btn-secondary">
+                                            <i class="fas fa-chart-bar"></i>
+                                            Check Status
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
                     <!-- Status Section -->
                     <section id="status" class="content-section">
                         <div class="section-header">
@@ -1574,6 +1696,32 @@
                                     <div class="status-metric">
                                         <span class="metric-label">Requests Today</span>
                                         <span class="metric-value" id="ssweb-requests">1,243</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="status-card">
+                                <div class="status-header">
+                                    <div class="status-icon online">
+                                        <i class="fab fa-youtube"></i>
+                                    </div>
+                                    <div class="status-info">
+                                        <h3>YouTube API</h3>
+                                        <div class="status-badge online">Online</div>
+                                    </div>
+                                </div>
+                                <div class="status-details">
+                                    <div class="status-metric">
+                                        <span class="metric-label">Response Time</span>
+                                        <span class="metric-value" id="youtube-response">320ms</span>
+                                    </div>
+                                    <div class="status-metric">
+                                        <span class="metric-label">Uptime</span>
+                                        <span class="metric-value" id="youtube-uptime">99.5%</span>
+                                    </div>
+                                    <div class="status-metric">
+                                        <span class="metric-label">Requests Today</span>
+                                        <span class="metric-value" id="youtube-requests">892</span>
                                     </div>
                                 </div>
                             </div>
@@ -1861,6 +2009,12 @@
                 document.getElementById('ssweb-requests').textContent = statusData.ssweb.requestsToday.toLocaleString();
             }
             
+            if (statusData.youtube) {
+                document.getElementById('youtube-response').textContent = `${statusData.youtube.responseTime}ms`;
+                document.getElementById('youtube-uptime').textContent = `${statusData.youtube.uptime}%`;
+                document.getElementById('youtube-requests').textContent = statusData.youtube.requestsToday.toLocaleString();
+            }
+            
             if (statusData.auth) {
                 document.getElementById('auth-response').textContent = `${statusData.auth.responseTime}ms`;
                 document.getElementById('auth-uptime').textContent = `${statusData.auth.uptime}%`;
@@ -1913,6 +2067,45 @@
                 }
             } catch (error) {
                 Swal.fire('Error!', 'Failed to capture screenshot: ' + error.message, 'error');
+            }
+        }
+
+        async function testYouTubeEndpoint() {
+            const url = prompt('Enter YouTube video URL:', 'https://youtube.com/watch?v=dQw4w9WgXcQ');
+            if (!url) return;
+            
+            try {
+                Swal.fire({
+                    title: 'Fetching Video Info...',
+                    text: 'Please wait while we retrieve video information',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+                
+                const response = await fetch(`${API_BASE_URL}/api/youtube/info?url=${encodeURIComponent(url)}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    Swal.fire({
+                        title: 'Video Information',
+                        html: `
+                            <div style="text-align: left;">
+                                <p><strong>Title:</strong> ${data.title}</p>
+                                <p><strong>Duration:</strong> ${data.duration}</p>
+                                <p><strong>Views:</strong> ${data.views}</p>
+                                <p><strong>Upload Date:</strong> ${data.uploadDate}</p>
+                                <p><strong>Channel:</strong> ${data.channel}</p>
+                            </div>
+                        `,
+                        confirmButtonText: 'Close'
+                    });
+                } else {
+                    const error = await response.json();
+                    Swal.fire('Error!', error.message || 'Failed to fetch video information', 'error');
+                }
+            } catch (error) {
+                Swal.fire('Error!', 'Failed to fetch video information: ' + error.message, 'error');
             }
         }
 
@@ -2120,6 +2313,7 @@
         // Global functions
         window.toggleTheme = toggleTheme;
         window.testSSWebEndpoint = testSSWebEndpoint;
+        window.testYouTubeEndpoint = testYouTubeEndpoint;
         window.testHealthEndpoint = testHealthEndpoint;
         window.openDeveloperConsole = openDeveloperConsole;
         window.closeDeveloperConsole = closeDeveloperConsole;
