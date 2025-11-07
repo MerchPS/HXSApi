@@ -1,4 +1,4 @@
-import { addLog } from '../../lib/logger.js';
+import { addLog } from '../lib/logger.js';
 
 // SSWeb implementation
 const ssweb = {
