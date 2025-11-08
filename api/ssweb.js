@@ -54,6 +54,28 @@ const ssweb = {
     }
 }
 
+// Helper function untuk extract domain dari URL
+function getDomainFromUrl(url) {
+    try {
+        const domain = new URL(url).hostname;
+        return domain.replace('www.', '');
+    } catch {
+        return 'website';
+    }
+}
+
+// Helper function untuk generate title
+function generateTitle(url) {
+    const domain = getDomainFromUrl(url);
+    return `Screenshot of ${domain}`;
+}
+
+// Helper function untuk generate developer info
+function generateDeveloperInfo(url) {
+    const domain = getDomainFromUrl(url);
+    return `${domain} Development Team`;
+}
+
 export default async function handler(req, res) {
     const startTime = Date.now();
     const clientIP = req.headers['x-forwarded-for'] || 
@@ -86,7 +108,7 @@ export default async function handler(req, res) {
     }
     
     try {
-        const { url } = req.query;
+        const { url, format = 'json' } = req.query;
         
         if (!url) {
             addLog({
@@ -105,8 +127,9 @@ export default async function handler(req, res) {
         }
         
         // Validate URL
+        let parsedUrl;
         try {
-            new URL(url);
+            parsedUrl = new URL(url);
         } catch (error) {
             addLog({
                 ip: clientIP,
@@ -133,7 +156,36 @@ export default async function handler(req, res) {
 
         const buffer = await ssweb.capture(url);
         const responseTime = Date.now() - startTime;
+
+        // Generate base64 image
+        const base64Image = buffer.toString('base64');
+        const imageUrl = `data:image/jpeg;base64,${base64Image}`;
         
+        // Generate response data
+        const domain = getDomainFromUrl(url);
+        const responseData = {
+            status: true,
+            data: [
+                {
+                    title: generateTitle(url),
+                    link: imageUrl,
+                    developer: generateDeveloperInfo(url),
+                    image: imageUrl,
+                    domain: domain,
+                    url: url,
+                    timestamp: new Date().toISOString(),
+                    format: 'jpeg',
+                    size: buffer.length,
+                    dimensions: '1280x720' // Default dimensions, bisa disesuaikan
+                }
+            ],
+            meta: {
+                response_time: responseTime,
+                credits: "HXS API - Home & Start",
+                version: "1.0.0"
+            }
+        };
+
         addLog({
             ip: clientIP,
             method: 'GET',
@@ -141,14 +193,24 @@ export default async function handler(req, res) {
             status: 200,
             userAgent: req.headers['user-agent'],
             url: url,
-            responseTime: responseTime
+            responseTime: responseTime,
+            format: format
         });
-        
-        res.setHeader('Content-Type', 'image/jpeg');
-        res.setHeader('Content-Length', buffer.length);
-        res.setHeader('X-Response-Time', `${responseTime}ms`);
-        
-        return res.send(buffer);
+
+        // Return berdasarkan format yang diminta
+        if (format === 'image') {
+            // Return langsung gambar
+            res.setHeader('Content-Type', 'image/jpeg');
+            res.setHeader('Content-Length', buffer.length);
+            res.setHeader('X-Response-Time', `${responseTime}ms`);
+            res.setHeader('Content-Disposition', `inline; filename="screenshot-${domain}-${Date.now()}.jpg"`);
+            return res.send(buffer);
+        } else {
+            // Return JSON response (default)
+            res.setHeader('Content-Type', 'application/json');
+            res.setHeader('X-Response-Time', `${responseTime}ms`);
+            return res.json(responseData);
+        }
         
     } catch (error) {
         const responseTime = Date.now() - startTime;
@@ -166,7 +228,8 @@ export default async function handler(req, res) {
         return res.status(500).json({
             success: false,
             message: 'Gagal mengambil screenshot',
-            error: error.message
+            error: error.message,
+            status: false
         });
     }
 }
