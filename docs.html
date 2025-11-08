@@ -710,6 +710,11 @@ Access-Control-Allow-Headers: Content-Type</pre>
     </div>
 
     <script>
+        // JSONBin Configuration
+        const JSONBIN_BIN_ID = '690ef36a43b1c97be9a02df4'; // Ganti dengan ID bin Anda
+        const JSONBIN_MASTER_KEY = '$2a$10$t9rRybPASWD8ZC//W4fDuOOBbwmwCI0iC9P.X5GXdFOF3dpMVsnoS';
+        const JSONBIN_ACCESS_KEY = '$2a$10$5h7N1GoDlqh7oGuPAF7a1e8YFIOeMaU8I2phwCAVziyKRVIKqCQOK';
+
         // Accordion functionality
         document.addEventListener('DOMContentLoaded', function() {
             const accordionItems = document.querySelectorAll('.accordion-item');
@@ -776,38 +781,69 @@ Access-Control-Allow-Headers: Content-Type</pre>
                 }
             });
 
-            // Load stats from API
+            // Load stats from JSONBin
             async function loadStats() {
                 try {
+                    // Jika Anda sudah punya endpoint /api/stats, gunakan ini:
                     const response = await fetch('https://hxs-apis.vercel.app/api/stats');
+                    
                     if (response.ok) {
                         const data = await response.json();
                         if (data.success) {
-                            const stats = data.data;
-                            
-                            // Format numbers with commas
-                            const formatNumber = (num) => {
-                                return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                            };
-                            
-                            // Update today requests
-                            const todayElement = document.getElementById('todayRequests');
-                            todayElement.textContent = formatNumber(stats.totalTodayRequests);
-                            todayElement.classList.remove('pulse');
-                            
-                            // Update total requests
-                            const totalElement = document.getElementById('totalRequests');
-                            totalElement.textContent = formatNumber(stats.totalAllRequests);
-                            totalElement.classList.remove('pulse');
+                            updateStatsDisplay(data.data);
                         }
+                    } else {
+                        // Fallback: langsung ambil dari JSONBin
+                        await loadStatsFromJSONBin();
                     }
                 } catch (error) {
-                    console.error('Error loading stats:', error);
+                    console.error('Error loading stats from API:', error);
+                    // Fallback ke JSONBin langsung
+                    await loadStatsFromJSONBin();
+                }
+            }
+
+            // Load stats langsung dari JSONBin
+            async function loadStatsFromJSONBin() {
+                try {
+                    const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+                        headers: {
+                            'X-Master-Key': JSONBIN_MASTER_KEY,
+                            'X-Access-Key': JSONBIN_ACCESS_KEY
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        updateStatsDisplay(data.record);
+                    } else {
+                        throw new Error('Failed to fetch from JSONBin');
+                    }
+                } catch (error) {
+                    console.error('Error loading stats from JSONBin:', error);
                     // Fallback values
-                    document.getElementById('todayRequests').textContent = '1,234';
-                    document.getElementById('totalRequests').textContent = '45,678';
+                    document.getElementById('todayRequests').textContent = '2';
+                    document.getElementById('totalRequests').textContent = '2';
                     document.querySelectorAll('.stat-value').forEach(el => el.classList.remove('pulse'));
                 }
+            }
+
+            // Update stats display
+            function updateStatsDisplay(stats) {
+                // Format numbers with commas
+                const formatNumber = (num) => {
+                    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                };
+                
+                // Update today requests
+                const todayElement = document.getElementById('todayRequests');
+                todayElement.textContent = formatNumber(stats.totalTodayRequests || 0);
+                todayElement.classList.remove('pulse');
+                
+                // Update total requests
+                const totalElement = document.getElementById('totalRequests');
+                totalElement.textContent = formatNumber(stats.totalAllRequests || 0);
+                totalElement.classList.remove('pulse');
             }
 
             // Load stats when page loads
