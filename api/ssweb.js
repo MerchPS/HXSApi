@@ -124,9 +124,13 @@ export default async function handler(req, res) {
             });
         }
 
-        // Increment request counter
-        const requestStats = await incrementRequest('/api/ssweb');
-        
+        // Increment request counter - TIDAK blocking
+        incrementRequest('/api/ssweb').then(requestStats => {
+            console.log('Request counter updated:', requestStats);
+        }).catch(error => {
+            console.error('Error updating request counter:', error);
+        });
+
         const buffer = await ssweb.capture(url);
         const responseTime = Date.now() - startTime;
         
@@ -137,15 +141,12 @@ export default async function handler(req, res) {
             status: 200,
             userAgent: req.headers['user-agent'],
             url: url,
-            responseTime: responseTime,
-            requestStats: requestStats
+            responseTime: responseTime
         });
         
         res.setHeader('Content-Type', 'image/jpeg');
         res.setHeader('Content-Length', buffer.length);
         res.setHeader('X-Response-Time', `${responseTime}ms`);
-        res.setHeader('X-Total-Requests', requestStats.totalAllRequests);
-        res.setHeader('X-Today-Requests', requestStats.totalTodayRequests);
         
         return res.send(buffer);
         
