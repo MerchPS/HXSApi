@@ -1,4 +1,5 @@
-import { getAPIStatus, addLog } from '../lib/logger.js';
+import { getStats } from '../lib/requestCounter.js';
+import { addLog } from '../lib/logger.js';
 
 export default async function handler(req, res) {
     const clientIP = req.headers['x-forwarded-for'] || 
@@ -29,19 +30,37 @@ export default async function handler(req, res) {
         });
     }
     
-    addLog({
-        ip: clientIP,
-        method: 'GET',
-        endpoint: '/api/status',
-        status: 200,
-        userAgent: req.headers['user-agent']
-    });
-    
-    const status = getAPIStatus();
-    
-    return res.json({
-        success: true,
-        data: status,
-        timestamp: new Date().toISOString()
-    });
+    try {
+        const stats = await getStats();
+        
+        addLog({
+            ip: clientIP,
+            method: 'GET',
+            endpoint: '/api/status',
+            status: 200,
+            userAgent: req.headers['user-agent']
+        });
+        
+        return res.json({
+            success: true,
+            data: stats,
+            timestamp: new Date().toISOString()
+        });
+        
+    } catch (error) {
+        addLog({
+            ip: clientIP,
+            method: 'GET',
+            endpoint: '/api/status',
+            status: 500,
+            userAgent: req.headers['user-agent'],
+            error: error.message
+        });
+        
+        return res.status(500).json({
+            success: false,
+            message: 'Gagal mengambil status',
+            error: error.message
+        });
+    }
 }
