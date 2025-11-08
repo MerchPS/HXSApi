@@ -54,6 +54,20 @@ const ssweb = {
     }
 }
 
+// In-memory storage untuk temporary images
+const imageStorage = new Map();
+const IMAGE_TTL = 5 * 60 * 1000; // 5 menit
+
+// Helper function untuk membersihkan expired images
+function cleanupExpiredImages() {
+    const now = Date.now();
+    for (const [key, value] of imageStorage.entries()) {
+        if (now - value.timestamp > IMAGE_TTL) {
+            imageStorage.delete(key);
+        }
+    }
+}
+
 // Helper function untuk extract domain dari URL
 function getDomainFromUrl(url) {
     try {
@@ -76,6 +90,14 @@ function generateDeveloperInfo(url) {
     return `${domain} Development Team`;
 }
 
+// Helper function untuk generate unique filename
+function generateFilename(url) {
+    const domain = getDomainFromUrl(url);
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(2, 8);
+    return `${domain}-${timestamp}-${random}.jpg`;
+}
+
 export default async function handler(req, res) {
     const startTime = Date.now();
     const clientIP = req.headers['x-forwarded-for'] || 
@@ -89,6 +111,30 @@ export default async function handler(req, res) {
     
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
+    }
+    
+    // Handler untuk image request
+    if (req.url.startsWith('/api/ssweb/img/')) {
+        const filename = req.url.split('/').pop();
+        
+        if (imageStorage.has(filename)) {
+            const imageData = imageStorage.get(filename);
+            const buffer = Buffer.from(imageData.data, 'base64');
+            
+            res.setHeader('Content-Type', 'image/jpeg');
+            res.setHeader('Content-Length', buffer.length);
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.setHeader('Pragma', 'no-cache');
+            res.setHeader('Expires', '0');
+            res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+            
+            return res.send(buffer);
+        } else {
+            return res.status(404).json({
+                success: false,
+                message: 'Image not found or expired'
+            });
+        }
     }
     
     if (req.method !== 'GET') {
@@ -157,9 +203,26 @@ export default async function handler(req, res) {
         const buffer = await ssweb.capture(url);
         const responseTime = Date.now() - startTime;
 
-        // Generate base64 image
+        // Generate unique filename dan simpan ke storage
+        const filename = generateFilename(url);
         const base64Image = buffer.toString('base64');
-        const imageUrl = `data:image/jpeg;base64,${base64Image}`;
+        
+        // Simpan image ke temporary storage
+        imageStorage.set(filename, {
+            data: base64Image,
+            timestamp: Date.now(),
+            domain: getDomainFromUrl(url)
+        });
+        
+        // Schedule cleanup
+        setTimeout(() => {
+            if (imageStorage.has(filename)) {
+                imageStorage.delete(filename);
+            }
+        }, IMAGE_TTL);
+
+        // Generate image URL
+        const imageUrl = `https://hxs-apis.vercel.app/api/ssweb/img/${filename}`;
         
         // Generate response data
         const domain = getDomainFromUrl(url);
@@ -176,13 +239,16 @@ export default async function handler(req, res) {
                     timestamp: new Date().toISOString(),
                     format: 'jpeg',
                     size: buffer.length,
-                    dimensions: '1280x720' // Default dimensions, bisa disesuaikan
+                    dimensions: '1280x720',
+                    filename: filename,
+                    expires_in: '5 minutes'
                 }
             ],
             meta: {
                 response_time: responseTime,
                 credits: "HXS API - Home & Start",
-                version: "1.0.0"
+                version: "1.0.0",
+                cache_info: "Image will be automatically deleted after 5 minutes"
             }
         };
 
@@ -194,7 +260,8 @@ export default async function handler(req, res) {
             userAgent: req.headers['user-agent'],
             url: url,
             responseTime: responseTime,
-            format: format
+            format: format,
+            filename: filename
         });
 
         // Return berdasarkan format yang diminta
@@ -203,6 +270,7 @@ export default async function handler(req, res) {
             res.setHeader('Content-Type', 'image/jpeg');
             res.setHeader('Content-Length', buffer.length);
             res.setHeader('X-Response-Time', `${responseTime}ms`);
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
             res.setHeader('Content-Disposition', `inline; filename="screenshot-${domain}-${Date.now()}.jpg"`);
             return res.send(buffer);
         } else {
@@ -233,3 +301,6 @@ export default async function handler(req, res) {
         });
     }
 }
+
+// Cleanup expired images setiap 1 menit
+setInterval(cleanupExpiredImages, 60 * 1000);
