@@ -710,10 +710,9 @@ Access-Control-Allow-Headers: Content-Type</pre>
     </div>
 
     <script>
-        // JSONBin Configuration
-        const JSONBIN_BIN_ID = '690ef36a43b1c97be9a02df4'; // Ganti dengan ID bin Anda
+        // JSONBin Configuration - menggunakan ID bins yang sudah ada
+        const JSONBIN_BIN_ID = '690ef42c43b1c97be9a02ee3';
         const JSONBIN_MASTER_KEY = '$2a$10$t9rRybPASWD8ZC//W4fDuOOBbwmwCI0iC9P.X5GXdFOF3dpMVsnoS';
-        const JSONBIN_ACCESS_KEY = '$2a$10$5h7N1GoDlqh7oGuPAF7a1e8YFIOeMaU8I2phwCAVziyKRVIKqCQOK';
 
         // Accordion functionality
         document.addEventListener('DOMContentLoaded', function() {
@@ -781,42 +780,21 @@ Access-Control-Allow-Headers: Content-Type</pre>
                 }
             });
 
-            // Load stats from JSONBin
-            async function loadStats() {
-                try {
-                    // Jika Anda sudah punya endpoint /api/stats, gunakan ini:
-                    const response = await fetch('https://hxs-apis.vercel.app/api/stats');
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.success) {
-                            updateStatsDisplay(data.data);
-                        }
-                    } else {
-                        // Fallback: langsung ambil dari JSONBin
-                        await loadStatsFromJSONBin();
-                    }
-                } catch (error) {
-                    console.error('Error loading stats from API:', error);
-                    // Fallback ke JSONBin langsung
-                    await loadStatsFromJSONBin();
-                }
-            }
-
             // Load stats langsung dari JSONBin
-            async function loadStatsFromJSONBin() {
+            async function loadStats() {
                 try {
                     const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
                         headers: {
-                            'X-Master-Key': JSONBIN_MASTER_KEY,
-                            'X-Access-Key': JSONBIN_ACCESS_KEY
+                            'X-Master-Key': JSONBIN_MASTER_KEY
                         }
                     });
 
                     if (response.ok) {
                         const data = await response.json();
+                        console.log('Data dari JSONBin:', data); // Debug log
                         updateStatsDisplay(data.record);
                     } else {
+                        console.error('Response tidak ok:', response.status);
                         throw new Error('Failed to fetch from JSONBin');
                     }
                 } catch (error) {
@@ -830,20 +808,24 @@ Access-Control-Allow-Headers: Content-Type</pre>
 
             // Update stats display
             function updateStatsDisplay(stats) {
+                console.log('Stats yang diterima:', stats); // Debug log
+                
                 // Format numbers with commas
                 const formatNumber = (num) => {
-                    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    return num ? num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : '0';
                 };
                 
                 // Update today requests
                 const todayElement = document.getElementById('todayRequests');
-                todayElement.textContent = formatNumber(stats.totalTodayRequests || 0);
+                todayElement.textContent = formatNumber(stats.totalTodayRequests);
                 todayElement.classList.remove('pulse');
                 
                 // Update total requests
                 const totalElement = document.getElementById('totalRequests');
-                totalElement.textContent = formatNumber(stats.totalAllRequests || 0);
+                totalElement.textContent = formatNumber(stats.totalAllRequests);
                 totalElement.classList.remove('pulse');
+                
+                console.log('Today:', stats.totalTodayRequests, 'Total:', stats.totalAllRequests); // Debug log
             }
 
             // Load stats when page loads
