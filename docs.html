@@ -1,1941 +1,406 @@
 <!DOCTYPE html>
-<html lang="id" data-theme="light">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HXS API Documentation</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root {
-            /* Ocean Blue Theme Colors - Light */
-            --primary: #0077b6;
-            --primary-dark: #023e8a;
-            --primary-light: #90e0ef;
-            --secondary: #00b4d8;
-            --accent: #0077b6;
-            --background: #f8f9fa;
-            --surface: #ffffff;
-            --card: #ffffff;
-            --text: #212529;
-            --text-light: #6c757d;
-            --text-lighter: #adb5bd;
-            --border: #dee2e6;
-            --shadow: 0 2px 8px rgba(0, 119, 182, 0.1);
-            --shadow-lg: 0 8px 25px rgba(0, 119, 182, 0.15);
-            --radius: 10px;
-            --radius-sm: 6px;
-            --success: #28a745;
-            --warning: #ffc107;
-            --error: #dc3545;
-            --online: #28a745;
-            --offline: #dc3545;
-            --maintenance: #ffc107;
-        }
-
-        [data-theme="dark"] {
-            /* Ocean Blue Theme Colors - Dark */
-            --primary: #48cae4;
-            --primary-dark: #0096c7;
-            --primary-light: #90e0ef;
-            --secondary: #00b4d8;
-            --accent: #48cae4;
-            --background: #0a1929;
-            --surface: #112240;
-            --card: #1a365d;
-            --text: #e9ecef;
-            --text-light: #adb5bd;
-            --text-lighter: #6c757d;
-            --border: #2d3748;
-            --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.4);
-        }
-
-        /* Reset & Base Styles */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        html {
-            scroll-behavior: smooth;
-            font-size: 16px;
-        }
-
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: var(--background);
-            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-            transition: all 0.3s ease;
-            overflow-x: hidden;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 16px;
-        }
-
-        /* Header */
-        .header {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-            padding: 0.75rem 0;
-        }
-
-        .header-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            text-decoration: none;
-            color: var(--text);
-        }
-
-        .logo-icon {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1rem;
-            font-weight: bold;
-        }
-
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .logo-text h1 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            line-height: 1.2;
-        }
-
-        .logo-text span {
-            font-size: 0.75rem;
-            color: var(--text-light);
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .theme-toggle {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 0.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 2.5rem;
-            height: 2.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .theme-toggle:hover {
-            border-color: var(--primary);
-            transform: translateY(-1px);
-        }
-
-        .mobile-menu {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.25rem;
-            color: var(--text);
-            cursor: pointer;
-            width: 2.5rem;
-            height: 2.5rem;
-            align-items: center;
-            justify-content: center;
-            border-radius: var(--radius-sm);
-            transition: all 0.3s ease;
-        }
-
-        .mobile-menu:hover {
-            background: var(--card);
-        }
-
-        .nav {
-            display: flex;
-        }
-
-        .nav ul {
-            display: flex;
-            list-style: none;
-            gap: 1.5rem;
-            align-items: center;
-        }
-
-        .nav a {
-            color: var(--text);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            padding: 0.5rem 0.75rem;
-            border-radius: var(--radius-sm);
-            white-space: nowrap;
-        }
-
-        .nav a:hover {
-            color: var(--primary);
-            background: var(--card);
-        }
-
-        /* Hero Section */
-        .docs-hero {
-            padding: 120px 0 60px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .docs-hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="%23ffffff" fill-opacity="0.1"/></svg>');
-            background-size: cover;
-            background-position: bottom;
-        }
-
-        .docs-hero-content {
-            position: relative;
-            z-index: 1;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 1rem;
-        }
-
-        .docs-hero h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            line-height: 1.2;
-            margin-bottom: 1rem;
-        }
-
-        .docs-hero-subtitle {
-            font-size: 1.125rem;
-            margin-bottom: 2rem;
-            opacity: 0.95;
-            line-height: 1.6;
-        }
-
-        .docs-hero-buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        /* Button Styles */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: var(--radius);
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.875rem;
-            white-space: nowrap;
-        }
-
-        .btn-primary {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .btn-small {
-            padding: 0.5rem 1rem;
-            font-size: 0.8rem;
-        }
-
-        .btn-danger {
-            background: var(--error);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #c82333;
-        }
-
-        /* Quick Navigation */
-        .quick-nav {
-            background: var(--surface);
-            padding: 1.5rem 0;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 70px;
-            z-index: 999;
-            backdrop-filter: blur(10px);
-        }
-
-        .quick-nav-content {
-            display: flex;
-            gap: 0.75rem;
-            overflow-x: auto;
-            padding: 0.25rem 0;
-            scrollbar-width: none;
-        }
-
-        .quick-nav-content::-webkit-scrollbar {
-            display: none;
-        }
-
-        .nav-pill {
-            padding: 0.5rem 1.25rem;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 50px;
-            color: var(--text);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.85rem;
-            white-space: nowrap;
-            transition: all 0.3s ease;
-        }
-
-        .nav-pill:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .nav-pill.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        /* Main Content */
-        .docs-main {
-            padding: 3rem 0;
-        }
-
-        .docs-container {
-            display: grid;
-            grid-template-columns: 250px 1fr;
-            gap: 2rem;
-            align-items: start;
-        }
-
-        /* Sidebar */
-        .docs-sidebar {
-            position: sticky;
-            top: 130px;
-            max-height: calc(100vh - 150px);
-            overflow-y: auto;
-            padding-right: 1rem;
-        }
-
-        .sidebar-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .sidebar-section h3 {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-light);
-            margin-bottom: 0.75rem;
-            font-weight: 600;
-        }
-
-        .sidebar-links {
-            list-style: none;
-        }
-
-        .sidebar-links li {
-            margin-bottom: 0.375rem;
-        }
-
-        .sidebar-links a {
-            display: block;
-            padding: 0.5rem 0.75rem;
-            color: var(--text-light);
-            text-decoration: none;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
-            border-radius: var(--radius-sm);
-        }
-
-        .sidebar-links a:hover {
-            color: var(--primary);
-            background: var(--card);
-        }
-
-        .sidebar-links a.active {
-            color: var(--primary);
-            background: var(--card);
-            font-weight: 600;
-        }
-
-        /* Content */
-        .docs-content {
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
 
-        .content-section {
-            margin-bottom: 3rem;
-            scroll-margin-top: 120px;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
-        .content-section:last-child {
-            margin-bottom: 0;
-        }
-
-        .section-header {
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .section-header h2 {
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            color: var(--primary);
-        }
-
-        .section-header p {
-            font-size: 1.125rem;
-            color: var(--text-light);
-            line-height: 1.6;
-        }
-
-        /* API Cards */
-        .api-cards {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .api-card {
-            background: var(--card);
-            border-radius: var(--radius);
-            padding: 2rem;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            transition: all 0.3s ease;
-        }
-
-        .api-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .api-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-            margin-bottom: 1.25rem;
-        }
-
-        .api-icon {
-            width: 3rem;
-            height: 3rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
             color: white;
-            font-size: 1.25rem;
-            flex-shrink: 0;
         }
 
-        .api-info {
-            flex: 1;
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
-        .api-info h3 {
-            font-size: 1.375rem;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
         }
 
-        .api-status {
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
+        .api-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .status-live {
-            background: #d4edda;
-            color: #155724;
+        .api-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
         }
 
-        .status-dev {
-            background: #fff3cd;
-            color: #856404;
+        .section-title {
+            color: #4a5568;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
         }
 
-        .api-description {
-            color: var(--text-light);
-            font-size: 1.0625rem;
-            line-height: 1.6;
+        .endpoint {
+            background: #f7fafc;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
         }
 
-        /* Endpoint Sections */
-        .endpoint-section {
-            margin-top: 1.5rem;
+        .method {
+            display: inline-block;
+            padding: 5px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 10px;
         }
 
-        .endpoint-section h4 {
-            font-size: 1.25rem;
-            margin-bottom: 1rem;
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .endpoint-section h4 i {
-            color: var(--primary);
-        }
-
-        .endpoint-card {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            border: 1px solid var(--border);
-        }
-
-        .endpoint-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .method-badge {
-            padding: 0.375rem 0.75rem;
-            border-radius: var(--radius-sm);
-            font-weight: 600;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-        }
-
-        .method-badge.get {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
-        [data-theme="dark"] .method-badge.get {
-            background: #1b4b5a;
-            color: #d1ecf1;
-        }
-
-        .method-badge.post {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        [data-theme="dark"] .method-badge.post {
-            background: #1a472a;
-            color: #d4edda;
-        }
-
-        .endpoint-path {
-            font-family: 'Fira Code', 'Courier New', monospace;
-            background: var(--card);
-            padding: 0.5rem 0.75rem;
-            border-radius: var(--radius-sm);
-            font-size: 0.85rem;
-            flex: 1;
-            border: 1px solid var(--border);
-            min-width: 200px;
-        }
-
-        .endpoint-description {
-            color: var(--text-light);
-            margin-bottom: 1.25rem;
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-
-        .parameters-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .parameters-section h5 {
-            font-size: 1rem;
-            margin-bottom: 0.75rem;
-            color: var(--text);
-        }
-
-        .parameters-table {
-            background: var(--card);
-            border-radius: var(--radius);
-            overflow: hidden;
-            border: 1px solid var(--border);
-        }
-
-        .param-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 2fr;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .param-row.header {
-            background: var(--surface);
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-
-        .param-row:last-child {
-            border-bottom: none;
-        }
-
-        .param-name {
-            font-family: 'Fira Code', 'Courier New', monospace;
-            font-size: 0.85rem;
-        }
-
-        .param-type {
-            color: var(--primary);
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .param-required {
-            font-size: 0.85rem;
-        }
-
-        .param-desc {
-            color: var(--text-light);
-            font-size: 0.85rem;
-        }
-
-        .code-example {
-            margin: 1.5rem 0;
-        }
-
-        .code-example h5 {
-            font-size: 1rem;
-            margin-bottom: 0.75rem;
-            color: var(--text);
-        }
-
-        .code-block {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 1.25rem;
-            position: relative;
-            border: 1px solid var(--border);
-            overflow-x: auto;
-        }
-
-        .code-block pre {
-            margin: 0;
-            font-family: 'Fira Code', 'Courier New', monospace;
-            font-size: 0.85rem;
-            line-height: 1.5;
-            color: var(--text);
-            white-space: pre-wrap;
+        .url {
+            font-family: 'Courier New', monospace;
+            background: #edf2f7;
+            padding: 8px 12px;
+            border-radius: 4px;
             word-break: break-all;
         }
 
-        .copy-btn {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 0.375rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: var(--text-light);
-            font-size: 0.8rem;
+        .parameter {
+            margin: 15px 0;
         }
 
-        .copy-btn:hover {
-            background: var(--primary);
-            color: white;
+        .param-name {
+            font-weight: bold;
+            color: #2d3748;
         }
 
-        .endpoint-actions {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 1.25rem;
-            flex-wrap: wrap;
+        .param-required {
+            color: #e53e3e;
+            font-size: 0.9rem;
+            margin-left: 5px;
         }
 
-        /* Status Section */
-        .status-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
+        .param-optional {
+            color: #38a169;
+            font-size: 0.9rem;
+            margin-left: 5px;
         }
 
-        .status-card {
-            background: var(--card);
-            padding: 1.5rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
+        .response {
+            margin-top: 20px;
         }
 
-        .status-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.25rem;
+        .response pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9rem;
         }
 
-        .status-icon {
-            width: 2.5rem;
-            height: 2.5rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.125rem;
-            color: white;
-        }
-
-        .status-icon.online {
-            background: var(--online);
-        }
-
-        .status-icon.offline {
-            background: var(--offline);
-        }
-
-        .status-icon.maintenance {
-            background: var(--maintenance);
-        }
-
-        .status-info {
-            flex: 1;
-        }
-
-        .status-info h3 {
-            margin-bottom: 0.25rem;
-            font-size: 1.125rem;
-        }
-
-        .status-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: var(--radius-sm);
-            font-size: 0.75rem;
-            font-weight: 600;
+        .status-code {
             display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 5px;
         }
 
-        .status-badge.online {
-            background: #d4edda;
-            color: #155724;
+        .status-200 { background: #48bb78; color: white; }
+        .status-400 { background: #ed8936; color: white; }
+        .status-405 { background: #e53e3e; color: white; }
+        .status-500 { background: #e53e3e; color: white; }
+
+        .note {
+            background: #fffaf0;
+            border-left: 4px solid #ed8936;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
         }
 
-        .status-badge.offline {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .status-badge.maintenance {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-details {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .status-metric {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .status-metric:last-child {
-            border-bottom: none;
-        }
-
-        .metric-label {
-            color: var(--text-light);
-            font-size: 0.85rem;
-        }
-
-        .metric-value {
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-
-        /* Footer */
         .footer {
-            background: var(--surface);
-            padding: 3rem 0 1.5rem;
-            border-top: 1px solid var(--border);
-            margin-top: 2rem;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .footer-section h3,
-        .footer-section h4 {
-            margin-bottom: 1rem;
-            font-size: 1.125rem;
-        }
-
-        .footer-section ul {
-            list-style: none;
-        }
-
-        .footer-section ul li {
-            margin-bottom: 0.5rem;
-        }
-
-        .footer-section a {
-            color: var(--text-light);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.3s ease;
-        }
-
-        .footer-section a:hover {
-            color: var(--primary);
-        }
-
-        .social-links {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 1rem;
-        }
-
-        .social-links a {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 2.25rem;
-            height: 2.25rem;
-            background: var(--card);
-            border-radius: 50%;
-            color: var(--text);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-        }
-
-        .social-links a:hover {
-            background: var(--primary);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .footer-bottom {
             text-align: center;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border);
-            color: var(--text-light);
-            font-size: 0.85rem;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-            .docs-container {
-                grid-template-columns: 220px 1fr;
-                gap: 1.5rem;
-            }
+            color: white;
+            margin-top: 50px;
+            padding: 20px;
+            opacity: 0.8;
         }
 
         @media (max-width: 768px) {
-            .header-content {
-                flex-wrap: wrap;
-            }
-            
-            .nav {
-                display: none;
-                width: 100%;
-                margin-top: 1rem;
-                order: 3;
-            }
-            
-            .nav.active {
-                display: block;
-            }
-            
-            .nav ul {
-                flex-direction: column;
-                gap: 0.5rem;
-                align-items: stretch;
-            }
-            
-            .nav a {
-                display: block;
-                padding: 0.75rem 1rem;
-                border-radius: var(--radius-sm);
-            }
-            
-            .mobile-menu {
-                display: flex;
-            }
-            
-            .docs-container {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-            
-            .docs-sidebar {
-                position: static;
-                max-height: none;
-                order: 2;
-            }
-            
-            .quick-nav {
-                top: 60px;
-            }
-            
-            .docs-hero h1 {
+            .header h1 {
                 font-size: 2rem;
             }
             
-            .docs-hero-subtitle {
-                font-size: 1rem;
+            .api-section {
+                padding: 20px;
             }
             
-            .docs-hero-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .btn {
-                width: 100%;
-                justify-content: center;
-                max-width: 280px;
-            }
-            
-            .param-row {
-                grid-template-columns: 1fr;
-                gap: 0.5rem;
-                padding: 1rem;
-            }
-            
-            .param-row.header {
-                display: none;
-            }
-            
-            .param-row::before {
-                content: attr(data-label);
-                font-weight: 600;
-                font-size: 0.8rem;
-                color: var(--text-light);
-                margin-bottom: 0.25rem;
-            }
-            
-            .endpoint-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-            
-            .endpoint-path {
-                width: 100%;
-                min-width: auto;
-            }
-            
-            .api-card {
-                padding: 1.5rem;
-            }
-            
-            .endpoint-card {
-                padding: 1.25rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 0 12px;
-            }
-            
-            .docs-hero {
-                padding: 100px 0 40px;
-            }
-            
-            .docs-hero h1 {
-                font-size: 1.75rem;
-            }
-            
-            .section-header h2 {
-                font-size: 1.5rem;
-            }
-            
-            .api-info h3 {
-                font-size: 1.25rem;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-            
-            .status-cards {
-                grid-template-columns: 1fr;
-            }
-            
-            .footer-content {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-            
-            .logo-text h1 {
-                font-size: 1.125rem;
-            }
-            
-            .logo-text span {
-                font-size: 0.7rem;
-            }
-        }
-
-        /* High DPI Screens */
-        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-            .docs-hero::before {
-                background-size: 1200px auto;
-            }
-        }
-
-        /* Reduced Motion */
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-            
-            html {
-                scroll-behavior: auto;
+            .url {
+                font-size: 0.9rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <a href="/" class="logo">
-                    <div class="logo-icon">HX</div>
-                    <div class="logo-text">
-                        <h1>HXS API</h1>
-                        <span>by Hans & Stret</span>
-                    </div>
-                </a>
+    <div class="container">
+        <div class="header">
+            <h1>HXS API</h1>
+            <p>By Home & Start - Comprehensive API Documentation</p>
+        </div>
+
+        <!-- Introduction Section -->
+        <div class="api-section">
+            <h2 class="section-title">Introduction</h2>
+            <p>HXS API menyediakan berbagai layanan untuk pengembangan aplikasi, termasuk capture screenshot website, status monitoring, dan health check.</p>
+            
+            <div class="note">
+                <strong>Base URL:</strong> <code>https://your-domain.com/api</code>
+            </div>
+        </div>
+
+        <!-- SSWeb API Section -->
+        <div class="api-section">
+            <h2 class="section-title">SSWeb API - Website Screenshot</h2>
+            <p>Endpoint untuk mengambil screenshot dari website tertentu.</p>
+            
+            <div class="endpoint">
+                <span class="method">GET</span>
+                <span class="url">/api/ssweb?url=https://example.com</span>
                 
-                <div class="header-actions">
-                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-                        <i class="fas fa-moon"></i>
-                    </button>
-                    
-                    <button class="mobile-menu" id="mobileMenu" aria-label="Toggle menu">
-                        <i class="fas fa-bars"></i>
-                    </button>
+                <div class="parameter">
+                    <span class="param-name">url</span>
+                    <span class="param-required">*required</span>
+                    <p>URL lengkap website yang akan di-screenshot (harus termasuk protocol http:// atau https://)</p>
                 </div>
 
-                <nav class="nav" id="nav">
-                    <ul>
-                        <li><a href="/" class="nav-link">Home</a></li>
-                        <li><a href="#introduction" class="nav-link">Introduction</a></li>
-                        <li><a href="#getting-started" class="nav-link">Getting Started</a></li>
-                        <li><a href="#authentication" class="nav-link">Authentication</a></li>
-                        <li><a href="#ssweb-api" class="nav-link">SSWeb API</a></li>
-                        <li><a href="#youtube-api" class="nav-link">YouTube API</a></li>
-                        <li><a href="#status" class="nav-link">Status</a></li>
-                        <li><a href="#" onclick="openDeveloperConsole()" class="nav-link">Developer Logs</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-    </header>
+                <h4>Response Success:</h4>
+                <div class="response">
+                    <span class="status-code status-200">200 OK</span>
+                    <p>Mengembalikan gambar dalam format JPEG</p>
+                    <pre>{
+Content-Type: image/jpeg
+Content-Length: [size]
+X-Response-Time: [time]ms
+}</pre>
+                </div>
 
-    <!-- Hero Section -->
-    <section class="docs-hero">
-        <div class="container">
-            <div class="docs-hero-content">
-                <h1>HXS API Documentation</h1>
-                <p class="docs-hero-subtitle">
-                    Complete API reference, guides, and examples for the HXS API Platform. 
-                    Everything you need to integrate our services.
-                </p>
-                <div class="docs-hero-buttons">
-                    <a href="#getting-started" class="btn btn-primary">
-                        <i class="fas fa-rocket"></i>
-                        Quick Start
-                    </a>
-                    <a href="#ssweb-api" class="btn btn-secondary">
-                        <i class="fas fa-code"></i>
-                        API Reference
-                    </a>
+                <h4>Response Error:</h4>
+                <div class="response">
+                    <span class="status-code status-400">400 Bad Request</span>
+                    <span class="status-code status-500">500 Internal Server Error</span>
+                    <pre>{
+  "success": false,
+  "message": "Pesan error",
+  "error": "Detail error"
+}</pre>
+                </div>
+
+                <h4>Contoh Penggunaan:</h4>
+                <div class="response">
+                    <pre>// JavaScript
+const response = await fetch('/api/ssweb?url=https://google.com');
+const imageBlob = await response.blob();</pre>
                 </div>
             </div>
         </div>
-    </section>
 
-    <!-- Quick Navigation -->
-    <section class="quick-nav">
-        <div class="container">
-            <div class="quick-nav-content">
-                <a href="#introduction" class="nav-pill">Introduction</a>
-                <a href="#getting-started" class="nav-pill">Getting Started</a>
-                <a href="#authentication" class="nav-pill">Authentication</a>
-                <a href="#ssweb-api" class="nav-pill">SSWeb API</a>
-                <a href="#youtube-api" class="nav-pill">YouTube API</a>
-                <a href="#status" class="nav-pill">API Status</a>
-                <a href="#support" class="nav-pill">Support</a>
-            </div>
-        </div>
-    </section>
+        <!-- Status API Section -->
+        <div class="api-section">
+            <h2 class="section-title">Status API</h2>
+            <p>Endpoint untuk memeriksa status dan statistik API.</p>
+            
+            <div class="endpoint">
+                <span class="method">GET</span>
+                <span class="url">/api/status</span>
 
-    <!-- Main Content -->
-    <main class="docs-main">
-        <div class="container">
-            <div class="docs-container">
-                <!-- Sidebar -->
-                <aside class="docs-sidebar">
-                    <div class="sidebar-section">
-                        <h3>Getting Started</h3>
-                        <ul class="sidebar-links">
-                            <li><a href="#introduction" class="sidebar-link">Introduction</a></li>
-                            <li><a href="#getting-started" class="sidebar-link">Quick Start</a></li>
-                            <li><a href="#authentication" class="sidebar-link">Authentication</a></li>
-                            <li><a href="#rate-limiting" class="sidebar-link">Rate Limiting</a></li>
-                            <li><a href="#error-handling" class="sidebar-link">Error Handling</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="sidebar-section">
-                        <h3>API Reference</h3>
-                        <ul class="sidebar-links">
-                            <li><a href="#ssweb-api" class="sidebar-link">SSWeb API</a></li>
-                            <li><a href="#youtube-api" class="sidebar-link">YouTube API</a></li>
-                            <li><a href="#image-api" class="sidebar-link">Image Processing</a></li>
-                            <li><a href="#document-api" class="sidebar-link">Document Converter</a></li>
-                            <li><a href="#utility-api" class="sidebar-link">Utility APIs</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="sidebar-section">
-                        <h3>Resources</h3>
-                        <ul class="sidebar-links">
-                            <li><a href="#status" class="sidebar-link">API Status</a></li>
-                            <li><a href="#logs" class="sidebar-link">Developer Logs</a></li>
-                            <li><a href="#support" class="sidebar-link">Support</a></li>
-                            <li><a href="#changelog" class="sidebar-link">Changelog</a></li>
-                        </ul>
-                    </div>
-                </aside>
-
-                <!-- Content -->
-                <div class="docs-content">
-                    <!-- Introduction Section -->
-                    <section id="introduction" class="content-section">
-                        <div class="section-header">
-                            <h2><i class="fas fa-info-circle"></i> Introduction</h2>
-                            <p>Welcome to HXS API Platform - Powerful APIs for modern developers</p>
-                        </div>
-
-                        <div class="api-card">
-                            <div class="api-description">
-                                <p>HXS API Platform provides a comprehensive suite of APIs designed to help developers build amazing applications faster. From website screenshots to media processing, we handle the complex infrastructure so you can focus on building your product.</p>
-                                
-                                <div style="margin-top: 1.5rem;">
-                                    <h4 style="margin-bottom: 0.75rem; color: var(--primary);">Key Features</h4>
-                                    <ul style="color: var(--text-light); line-height: 1.7; padding-left: 1.25rem;">
-                                        <li style="margin-bottom: 0.5rem;"><strong>RESTful Design</strong> - Clean, consistent API design following REST principles</li>
-                                        <li style="margin-bottom: 0.5rem;"><strong>JSON Responses</strong> - All responses in JSON format for easy parsing</li>
-                                        <li style="margin-bottom: 0.5rem;"><strong>HTTPS Only</strong> - Secure connections with SSL encryption</li>
-                                        <li style="margin-bottom: 0.5rem;"><strong>CORS Enabled</strong> - Cross-origin requests supported for web applications</li>
-                                        <li style="margin-bottom: 0.5rem;"><strong>Rate Limiting</strong> - Fair usage policies to ensure service stability</li>
-                                        <li style="margin-bottom: 0.5rem;"><strong>Real-time Monitoring</strong> - Live status updates and performance metrics</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Getting Started Section -->
-                    <section id="getting-started" class="content-section">
-                        <div class="section-header">
-                            <h2><i class="fas fa-rocket"></i> Getting Started</h2>
-                            <p>Start integrating HXS APIs in just a few minutes</p>
-                        </div>
-
-                        <div class="api-card">
-                            <div class="api-description">
-                                <h4 style="margin-bottom: 0.75rem; color: var(--primary);">Base URL</h4>
-                                <p>All API requests should be made to:</p>
-                                <div class="code-block" style="margin: 1rem 0;">
-                                    <button class="copy-btn" onclick="copyCode('base-url')" aria-label="Copy code">
-                                        <i class="far fa-copy"></i>
-                                    </button>
-                                    <pre id="base-url"><code>https://your-domain.vercel.app/api</code></pre>
-                                </div>
-
-                                <h4 style="margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--primary);">Making Your First Request</h4>
-                                <p>Test the API with a simple health check:</p>
-                                <div class="code-block" style="margin: 1rem 0;">
-                                    <button class="copy-btn" onclick="copyCode('first-request')" aria-label="Copy code">
-                                        <i class="far fa-copy"></i>
-                                    </button>
-                                    <pre id="first-request"><code>fetch('https://your-domain.vercel.app/api/health')
-  .then(response => response.json())
-  .then(data => console.log(data));</code></pre>
-                                </div>
-
-                                <div class="endpoint-actions">
-                                    <button class="btn btn-primary" onclick="testHealthEndpoint()">
-                                        <i class="fas fa-play"></i>
-                                        Test Health Endpoint
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Authentication Section -->
-                    <section id="authentication" class="content-section">
-                        <div class="section-header">
-                            <h2><i class="fas fa-key"></i> Authentication</h2>
-                            <p>Secure your API requests with authentication</p>
-                        </div>
-
-                        <div class="api-card">
-                            <div class="api-description">
-                                <p>HXS API uses API keys to authenticate requests. You can view and manage your API keys in the Developer Console.</p>
-                                
-                                <h4 style="margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--primary);">Getting Your API Key</h4>
-                                <p>Access the Developer Console to generate and manage your API keys:</p>
-                                
-                                <div class="endpoint-actions">
-                                    <button class="btn btn-primary" onclick="openDeveloperConsole()">
-                                        <i class="fas fa-terminal"></i>
-                                        Developer Console
-                                    </button>
-                                </div>
-
-                                <h4 style="margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--primary);">Using Your API Key</h4>
-                                <p>Include your API key in the request header:</p>
-                                <div class="code-block" style="margin: 1rem 0;">
-                                    <button class="copy-btn" onclick="copyCode('auth-example')" aria-label="Copy code">
-                                        <i class="far fa-copy"></i>
-                                    </button>
-                                    <pre id="auth-example"><code>fetch('https://your-domain.vercel.app/api/endpoint', {
-  headers: {
-    'Authorization': 'Bearer YOUR_API_KEY'
-  }
-})
-.then(response => response.json())
-.then(data => console.log(data));</code></pre>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- SSWeb API Section -->
-                    <section id="ssweb-api" class="content-section">
-                        <div class="section-header">
-                            <h2><i class="fas fa-camera"></i> SSWeb API</h2>
-                            <p>Capture high-quality screenshots of any website</p>
-                        </div>
-
-                        <div class="api-card">
-                            <div class="api-header">
-                                <div class="api-icon">
-                                    <i class="fas fa-camera"></i>
-                                </div>
-                                <div class="api-info">
-                                    <h3>Website Screenshot API
-                                        <span class="api-status status-live">Live</span>
-                                    </h3>
-                                    <p class="api-description">
-                                        Capture screenshots of any website with customizable options. 
-                                        Perfect for generating previews, monitoring changes, or creating content.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <!-- Capture Endpoint -->
-                            <div class="endpoint-section">
-                                <h4><i class="fas fa-link"></i> Capture Screenshot</h4>
-                                
-                                <div class="endpoint-card">
-                                    <div class="endpoint-header">
-                                        <div class="method-badge get">GET</div>
-                                        <div class="endpoint-path">/api/ssweb</div>
-                                    </div>
-                                    
-                                    <div class="endpoint-description">
-                                        <p>Capture a screenshot of the specified website and receive the image directly.</p>
-                                    </div>
-
-                                    <div class="parameters-section">
-                                        <h5 style="color: var(--primary);">Query Parameters</h5>
-                                        <div class="parameters-table">
-                                            <div class="param-row header">
-                                                <div class="param-name">Name</div>
-                                                <div class="param-type">Type</div>
-                                                <div class="param-required">Required</div>
-                                                <div class="param-desc">Description</div>
-                                            </div>
-                                            <div class="param-row" data-label="Parameter">
-                                                <div class="param-name">url</div>
-                                                <div class="param-type">String</div>
-                                                <div class="param-required">Yes</div>
-                                                <div class="param-desc">Website URL to capture (include http:// or https://)</div>
-                                            </div>
-                                            <div class="param-row" data-label="Parameter">
-                                                <div class="param-name">width</div>
-                                                <div class="param-type">Number</div>
-                                                <div class="param-required">No</div>
-                                                <div class="param-desc">Viewport width in pixels (default: 1280)</div>
-                                            </div>
-                                            <div class="param-row" data-label="Parameter">
-                                                <div class="param-name">height</div>
-                                                <div class="param-type">Number</div>
-                                                <div class="param-required">No</div>
-                                                <div class="param-desc">Viewport height in pixels (default: 720)</div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="code-example">
-                                        <h5 style="color: var(--primary);">Example Request</h5>
-                                        <div class="code-block">
-                                            <button class="copy-btn" onclick="copyCode('ssweb-example')" aria-label="Copy code">
-                                                <i class="far fa-copy"></i>
-                                            </button>
-                                            <pre id="ssweb-example"><code>fetch('https://your-domain.vercel.app/api/ssweb?url=https://google.com')
-  .then(response => response.blob())
-  .then(blob => {
-    const img = document.createElement('img');
-    img.src = URL.createObjectURL(blob);
-    document.body.appendChild(img);
-  });</code></pre>
-                                        </div>
-                                    </div>
-
-                                    <div class="endpoint-actions">
-                                        <button class="btn btn-primary" onclick="testSSWebEndpoint()">
-                                            <i class="fas fa-play"></i>
-                                            Test Endpoint
-                                        </button>
-                                        <a href="#status" class="btn btn-secondary">
-                                            <i class="fas fa-chart-bar"></i>
-                                            Check Status
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- YouTube API Section -->
-                    <section id="youtube-api" class="content-section">
-                        <div class="section-header">
-                            <h2><i class="fab fa-youtube"></i> YouTube API</h2>
-                            <p>Extract data and information from YouTube videos</p>
-                        </div>
-
-                        <div class="api-card">
-                            <div class="api-header">
-                                <div class="api-icon">
-                                    <i class="fab fa-youtube"></i>
-                                </div>
-                                <div class="api-info">
-                                    <h3>YouTube Data API
-                                        <span class="api-status status-live">Live</span>
-                                    </h3>
-                                    <p class="api-description">
-                                        Get video information, download videos, and extract metadata from YouTube.
-                                        Perfect for content analysis, archiving, or integration with your applications.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <!-- Video Info Endpoint -->
-                            <div class="endpoint-section">
-                                <h4><i class="fas fa-info-circle"></i> Get Video Information</h4>
-                                
-                                <div class="endpoint-card">
-                                    <div class="endpoint-header">
-                                        <div class="method-badge get">GET</div>
-                                        <div class="endpoint-path">/api/youtube/info</div>
-                                    </div>
-                                    
-                                    <div class="endpoint-description">
-                                        <p>Retrieve detailed information about a YouTube video including title, description, duration, and more.</p>
-                                    </div>
-
-                                    <div class="parameters-section">
-                                        <h5 style="color: var(--primary);">Query Parameters</h5>
-                                        <div class="parameters-table">
-                                            <div class="param-row header">
-                                                <div class="param-name">Name</div>
-                                                <div class="param-type">Type</div>
-                                                <div class="param-required">Required</div>
-                                                <div class="param-desc">Description</div>
-                                            </div>
-                                            <div class="param-row" data-label="Parameter">
-                                                <div class="param-name">url</div>
-                                                <div class="param-type">String</div>
-                                                <div class="param-required">Yes</div>
-                                                <div class="param-desc">YouTube video URL or ID</div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="code-example">
-                                        <h5 style="color: var(--primary);">Example Request</h5>
-                                        <div class="code-block">
-                                            <button class="copy-btn" onclick="copyCode('youtube-example')" aria-label="Copy code">
-                                                <i class="far fa-copy"></i>
-                                            </button>
-                                            <pre id="youtube-example"><code>fetch('https://your-domain.vercel.app/api/youtube/info?url=https://youtube.com/watch?v=VIDEO_ID')
-  .then(response => response.json())
-  .then(data => console.log(data));</code></pre>
-                                        </div>
-                                    </div>
-
-                                    <div class="endpoint-actions">
-                                        <button class="btn btn-primary" onclick="testYouTubeEndpoint()">
-                                            <i class="fas fa-play"></i>
-                                            Test Endpoint
-                                        </button>
-                                        <a href="#status" class="btn btn-secondary">
-                                            <i class="fas fa-chart-bar"></i>
-                                            Check Status
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Status Section -->
-                    <section id="status" class="content-section">
-                        <div class="section-header">
-                            <h2><i class="fas fa-chart-bar"></i> API Status</h2>
-                            <p>Real-time monitoring of all API services</p>
-                        </div>
-
-                        <div class="status-cards">
-                            <div class="status-card">
-                                <div class="status-header">
-                                    <div class="status-icon online">
-                                        <i class="fas fa-camera"></i>
-                                    </div>
-                                    <div class="status-info">
-                                        <h3>SSWeb API</h3>
-                                        <div class="status-badge online">Online</div>
-                                    </div>
-                                </div>
-                                <div class="status-details">
-                                    <div class="status-metric">
-                                        <span class="metric-label">Response Time</span>
-                                        <span class="metric-value" id="ssweb-response">240ms</span>
-                                    </div>
-                                    <div class="status-metric">
-                                        <span class="metric-label">Uptime</span>
-                                        <span class="metric-value" id="ssweb-uptime">99.8%</span>
-                                    </div>
-                                    <div class="status-metric">
-                                        <span class="metric-label">Requests Today</span>
-                                        <span class="metric-value" id="ssweb-requests">1,243</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="status-card">
-                                <div class="status-header">
-                                    <div class="status-icon online">
-                                        <i class="fab fa-youtube"></i>
-                                    </div>
-                                    <div class="status-info">
-                                        <h3>YouTube API</h3>
-                                        <div class="status-badge online">Online</div>
-                                    </div>
-                                </div>
-                                <div class="status-details">
-                                    <div class="status-metric">
-                                        <span class="metric-label">Response Time</span>
-                                        <span class="metric-value" id="youtube-response">320ms</span>
-                                    </div>
-                                    <div class="status-metric">
-                                        <span class="metric-label">Uptime</span>
-                                        <span class="metric-value" id="youtube-uptime">99.5%</span>
-                                    </div>
-                                    <div class="status-metric">
-                                        <span class="metric-label">Requests Today</span>
-                                        <span class="metric-value" id="youtube-requests">892</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="status-card">
-                                <div class="status-header">
-                                    <div class="status-icon online">
-                                        <i class="fas fa-shield-alt"></i>
-                                    </div>
-                                    <div class="status-info">
-                                        <h3>Auth API</h3>
-                                        <div class="status-badge online">Online</div>
-                                    </div>
-                                </div>
-                                <div class="status-details">
-                                    <div class="status-metric">
-                                        <span class="metric-label">Response Time</span>
-                                        <span class="metric-value" id="auth-response">180ms</span>
-                                    </div>
-                                    <div class="status-metric">
-                                        <span class="metric-label">Uptime</span>
-                                        <span class="metric-value" id="auth-uptime">99.9%</span>
-                                    </div>
-                                    <div class="status-metric">
-                                        <span class="metric-label">Active Users</span>
-                                        <span class="metric-value" id="auth-users">856</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Support Section -->
-                    <section id="support" class="content-section">
-                        <div class="section-header">
-                            <h2><i class="fas fa-life-ring"></i> Support</h2>
-                            <p>Get help and support for the HXS API Platform</p>
-                        </div>
-
-                        <div class="api-card">
-                            <div class="api-description">
-                                <h4 style="margin-bottom: 0.75rem; color: var(--primary);">Need Help?</h4>
-                                <p>We're here to help you succeed with our APIs. Here are the best ways to get support:</p>
-                                
-                                <div style="margin-top: 1.5rem;">
-                                    <h5 style="margin-bottom: 0.75rem; color: var(--primary);">Support Channels</h5>
-                                    <ul style="color: var(--text-light); line-height: 1.7; padding-left: 1.25rem;">
-                                        <li style="margin-bottom: 0.5rem;"><strong>Documentation</strong> - This documentation is your first stop for answers</li>
-                                        <li style="margin-bottom: 0.5rem;"><strong>Developer Logs</strong> - Access real-time API logs for debugging</li>
-                                        <li style="margin-bottom: 0.5rem;"><strong>GitHub Issues</strong> - Report bugs and request features</li>
-                                        <li style="margin-bottom: 0.5rem;"><strong>Email Support</strong> - Get direct help from our team</li>
-                                        <li style="margin-bottom: 0.5rem;"><strong>Community Forum</strong> - Connect with other developers</li>
-                                    </ul>
-                                </div>
-
-                                <div style="margin-top: 1.5rem;">
-                                    <h5 style="margin-bottom: 0.75rem; color: var(--primary);">Developer Resources</h5>
-                                    <div class="endpoint-actions">
-                                        <button class="btn btn-primary" onclick="openDeveloperConsole()">
-                                            <i class="fas fa-terminal"></i>
-                                            Access Developer Logs
-                                        </button>
-                                        <a href="#" class="btn btn-secondary">
-                                            <i class="fab fa-github"></i>
-                                            GitHub Repository
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
+                <h4>Response:</h4>
+                <div class="response">
+                    <span class="status-code status-200">200 OK</span>
+                    <pre>{
+  "success": true,
+  "data": {
+    "totalRequests": 150,
+    "successfulRequests": 145,
+    "errorRequests": 5,
+    "averageResponseTime": 245,
+    "endpoints": {
+      "/api/ssweb": {
+        "requestCount": 100,
+        "successRate": 95.0
+      },
+      "/api/status": {
+        "requestCount": 30,
+        "successRate": 100.0
+      },
+      "/api/health": {
+        "requestCount": 20,
+        "successRate": 100.0
+      }
+    }
+  },
+  "timestamp": "2024-01-01T00:00:00.000Z"
+}</pre>
                 </div>
             </div>
         </div>
-    </main>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="logo">
-                        <div class="logo-icon">HX</div>
-                        <div class="logo-text">
-                            <h3>HXS API</h3>
-                            <span>by Hans & Stret</span>
-                        </div>
-                    </div>
-                    <p style="color: var(--text-light); font-size: 0.9rem; margin-top: 0.5rem;">Powerful API platform for modern developers. Reliable, scalable, and easy to use.</p>
-                    <div class="social-links">
-                        <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
-                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                        <a href="#" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
-                    </div>
+        <!-- Health Check API Section -->
+        <div class="api-section">
+            <h2 class="section-title">Health Check API</h2>
+            <p>Endpoint untuk memeriksa kesehatan sistem API.</p>
+            
+            <div class="endpoint">
+                <span class="method">GET</span>
+                <span class="url">/api/health</span>
+
+                <h4>Response:</h4>
+                <div class="response">
+                    <span class="status-code status-200">200 OK</span>
+                    <pre>{
+  "success": true,
+  "message": "API berjalan dengan baik",
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "version": "1.0.0"
+}</pre>
                 </div>
-                
-                <div class="footer-section">
-                    <h4>Documentation</h4>
-                    <ul>
-                        <li><a href="#introduction">Introduction</a></li>
-                        <li><a href="#getting-started">Getting Started</a></li>
-                        <li><a href="#ssweb-api">SSWeb API</a></li>
-                        <li><a href="#status">API Status</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Support</h4>
-                    <ul>
-                        <li><a href="#support">Help Center</a></li>
-                        <li><a href="#">Contact Us</a></li>
-                        <li><a href="#">Report Issue</a></li>
-                        <li><a href="#" onclick="openDeveloperConsole()">Developer Logs</a></li>
-                    </ul>
+            </div>
+        </div>
+
+        <!-- Error Handling Section -->
+        <div class="api-section">
+            <h2 class="section-title">Error Handling</h2>
+            <p>Semua endpoint mengikuti format error handling yang konsisten.</p>
+            
+            <div class="endpoint">
+                <h4>Format Error Standar:</h4>
+                <div class="response">
+                    <pre>{
+  "success": false,
+  "message": "Deskripsi error yang mudah dipahami"
+}</pre>
                 </div>
 
-                <div class="footer-section">
-                    <h4>Company</h4>
-                    <ul>
-                        <li><a href="/">Homepage</a></li>
-                        <li><a href="#">About</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                    </ul>
+                <h4>Status Code yang Digunakan:</h4>
+                <div class="response">
+                    <p><span class="status-code status-200">200</span> Success - Request berhasil</p>
+                    <p><span class="status-code status-400">400</span> Bad Request - Parameter tidak valid atau tidak lengkap</p>
+                    <p><span class="status-code status-405">405</span> Method Not Allowed - Method HTTP tidak didukung</p>
+                    <p><span class="status-code status-500">500</span> Internal Server Error - Kesalahan server internal</p>
                 </div>
+            </div>
+        </div>
+
+        <!-- CORS Support Section -->
+        <div class="api-section">
+            <h2 class="section-title">CORS Support</h2>
+            <p>Semua endpoint mendukung Cross-Origin Resource Sharing (CORS) dengan konfigurasi berikut:</p>
+            
+            <div class="response">
+                <pre>Access-Control-Allow-Origin: *
+Access-Control-Allow-Methods: GET, OPTIONS
+Access-Control-Allow-Headers: Content-Type</pre>
             </div>
             
-            <div class="footer-bottom">
-                <p>&copy; 2023 HXS API Platform. All rights reserved. | Developed by Hans & Stret</p>
+            <div class="note">
+                <strong>Catatan:</strong> API dapat diakses dari domain mana pun (*) dan mendukung preflight OPTIONS requests.
             </div>
         </div>
-    </footer>
+
+        <!-- Logging Section -->
+        <div class="api-section">
+            <h2 class="section-title">Logging System</h2>
+            <p>Setiap request ke API akan tercatat secara otomatis dengan informasi berikut:</p>
+            
+            <ul style="margin-left: 20px; margin-top: 10px;">
+                <li>IP Address pengguna</li>
+                <li>HTTP Method yang digunakan</li>
+                <li>Endpoint yang diakses</li>
+                <li>Status code response</li>
+                <li>User-Agent browser/klien</li>
+                <li>Waktu respons (response time)</li>
+                <li>Pesan error (jika terjadi)</li>
+                <li>URL target (untuk endpoint ssweb)</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2024 HXS API - Home & Start. All rights reserved.</p>
+            <p>Dokumentasi terakhir diperbarui: January 2024</p>
+        </div>
+    </div>
 
     <script>
-        // Configuration
-        const API_BASE_URL = window.location.origin;
-
-        // Theme Management
-        function initTheme() {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            updateThemeToggle(savedTheme);
-        }
-
-        function toggleTheme() {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        // Smooth scroll untuk anchor links
+        document.addEventListener('DOMContentLoaded', function() {
+            const links = document.querySelectorAll('a[href^="#"]');
             
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeToggle(newTheme);
-        }
-
-        function updateThemeToggle(theme) {
-            const toggle = document.getElementById('themeToggle');
-            const icon = toggle.querySelector('i');
-            
-            if (theme === 'dark') {
-                icon.className = 'fas fa-sun';
-                toggle.setAttribute('aria-label', 'Switch to light mode');
-            } else {
-                icon.className = 'fas fa-moon';
-                toggle.setAttribute('aria-label', 'Switch to dark mode');
-            }
-        }
-
-        // Mobile Menu
-        function initMobileMenu() {
-            const mobileMenu = document.getElementById('mobileMenu');
-            const nav = document.getElementById('nav');
-            
-            mobileMenu.addEventListener('click', () => {
-                nav.classList.toggle('active');
-                const isExpanded = nav.classList.contains('active');
-                mobileMenu.setAttribute('aria-expanded', isExpanded);
-                mobileMenu.querySelector('i').className = isExpanded ? 'fas fa-times' : 'fas fa-bars';
-            });
-            
-            // Close mobile menu when clicking on links
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', () => {
-                    nav.classList.remove('active');
-                    mobileMenu.setAttribute('aria-expanded', 'false');
-                    mobileMenu.querySelector('i').className = 'fas fa-bars';
-                });
-            });
-            
-            // Close mobile menu when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!nav.contains(e.target) && !mobileMenu.contains(e.target) && nav.classList.contains('active')) {
-                    nav.classList.remove('active');
-                    mobileMenu.setAttribute('aria-expanded', 'false');
-                    mobileMenu.querySelector('i').className = 'fas fa-bars';
-                }
-            });
-        }
-
-        // Smooth Scrolling
-        function initSmoothScroll() {
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
                     e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        const headerHeight = document.querySelector('.header').offsetHeight;
-                        const targetPosition = target.offsetTop - headerHeight - 20;
-                        
-                        window.scrollTo({
-                            top: targetPosition,
-                            behavior: 'smooth'
+                    
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
                         });
                     }
                 });
             });
-        }
 
-        // Active Navigation
-        function initActiveNav() {
-            const sections = document.querySelectorAll('.content-section');
-            const navLinks = document.querySelectorAll('.sidebar-link, .nav-pill');
-            const headerHeight = document.querySelector('.header').offsetHeight;
-            
+            // Add animation to API sections when they come into view
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        const id = entry.target.getAttribute('id');
-                        navLinks.forEach(link => {
-                            link.classList.remove('active');
-                            if (link.getAttribute('href') === `#${id}`) {
-                                link.classList.add('active');
-                            }
-                        });
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
                     }
                 });
-            }, { 
-                threshold: 0.3,
-                rootMargin: `-${headerHeight}px 0px -30% 0px`
-            });
-            
-            sections.forEach(section => observer.observe(section));
-        }
+            }, observerOptions);
 
-        // API Testing Functions
-        async function testSSWebEndpoint() {
-            const url = prompt('Enter website URL to capture:', 'https://google.com');
-            if (!url) return;
-            
-            try {
-                await Swal.fire({
-                    title: 'Taking Screenshot...',
-                    text: 'Please wait while we capture the website',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
-                
-                // Simulate API call for demo
-                setTimeout(() => {
-                    Swal.fire({
-                        title: 'Screenshot Captured!',
-                        html: `
-                            <p>Successfully captured screenshot of:</p>
-                            <p><strong>${url}</strong></p>
-                            <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-                                <p style="color: #6c757d; font-style: italic;">Screenshot would be displayed here in a real implementation</p>
-                            </div>
-                        `,
-                        confirmButtonText: 'Close'
-                    });
-                }, 1500);
-            } catch (error) {
-                Swal.fire('Error!', 'Failed to capture screenshot: ' + error.message, 'error');
-            }
-        }
-
-        async function testYouTubeEndpoint() {
-            const url = prompt('Enter YouTube video URL:', 'https://youtube.com/watch?v=dQw4w9WgXcQ');
-            if (!url) return;
-            
-            try {
-                await Swal.fire({
-                    title: 'Fetching Video Info...',
-                    text: 'Please wait while we retrieve video information',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
-                
-                // Simulate API call for demo
-                setTimeout(() => {
-                    Swal.fire({
-                        title: 'Video Information',
-                        html: `
-                            <div style="text-align: left;">
-                                <p><strong>Title:</strong> Example Video Title</p>
-                                <p><strong>Duration:</strong> 3:45</p>
-                                <p><strong>Views:</strong> 1,234,567</p>
-                                <p><strong>Upload Date:</strong> 2023-10-01</p>
-                                <p><strong>Channel:</strong> Example Channel</p>
-                            </div>
-                        `,
-                        confirmButtonText: 'Close'
-                    });
-                }, 1500);
-            } catch (error) {
-                Swal.fire('Error!', 'Failed to fetch video information: ' + error.message, 'error');
-            }
-        }
-
-        async function testHealthEndpoint() {
-            try {
-                await Swal.fire({
-                    title: 'Checking API Health...',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
-                
-                // Simulate API call for demo
-                setTimeout(() => {
-                    Swal.fire({
-                        title: 'API Health Status',
-                        html: `
-                            <div style="text-align: left;">
-                                <p><strong>Status:</strong> <span style="color: #28a745;">✓ Healthy</span></p>
-                                <p><strong>Response Time:</strong> 156ms</p>
-                                <p><strong>Message:</strong> All systems operational</p>
-                                <p><strong>Version:</strong> 1.2.3</p>
-                                <p><strong>Timestamp:</strong> ${new Date().toLocaleString()}</p>
-                            </div>
-                        `,
-                        icon: 'success'
-                    });
-                }, 1000);
-            } catch (error) {
-                Swal.fire('Error!', 'Failed to check API health: ' + error.message, 'error');
-            }
-        }
-
-        // Developer Console Functions
-        function openDeveloperConsole() {
-            Swal.fire({
-                title: 'Developer Console',
-                html: `
-                    <p>This feature requires authentication.</p>
-                    <p>Please contact administrators for access.</p>
-                `,
-                icon: 'info',
-                confirmButtonText: 'OK'
-            });
-        }
-
-        // Copy Code Function
-        function copyCode(elementId) {
-            const element = document.getElementById(elementId);
-            const text = element.textContent || element.innerText;
-            
-            navigator.clipboard.writeText(text).then(() => {
-                const button = element.parentElement.querySelector('.copy-btn');
-                const originalIcon = button.innerHTML;
-                
-                button.innerHTML = '<i class="fas fa-check"></i>';
-                button.style.background = 'var(--success)';
-                button.style.color = 'white';
-                
-                setTimeout(() => {
-                    button.innerHTML = originalIcon;
-                    button.style.background = '';
-                    button.style.color = '';
-                }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy text: ', err);
-                Swal.fire('Error!', 'Failed to copy code to clipboard', 'error');
-            });
-        }
-
-        // Initialize everything
-        document.addEventListener('DOMContentLoaded', function() {
-            initTheme();
-            initMobileMenu();
-            initSmoothScroll();
-            initActiveNav();
-            
-            // Event listeners
-            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-            
-            // Add responsive behavior for parameter tables
-            document.querySelectorAll('.param-row:not(.header)').forEach(row => {
-                const cells = row.querySelectorAll('div');
-                const labels = ['Name', 'Type', 'Required', 'Description'];
-                cells.forEach((cell, index) => {
-                    cell.setAttribute('data-label', labels[index]);
-                });
+            // Set initial state and observe API sections
+            document.querySelectorAll('.api-section').forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(20px)';
+                section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(section);
             });
         });
-
-        // Global functions
-        window.toggleTheme = toggleTheme;
-        window.testSSWebEndpoint = testSSWebEndpoint;
-        window.testYouTubeEndpoint = testYouTubeEndpoint;
-        window.testHealthEndpoint = testHealthEndpoint;
-        window.openDeveloperConsole = openDeveloperConsole;
-        window.copyCode = copyCode;
     </script>
 </body>
 </html>
