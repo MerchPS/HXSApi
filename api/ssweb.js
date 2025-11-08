@@ -1,5 +1,7 @@
 import { addLog } from '../lib/logger.js';
 import { incrementRequest } from '../lib/requestCounter.js';
+import fs from 'fs';
+import path from 'path';
 
 // SSWeb implementation
 const ssweb = {
@@ -54,21 +56,6 @@ const ssweb = {
     }
 }
 
-// Global storage untuk temporary images (gunakan Redis atau database di production)
-const imageStorage = new Map();
-const IMAGE_TTL = 10 * 60 * 1000; // 10 menit
-
-// Helper function untuk membersihkan expired images
-function cleanupExpiredImages() {
-    const now = Date.now();
-    for (const [key, value] of imageStorage.entries()) {
-        if (now - value.timestamp > IMAGE_TTL) {
-            imageStorage.delete(key);
-            console.log(`Cleaned up expired image: ${key}`);
-        }
-    }
-}
-
 // Helper function untuk extract domain dari URL
 function getDomainFromUrl(url) {
     try {
@@ -89,14 +76,6 @@ function generateTitle(url) {
 function generateDeveloperInfo(url) {
     const domain = getDomainFromUrl(url);
     return `${domain} Development Team`;
-}
-
-// Helper function untuk generate unique filename
-function generateFilename(url) {
-    const domain = getDomainFromUrl(url);
-    const timestamp = Date.now();
-    const random = Math.random().toString(36).substring(2, 8);
-    return `${domain}-${timestamp}-${random}.jpg`;
 }
 
 export default async function handler(req, res) {
@@ -131,7 +110,7 @@ export default async function handler(req, res) {
     }
     
     try {
-        const { url, format = 'json' } = req.query;
+        const { url } = req.query;
         
         if (!url) {
             addLog({
@@ -150,9 +129,8 @@ export default async function handler(req, res) {
         }
         
         // Validate URL
-        let parsedUrl;
         try {
-            parsedUrl = new URL(url);
+            new URL(url);
         } catch (error) {
             addLog({
                 ip: clientIP,
@@ -180,28 +158,9 @@ export default async function handler(req, res) {
         const buffer = await ssweb.capture(url);
         const responseTime = Date.now() - startTime;
 
-        // Generate unique filename dan simpan ke storage
-        const filename = generateFilename(url);
+        // Generate base64 image untuk response JSON
         const base64Image = buffer.toString('base64');
-        
-        // Simpan image ke temporary storage
-        imageStorage.set(filename, {
-            data: base64Image,
-            timestamp: Date.now(),
-            domain: getDomainFromUrl(url),
-            contentType: 'image/jpeg'
-        });
-        
-        // Schedule cleanup untuk image ini
-        setTimeout(() => {
-            if (imageStorage.has(filename)) {
-                imageStorage.delete(filename);
-                console.log(`Auto-cleaned image: ${filename}`);
-            }
-        }, IMAGE_TTL);
-
-        // Generate image URL - menggunakan endpoint terpisah
-        const imageUrl = `https://hxs-apis.vercel.app/api/image/${filename}`;
+        const imageUrl = `data:image/jpeg;base64,${base64Image}`;
         
         // Generate response data
         const domain = getDomainFromUrl(url);
@@ -219,16 +178,14 @@ export default async function handler(req, res) {
                     format: 'jpeg',
                     size: buffer.length,
                     dimensions: '1280x720',
-                    filename: filename,
-                    expires_in: '10 minutes',
-                    download_url: imageUrl
+                    download_info: "Image is embedded as base64. Copy the 'image' field and use it directly in img src."
                 }
             ],
             meta: {
                 response_time: responseTime,
                 credits: "HXS API - Home & Start",
                 version: "1.0.0",
-                cache_info: "Image will be automatically deleted after 10 minutes"
+                usage: "Use the 'image' field directly in your HTML: <img src='data:image/jpeg;base64,...' />"
             }
         };
 
@@ -239,26 +196,13 @@ export default async function handler(req, res) {
             status: 200,
             userAgent: req.headers['user-agent'],
             url: url,
-            responseTime: responseTime,
-            format: format,
-            filename: filename
+            responseTime: responseTime
         });
 
-        // Return berdasarkan format yang diminta
-        if (format === 'image') {
-            // Return langsung gambar
-            res.setHeader('Content-Type', 'image/jpeg');
-            res.setHeader('Content-Length', buffer.length);
-            res.setHeader('X-Response-Time', `${responseTime}ms`);
-            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-            res.setHeader('Content-Disposition', `inline; filename="screenshot-${domain}-${Date.now()}.jpg"`);
-            return res.send(buffer);
-        } else {
-            // Return JSON response (default)
-            res.setHeader('Content-Type', 'application/json');
-            res.setHeader('X-Response-Time', `${responseTime}ms`);
-            return res.json(responseData);
-        }
+        // Selalu return JSON dengan base64 image
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('X-Response-Time', `${responseTime}ms`);
+        return res.json(responseData);
         
     } catch (error) {
         const responseTime = Date.now() - startTime;
@@ -281,9 +225,3 @@ export default async function handler(req, res) {
         });
     }
 }
-
-// Export imageStorage untuk digunakan di endpoint lain
-export { imageStorage, cleanupExpiredImages };
-
-// Cleanup expired images setiap 5 menit
-setInterval(cleanupExpiredImages, 5 * 60 * 1000);
