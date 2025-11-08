@@ -54,9 +54,9 @@ const ssweb = {
     }
 }
 
-// In-memory storage untuk temporary images
+// Global storage untuk temporary images (gunakan Redis atau database di production)
 const imageStorage = new Map();
-const IMAGE_TTL = 5 * 60 * 1000; // 5 menit
+const IMAGE_TTL = 10 * 60 * 1000; // 10 menit
 
 // Helper function untuk membersihkan expired images
 function cleanupExpiredImages() {
@@ -64,6 +64,7 @@ function cleanupExpiredImages() {
     for (const [key, value] of imageStorage.entries()) {
         if (now - value.timestamp > IMAGE_TTL) {
             imageStorage.delete(key);
+            console.log(`Cleaned up expired image: ${key}`);
         }
     }
 }
@@ -111,30 +112,6 @@ export default async function handler(req, res) {
     
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
-    }
-    
-    // Handler untuk image request
-    if (req.url.startsWith('/api/ssweb/img/')) {
-        const filename = req.url.split('/').pop();
-        
-        if (imageStorage.has(filename)) {
-            const imageData = imageStorage.get(filename);
-            const buffer = Buffer.from(imageData.data, 'base64');
-            
-            res.setHeader('Content-Type', 'image/jpeg');
-            res.setHeader('Content-Length', buffer.length);
-            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-            res.setHeader('Pragma', 'no-cache');
-            res.setHeader('Expires', '0');
-            res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
-            
-            return res.send(buffer);
-        } else {
-            return res.status(404).json({
-                success: false,
-                message: 'Image not found or expired'
-            });
-        }
     }
     
     if (req.method !== 'GET') {
@@ -211,18 +188,20 @@ export default async function handler(req, res) {
         imageStorage.set(filename, {
             data: base64Image,
             timestamp: Date.now(),
-            domain: getDomainFromUrl(url)
+            domain: getDomainFromUrl(url),
+            contentType: 'image/jpeg'
         });
         
-        // Schedule cleanup
+        // Schedule cleanup untuk image ini
         setTimeout(() => {
             if (imageStorage.has(filename)) {
                 imageStorage.delete(filename);
+                console.log(`Auto-cleaned image: ${filename}`);
             }
         }, IMAGE_TTL);
 
-        // Generate image URL
-        const imageUrl = `https://hxs-apis.vercel.app/api/ssweb/img/${filename}`;
+        // Generate image URL - menggunakan endpoint terpisah
+        const imageUrl = `https://hxs-apis.vercel.app/api/image/${filename}`;
         
         // Generate response data
         const domain = getDomainFromUrl(url);
@@ -241,14 +220,15 @@ export default async function handler(req, res) {
                     size: buffer.length,
                     dimensions: '1280x720',
                     filename: filename,
-                    expires_in: '5 minutes'
+                    expires_in: '10 minutes',
+                    download_url: imageUrl
                 }
             ],
             meta: {
                 response_time: responseTime,
                 credits: "HXS API - Home & Start",
                 version: "1.0.0",
-                cache_info: "Image will be automatically deleted after 5 minutes"
+                cache_info: "Image will be automatically deleted after 10 minutes"
             }
         };
 
@@ -302,5 +282,8 @@ export default async function handler(req, res) {
     }
 }
 
-// Cleanup expired images setiap 1 menit
-setInterval(cleanupExpiredImages, 60 * 1000);
+// Export imageStorage untuk digunakan di endpoint lain
+export { imageStorage, cleanupExpiredImages };
+
+// Cleanup expired images setiap 5 menit
+setInterval(cleanupExpiredImages, 5 * 60 * 1000);
