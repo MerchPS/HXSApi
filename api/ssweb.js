@@ -1,4 +1,5 @@
 import { addLog } from '../lib/logger.js';
+import { incrementRequest } from '../lib/requestCounter.js';
 
 // SSWeb implementation
 const ssweb = {
@@ -122,6 +123,9 @@ export default async function handler(req, res) {
                 message: 'Format URL tidak valid'
             });
         }
+
+        // Increment request counter
+        const requestStats = await incrementRequest('/api/ssweb');
         
         const buffer = await ssweb.capture(url);
         const responseTime = Date.now() - startTime;
@@ -133,12 +137,15 @@ export default async function handler(req, res) {
             status: 200,
             userAgent: req.headers['user-agent'],
             url: url,
-            responseTime: responseTime
+            responseTime: responseTime,
+            requestStats: requestStats
         });
         
         res.setHeader('Content-Type', 'image/jpeg');
         res.setHeader('Content-Length', buffer.length);
         res.setHeader('X-Response-Time', `${responseTime}ms`);
+        res.setHeader('X-Total-Requests', requestStats.totalAllRequests);
+        res.setHeader('X-Today-Requests', requestStats.totalTodayRequests);
         
         return res.send(buffer);
         
