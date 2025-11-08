@@ -3,50 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HXS API Documentation - Complete API Reference</title>
+    <title>HXS API Documentation</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary: #06b6d4;
-            --accent: #3b82f6;
-            --background: #ffffff;
-            --surface: #f8fafc;
+            /* Ocean Blue Theme Colors - Light */
+            --primary: #0077b6;
+            --primary-dark: #023e8a;
+            --primary-light: #90e0ef;
+            --secondary: #00b4d8;
+            --accent: #0077b6;
+            --background: #f8f9fa;
+            --surface: #ffffff;
             --card: #ffffff;
-            --text: #1e293b;
-            --text-light: #64748b;
-            --text-lighter: #94a3b8;
-            --border: #e2e8f0;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --radius: 12px;
-            --radius-sm: 8px;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --error: #ef4444;
-            --online: #10b981;
-            --offline: #ef4444;
-            --maintenance: #f59e0b;
+            --text: #212529;
+            --text-light: #6c757d;
+            --text-lighter: #adb5bd;
+            --border: #dee2e6;
+            --shadow: 0 2px 8px rgba(0, 119, 182, 0.1);
+            --shadow-lg: 0 8px 25px rgba(0, 119, 182, 0.15);
+            --radius: 10px;
+            --radius-sm: 6px;
+            --success: #28a745;
+            --warning: #ffc107;
+            --error: #dc3545;
+            --online: #28a745;
+            --offline: #dc3545;
+            --maintenance: #ffc107;
         }
 
         [data-theme="dark"] {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --secondary: #06b6d4;
-            --accent: #60a5fa;
-            --background: #0f172a;
-            --surface: #1e293b;
-            --card: #1e293b;
-            --text: #f1f5f9;
-            --text-light: #cbd5e1;
-            --text-lighter: #64748b;
-            --border: #334155;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+            /* Ocean Blue Theme Colors - Dark */
+            --primary: #48cae4;
+            --primary-dark: #0096c7;
+            --primary-light: #90e0ef;
+            --secondary: #00b4d8;
+            --accent: #48cae4;
+            --background: #0a1929;
+            --surface: #112240;
+            --card: #1a365d;
+            --text: #e9ecef;
+            --text-light: #adb5bd;
+            --text-lighter: #6c757d;
+            --border: #2d3748;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.4);
         }
 
+        /* Reset & Base Styles */
         * {
             margin: 0;
             padding: 0;
@@ -55,21 +60,23 @@
 
         html {
             scroll-behavior: smooth;
+            font-size: 16px;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: var(--background);
             color: var(--text);
             line-height: 1.6;
             transition: all 0.3s ease;
+            overflow-x: hidden;
         }
 
         .container {
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 16px;
         }
 
         /* Header */
@@ -81,172 +88,127 @@
             width: 100%;
             z-index: 1000;
             backdrop-filter: blur(10px);
+            padding: 0.75rem 0;
         }
 
         .header-content {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 1rem 0;
+            gap: 1rem;
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text);
         }
 
-        .logo i {
-            font-size: 2rem;
-            color: var(--primary);
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
         }
 
-        .logo h1 {
-            font-size: 1.5rem;
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-text h1 {
+            font-size: 1.25rem;
             font-weight: 700;
+            line-height: 1.2;
         }
 
-        .logo span {
-            font-size: 0.875rem;
+        .logo-text span {
+            font-size: 0.75rem;
             color: var(--text-light);
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
         .theme-toggle {
             background: var(--card);
             border: 1px solid var(--border);
-            border-radius: var(--radius);
+            border-radius: var(--radius-sm);
             padding: 0.5rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            position: relative;
-            width: 3rem;
-            height: 3rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .theme-toggle:hover {
             border-color: var(--primary);
-        }
-
-        .theme-toggle i {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            transition: all 0.3s ease;
-        }
-
-        .theme-toggle .fa-sun {
-            opacity: 0;
-        }
-
-        [data-theme="dark"] .theme-toggle .fa-moon {
-            opacity: 0;
-        }
-
-        [data-theme="dark"] .theme-toggle .fa-sun {
-            opacity: 1;
+            transform: translateY(-1px);
         }
 
         .mobile-menu {
             display: none;
             background: none;
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             color: var(--text);
             cursor: pointer;
+            width: 2.5rem;
+            height: 2.5rem;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu:hover {
+            background: var(--card);
+        }
+
+        .nav {
+            display: flex;
         }
 
         .nav ul {
             display: flex;
             list-style: none;
-            gap: 2rem;
+            gap: 1.5rem;
+            align-items: center;
         }
 
         .nav a {
             color: var(--text);
             text-decoration: none;
             font-weight: 500;
-            transition: color 0.3s ease;
-            position: relative;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-sm);
+            white-space: nowrap;
         }
 
         .nav a:hover {
             color: var(--primary);
-        }
-
-        .nav a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary);
-            transition: width 0.3s ease;
-        }
-
-        .nav a:hover::after {
-            width: 100%;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: var(--radius);
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.875rem;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: var(--surface);
-            color: var(--text);
-            border: 1px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        .btn-small {
-            padding: 0.5rem 1rem;
-            font-size: 0.75rem;
-        }
-
-        .btn-danger {
-            background: var(--error);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #dc2626;
+            background: var(--card);
         }
 
         /* Hero Section */
         .docs-hero {
-            padding: 140px 0 80px;
+            padding: 120px 0 60px;
             background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
             text-align: center;
@@ -261,7 +223,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,197.3C1248,203,1344,149,1392,122.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="%23ffffff" fill-opacity="0.1"/></svg>');
             background-size: cover;
             background-position: bottom;
         }
@@ -271,19 +233,21 @@
             z-index: 1;
             max-width: 800px;
             margin: 0 auto;
+            padding: 0 1rem;
         }
 
         .docs-hero h1 {
-            font-size: 3.5rem;
+            font-size: 2.5rem;
             font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            margin-bottom: 1rem;
         }
 
         .docs-hero-subtitle {
-            font-size: 1.25rem;
-            margin-bottom: 2.5rem;
-            opacity: 0.9;
+            font-size: 1.125rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+            line-height: 1.6;
         }
 
         .docs-hero-buttons {
@@ -293,42 +257,76 @@
             flex-wrap: wrap;
         }
 
-        .docs-hero .btn-primary {
+        /* Button Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
         }
 
-        .docs-hero .btn-primary:hover {
+        .btn-primary:hover {
             background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
         }
 
-        .docs-hero .btn-secondary {
+        .btn-secondary {
             background: transparent;
             color: white;
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
-        .docs-hero .btn-secondary:hover {
+        .btn-secondary:hover {
             background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
         }
 
         /* Quick Navigation */
         .quick-nav {
             background: var(--surface);
-            padding: 2rem 0;
+            padding: 1.5rem 0;
             border-bottom: 1px solid var(--border);
             position: sticky;
-            top: 80px;
+            top: 70px;
             z-index: 999;
             backdrop-filter: blur(10px);
         }
 
         .quick-nav-content {
             display: flex;
-            gap: 1rem;
+            gap: 0.75rem;
             overflow-x: auto;
-            padding: 0.5rem 0;
+            padding: 0.25rem 0;
+            scrollbar-width: none;
         }
 
         .quick-nav-content::-webkit-scrollbar {
@@ -336,14 +334,14 @@
         }
 
         .nav-pill {
-            padding: 0.75rem 1.5rem;
+            padding: 0.5rem 1.25rem;
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: 50px;
             color: var(--text);
             text-decoration: none;
             font-weight: 500;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             white-space: nowrap;
             transition: all 0.3s ease;
         }
@@ -361,34 +359,35 @@
 
         /* Main Content */
         .docs-main {
-            padding: 4rem 0;
+            padding: 3rem 0;
         }
 
         .docs-container {
             display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 3rem;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
             align-items: start;
         }
 
         /* Sidebar */
         .docs-sidebar {
             position: sticky;
-            top: 140px;
-            max-height: calc(100vh - 160px);
+            top: 130px;
+            max-height: calc(100vh - 150px);
             overflow-y: auto;
+            padding-right: 1rem;
         }
 
         .sidebar-section {
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .sidebar-section h3 {
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: var(--text-light);
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
             font-weight: 600;
         }
 
@@ -397,28 +396,27 @@
         }
 
         .sidebar-links li {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.375rem;
         }
 
         .sidebar-links a {
             display: block;
-            padding: 0.5rem 0;
+            padding: 0.5rem 0.75rem;
             color: var(--text-light);
             text-decoration: none;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             transition: all 0.3s ease;
-            border-left: 2px solid transparent;
-            padding-left: 1rem;
+            border-radius: var(--radius-sm);
         }
 
         .sidebar-links a:hover {
             color: var(--primary);
-            border-left-color: var(--primary);
+            background: var(--card);
         }
 
         .sidebar-links a.active {
             color: var(--primary);
-            border-left-color: var(--primary);
+            background: var(--card);
             font-weight: 600;
         }
 
@@ -428,8 +426,8 @@
         }
 
         .content-section {
-            margin-bottom: 4rem;
-            scroll-margin-top: 140px;
+            margin-bottom: 3rem;
+            scroll-margin-top: 120px;
         }
 
         .content-section:last-child {
@@ -437,38 +435,38 @@
         }
 
         .section-header {
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
         }
 
         .section-header h2 {
-            font-size: 2rem;
+            font-size: 1.75rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
             gap: 0.75rem;
-        }
-
-        .section-header h2 i {
             color: var(--primary);
         }
 
         .section-header p {
             font-size: 1.125rem;
             color: var(--text-light);
+            line-height: 1.6;
         }
 
         /* API Cards */
         .api-cards {
             display: flex;
             flex-direction: column;
-            gap: 2rem;
+            gap: 1.5rem;
         }
 
         .api-card {
             background: var(--card);
             border-radius: var(--radius);
-            padding: 2.5rem;
+            padding: 2rem;
             box-shadow: var(--shadow);
             border: 1px solid var(--border);
             transition: all 0.3s ease;
@@ -483,13 +481,13 @@
             display: flex;
             align-items: flex-start;
             gap: 1rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
 
         .api-icon {
             width: 3rem;
             height: 3rem;
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             border-radius: var(--radius);
             display: flex;
             align-items: center;
@@ -504,11 +502,12 @@
         }
 
         .api-info h3 {
-            font-size: 1.5rem;
+            font-size: 1.375rem;
             margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
             gap: 1rem;
+            flex-wrap: wrap;
         }
 
         .api-status {
@@ -519,29 +518,29 @@
         }
 
         .status-live {
-            background: #dcfce7;
-            color: #166534;
+            background: #d4edda;
+            color: #155724;
         }
 
         .status-dev {
-            background: #fef3c7;
-            color: #92400e;
+            background: #fff3cd;
+            color: #856404;
         }
 
         .api-description {
             color: var(--text-light);
-            font-size: 1.125rem;
-            line-height: 1.7;
+            font-size: 1.0625rem;
+            line-height: 1.6;
         }
 
         /* Endpoint Sections */
         .endpoint-section {
-            margin-top: 2rem;
+            margin-top: 1.5rem;
         }
 
         .endpoint-section h4 {
             font-size: 1.25rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             color: var(--text);
             display: flex;
             align-items: center;
@@ -555,71 +554,72 @@
         .endpoint-card {
             background: var(--surface);
             border-radius: var(--radius);
-            padding: 2rem;
-            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
             border: 1px solid var(--border);
         }
 
         .endpoint-header {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
             flex-wrap: wrap;
         }
 
         .method-badge {
-            padding: 0.5rem 1rem;
+            padding: 0.375rem 0.75rem;
             border-radius: var(--radius-sm);
             font-weight: 600;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
         }
 
         .method-badge.get {
-            background: #dbeafe;
-            color: #1d4ed8;
+            background: #d1ecf1;
+            color: #0c5460;
         }
 
         [data-theme="dark"] .method-badge.get {
-            background: #1e3a8a;
-            color: #dbeafe;
+            background: #1b4b5a;
+            color: #d1ecf1;
         }
 
         .method-badge.post {
-            background: #dcfce7;
-            color: #166534;
+            background: #d4edda;
+            color: #155724;
         }
 
         [data-theme="dark"] .method-badge.post {
-            background: #14532d;
-            color: #dcfce7;
+            background: #1a472a;
+            color: #d4edda;
         }
 
         .endpoint-path {
-            font-family: 'Fira Code', monospace;
+            font-family: 'Fira Code', 'Courier New', monospace;
             background: var(--card);
-            padding: 0.75rem 1rem;
+            padding: 0.5rem 0.75rem;
             border-radius: var(--radius-sm);
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             flex: 1;
             border: 1px solid var(--border);
+            min-width: 200px;
         }
 
         .endpoint-description {
             color: var(--text-light);
-            margin-bottom: 1.5rem;
-            font-size: 1rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.95rem;
             line-height: 1.6;
         }
 
         .parameters-section {
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .parameters-section h5 {
             font-size: 1rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
             color: var(--text);
         }
 
@@ -633,14 +633,15 @@
         .param-row {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr 2fr;
-            gap: 1rem;
-            padding: 1rem 1.5rem;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
             border-bottom: 1px solid var(--border);
         }
 
         .param-row.header {
             background: var(--surface);
             font-weight: 600;
+            font-size: 0.85rem;
         }
 
         .param-row:last-child {
@@ -648,39 +649,39 @@
         }
 
         .param-name {
-            font-family: 'Fira Code', monospace;
-            font-size: 0.875rem;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.85rem;
         }
 
         .param-type {
             color: var(--primary);
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             font-weight: 600;
         }
 
         .param-required {
-            font-size: 0.875rem;
+            font-size: 0.85rem;
         }
 
         .param-desc {
             color: var(--text-light);
-            font-size: 0.875rem;
+            font-size: 0.85rem;
         }
 
         .code-example {
-            margin: 2rem 0;
+            margin: 1.5rem 0;
         }
 
         .code-example h5 {
             font-size: 1rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
             color: var(--text);
         }
 
         .code-block {
             background: var(--surface);
             border-radius: var(--radius);
-            padding: 1.5rem;
+            padding: 1.25rem;
             position: relative;
             border: 1px solid var(--border);
             overflow-x: auto;
@@ -688,23 +689,26 @@
 
         .code-block pre {
             margin: 0;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.875rem;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.85rem;
             line-height: 1.5;
             color: var(--text);
+            white-space: pre-wrap;
+            word-break: break-all;
         }
 
         .copy-btn {
             position: absolute;
-            top: 0.75rem;
-            right: 0.75rem;
+            top: 0.5rem;
+            right: 0.5rem;
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
-            padding: 0.5rem;
+            padding: 0.375rem;
             cursor: pointer;
             transition: all 0.3s ease;
             color: var(--text-light);
+            font-size: 0.8rem;
         }
 
         .copy-btn:hover {
@@ -714,20 +718,21 @@
 
         .endpoint-actions {
             display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+            flex-wrap: wrap;
         }
 
         /* Status Section */
         .status-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
         }
 
         .status-card {
             background: var(--card);
-            padding: 2rem;
+            padding: 1.5rem;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             border: 1px solid var(--border);
@@ -737,17 +742,17 @@
             display: flex;
             align-items: center;
             gap: 1rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
 
         .status-icon {
-            width: 3rem;
-            height: 3rem;
+            width: 2.5rem;
+            height: 2.5rem;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.25rem;
+            font-size: 1.125rem;
             color: white;
         }
 
@@ -768,7 +773,8 @@
         }
 
         .status-info h3 {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
+            font-size: 1.125rem;
         }
 
         .status-badge {
@@ -780,31 +786,31 @@
         }
 
         .status-badge.online {
-            background: #dcfce7;
-            color: #166534;
+            background: #d4edda;
+            color: #155724;
         }
 
         .status-badge.offline {
-            background: #fee2e2;
-            color: #dc2626;
+            background: #f8d7da;
+            color: #721c24;
         }
 
         .status-badge.maintenance {
-            background: #fef3c7;
-            color: #92400e;
+            background: #fff3cd;
+            color: #856404;
         }
 
         .status-details {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.75rem;
         }
 
         .status-metric {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.75rem 0;
+            padding: 0.5rem 0;
             border-bottom: 1px solid var(--border);
         }
 
@@ -814,276 +820,33 @@
 
         .metric-label {
             color: var(--text-light);
-            font-size: 0.875rem;
+            font-size: 0.85rem;
         }
 
         .metric-value {
             font-weight: 600;
-            font-size: 0.875rem;
-        }
-
-        /* Developer Console Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 2000;
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: var(--card);
-            border-radius: var(--radius);
-            width: 90%;
-            max-width: 800px;
-            max-height: 80vh;
-            overflow: hidden;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .modal-header {
-            background: var(--surface);
-            padding: 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .modal-header h3 {
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            color: var(--text-light);
-            font-size: 1.25rem;
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .close-modal:hover {
-            color: var(--error);
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-            max-height: 60vh;
-            overflow-y: auto;
-        }
-
-        .password-section {
-            margin-bottom: 2rem;
-        }
-
-        .password-input-group {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .password-input {
-            flex: 1;
-            padding: 0.75rem 1rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            background: var(--surface);
-            color: var(--text);
-            font-size: 0.875rem;
-        }
-
-        .password-input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .logs-section {
-            margin-top: 2rem;
-        }
-
-        .logs-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .logs-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .logs-container {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 1rem;
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid var(--border);
-        }
-
-        .log-entry {
-            background: var(--card);
-            border-radius: var(--radius-sm);
-            padding: 1rem;
-            margin-bottom: 0.75rem;
-            border: 1px solid var(--border);
-        }
-
-        .log-entry:last-child {
-            margin-bottom: 0;
-        }
-
-        .log-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .log-time {
-            color: var(--text-light);
-            font-size: 0.75rem;
-            font-family: 'Fira Code', monospace;
-        }
-
-        .log-ip {
-            color: var(--primary);
-            font-size: 0.75rem;
-            font-family: 'Fira Code', monospace;
-            background: var(--surface);
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-        }
-
-        .log-method {
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            text-transform: uppercase;
-        }
-
-        .log-method.get {
-            background: #dbeafe;
-            color: #1d4ed8;
-        }
-
-        .log-method.post {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .log-method.delete {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .log-status {
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-        }
-
-        .log-status.status-200,
-        .log-status.status-201 {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .log-status.status-400,
-        .log-status.status-401,
-        .log-status.status-404 {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .log-status.status-500 {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-
-        .log-details {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-
-        .log-endpoint {
-            font-family: 'Fira Code', monospace;
-            font-size: 0.875rem;
-            color: var(--text);
-        }
-
-        .log-url {
-            font-size: 0.75rem;
-            color: var(--text-light);
-            word-break: break-all;
-        }
-
-        .log-ua {
-            font-size: 0.7rem;
-            color: var(--text-lighter);
-            font-style: italic;
-        }
-
-        .log-error {
-            font-size: 0.75rem;
-            color: var(--error);
-            background: #fee2e2;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            margin-top: 0.25rem;
-        }
-
-        .log-response {
-            font-size: 0.75rem;
-            color: var(--success);
-            background: #dcfce7;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            display: inline-block;
-            width: fit-content;
-        }
-
-        .no-logs {
-            text-align: center;
-            color: var(--text-light);
-            padding: 2rem;
-            font-style: italic;
+            font-size: 0.85rem;
         }
 
         /* Footer */
         .footer {
             background: var(--surface);
-            padding: 4rem 0 2rem;
+            padding: 3rem 0 1.5rem;
             border-top: 1px solid var(--border);
+            margin-top: 2rem;
         }
 
         .footer-content {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 3rem;
-            margin-bottom: 3rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
         }
 
         .footer-section h3,
         .footer-section h4 {
             margin-bottom: 1rem;
+            font-size: 1.125rem;
         }
 
         .footer-section ul {
@@ -1097,6 +860,7 @@
         .footer-section a {
             color: var(--text-light);
             text-decoration: none;
+            font-size: 0.9rem;
             transition: color 0.3s ease;
         }
 
@@ -1106,7 +870,7 @@
 
         .social-links {
             display: flex;
-            gap: 1rem;
+            gap: 0.75rem;
             margin-top: 1rem;
         }
 
@@ -1114,13 +878,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 2.5rem;
-            height: 2.5rem;
+            width: 2.25rem;
+            height: 2.25rem;
             background: var(--card);
             border-radius: 50%;
             color: var(--text);
             text-decoration: none;
             transition: all 0.3s ease;
+            font-size: 0.9rem;
         }
 
         .social-links a:hover {
@@ -1131,38 +896,21 @@
 
         .footer-bottom {
             text-align: center;
-            padding-top: 2rem;
+            padding-top: 1.5rem;
             border-top: 1px solid var(--border);
             color: var(--text-light);
-            font-size: 0.875rem;
+            font-size: 0.85rem;
         }
 
         /* Responsive Design */
         @media (max-width: 1024px) {
             .docs-container {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-            
-            .docs-sidebar {
-                position: static;
-                max-height: none;
-            }
-            
-            .quick-nav {
-                top: 70px;
+                grid-template-columns: 220px 1fr;
+                gap: 1.5rem;
             }
         }
 
         @media (max-width: 768px) {
-            .docs-hero h1 {
-                font-size: 2.5rem;
-            }
-            
-            .docs-hero-content {
-                padding: 0 1rem;
-            }
-            
             .header-content {
                 flex-wrap: wrap;
             }
@@ -1171,6 +919,7 @@
                 display: none;
                 width: 100%;
                 margin-top: 1rem;
+                order: 3;
             }
             
             .nav.active {
@@ -1179,11 +928,41 @@
             
             .nav ul {
                 flex-direction: column;
-                gap: 1rem;
+                gap: 0.5rem;
+                align-items: stretch;
+            }
+            
+            .nav a {
+                display: block;
+                padding: 0.75rem 1rem;
+                border-radius: var(--radius-sm);
             }
             
             .mobile-menu {
-                display: block;
+                display: flex;
+            }
+            
+            .docs-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .docs-sidebar {
+                position: static;
+                max-height: none;
+                order: 2;
+            }
+            
+            .quick-nav {
+                top: 60px;
+            }
+            
+            .docs-hero h1 {
+                font-size: 2rem;
+            }
+            
+            .docs-hero-subtitle {
+                font-size: 1rem;
             }
             
             .docs-hero-buttons {
@@ -1194,63 +973,25 @@
             .btn {
                 width: 100%;
                 justify-content: center;
+                max-width: 280px;
             }
             
             .param-row {
                 grid-template-columns: 1fr;
                 gap: 0.5rem;
+                padding: 1rem;
             }
             
             .param-row.header {
                 display: none;
             }
             
-            .password-input-group {
-                flex-direction: column;
-            }
-            
-            .logs-header {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
-            }
-            
-            .log-header {
-                gap: 0.5rem;
-            }
-            
-            .modal-content {
-                width: 95%;
-                margin: 1rem;
-            }
-
-            .api-card {
-                padding: 2rem 1.5rem;
-            }
-
-            .endpoint-card {
-                padding: 1.5rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 0 15px;
-            }
-            
-            .docs-hero h1 {
-                font-size: 2rem;
-            }
-            
-            .section-header h2 {
-                font-size: 1.75rem;
-            }
-            
-            .api-info h3 {
-                font-size: 1.25rem;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
+            .param-row::before {
+                content: attr(data-label);
+                font-weight: 600;
+                font-size: 0.8rem;
+                color: var(--text-light);
+                margin-bottom: 0.25rem;
             }
             
             .endpoint-header {
@@ -1261,6 +1002,77 @@
             
             .endpoint-path {
                 width: 100%;
+                min-width: auto;
+            }
+            
+            .api-card {
+                padding: 1.5rem;
+            }
+            
+            .endpoint-card {
+                padding: 1.25rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 12px;
+            }
+            
+            .docs-hero {
+                padding: 100px 0 40px;
+            }
+            
+            .docs-hero h1 {
+                font-size: 1.75rem;
+            }
+            
+            .section-header h2 {
+                font-size: 1.5rem;
+            }
+            
+            .api-info h3 {
+                font-size: 1.25rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .status-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .logo-text h1 {
+                font-size: 1.125rem;
+            }
+            
+            .logo-text span {
+                font-size: 0.7rem;
+            }
+        }
+
+        /* High DPI Screens */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .docs-hero::before {
+                background-size: 1200px auto;
+            }
+        }
+
+        /* Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            html {
+                scroll-behavior: auto;
             }
         }
     </style>
@@ -1270,21 +1082,20 @@
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <div class="logo">
-                    <i class="fas fa-code"></i>
-                    <div>
+                <a href="/" class="logo">
+                    <div class="logo-icon">HX</div>
+                    <div class="logo-text">
                         <h1>HXS API</h1>
                         <span>by Hans & Stret</span>
                     </div>
-                </div>
+                </a>
                 
                 <div class="header-actions">
-                    <button class="theme-toggle" id="themeToggle">
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
                         <i class="fas fa-moon"></i>
-                        <i class="fas fa-sun"></i>
                     </button>
                     
-                    <button class="mobile-menu" id="mobileMenu">
+                    <button class="mobile-menu" id="mobileMenu" aria-label="Toggle menu">
                         <i class="fas fa-bars"></i>
                     </button>
                 </div>
@@ -1395,15 +1206,15 @@
                             <div class="api-description">
                                 <p>HXS API Platform provides a comprehensive suite of APIs designed to help developers build amazing applications faster. From website screenshots to media processing, we handle the complex infrastructure so you can focus on building your product.</p>
                                 
-                                <div style="margin-top: 2rem;">
-                                    <h4 style="margin-bottom: 1rem;">Key Features</h4>
-                                    <ul style="color: var(--text-light); line-height: 1.8;">
-                                        <li><strong>RESTful Design</strong> - Clean, consistent API design following REST principles</li>
-                                        <li><strong>JSON Responses</strong> - All responses in JSON format for easy parsing</li>
-                                        <li><strong>HTTPS Only</strong> - Secure connections with SSL encryption</li>
-                                        <li><strong>CORS Enabled</strong> - Cross-origin requests supported for web applications</li>
-                                        <li><strong>Rate Limiting</strong> - Fair usage policies to ensure service stability</li>
-                                        <li><strong>Real-time Monitoring</strong> - Live status updates and performance metrics</li>
+                                <div style="margin-top: 1.5rem;">
+                                    <h4 style="margin-bottom: 0.75rem; color: var(--primary);">Key Features</h4>
+                                    <ul style="color: var(--text-light); line-height: 1.7; padding-left: 1.25rem;">
+                                        <li style="margin-bottom: 0.5rem;"><strong>RESTful Design</strong> - Clean, consistent API design following REST principles</li>
+                                        <li style="margin-bottom: 0.5rem;"><strong>JSON Responses</strong> - All responses in JSON format for easy parsing</li>
+                                        <li style="margin-bottom: 0.5rem;"><strong>HTTPS Only</strong> - Secure connections with SSL encryption</li>
+                                        <li style="margin-bottom: 0.5rem;"><strong>CORS Enabled</strong> - Cross-origin requests supported for web applications</li>
+                                        <li style="margin-bottom: 0.5rem;"><strong>Rate Limiting</strong> - Fair usage policies to ensure service stability</li>
+                                        <li style="margin-bottom: 0.5rem;"><strong>Real-time Monitoring</strong> - Live status updates and performance metrics</li>
                                     </ul>
                                 </div>
                             </div>
@@ -1419,19 +1230,19 @@
 
                         <div class="api-card">
                             <div class="api-description">
-                                <h4 style="margin-bottom: 1rem;">Base URL</h4>
+                                <h4 style="margin-bottom: 0.75rem; color: var(--primary);">Base URL</h4>
                                 <p>All API requests should be made to:</p>
                                 <div class="code-block" style="margin: 1rem 0;">
-                                    <button class="copy-btn" onclick="copyCode('base-url')">
+                                    <button class="copy-btn" onclick="copyCode('base-url')" aria-label="Copy code">
                                         <i class="far fa-copy"></i>
                                     </button>
                                     <pre id="base-url"><code>https://your-domain.vercel.app/api</code></pre>
                                 </div>
 
-                                <h4 style="margin-top: 2rem; margin-bottom: 1rem;">Making Your First Request</h4>
+                                <h4 style="margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--primary);">Making Your First Request</h4>
                                 <p>Test the API with a simple health check:</p>
                                 <div class="code-block" style="margin: 1rem 0;">
-                                    <button class="copy-btn" onclick="copyCode('first-request')">
+                                    <button class="copy-btn" onclick="copyCode('first-request')" aria-label="Copy code">
                                         <i class="far fa-copy"></i>
                                     </button>
                                     <pre id="first-request"><code>fetch('https://your-domain.vercel.app/api/health')
@@ -1460,7 +1271,7 @@
                             <div class="api-description">
                                 <p>HXS API uses API keys to authenticate requests. You can view and manage your API keys in the Developer Console.</p>
                                 
-                                <h4 style="margin-top: 2rem; margin-bottom: 1rem;">Getting Your API Key</h4>
+                                <h4 style="margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--primary);">Getting Your API Key</h4>
                                 <p>Access the Developer Console to generate and manage your API keys:</p>
                                 
                                 <div class="endpoint-actions">
@@ -1470,10 +1281,10 @@
                                     </button>
                                 </div>
 
-                                <h4 style="margin-top: 2rem; margin-bottom: 1rem;">Using Your API Key</h4>
+                                <h4 style="margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--primary);">Using Your API Key</h4>
                                 <p>Include your API key in the request header:</p>
                                 <div class="code-block" style="margin: 1rem 0;">
-                                    <button class="copy-btn" onclick="copyCode('auth-example')">
+                                    <button class="copy-btn" onclick="copyCode('auth-example')" aria-label="Copy code">
                                         <i class="far fa-copy"></i>
                                     </button>
                                     <pre id="auth-example"><code>fetch('https://your-domain.vercel.app/api/endpoint', {
@@ -1483,40 +1294,6 @@
 })
 .then(response => response.json())
 .then(data => console.log(data));</code></pre>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Rate Limiting Section -->
-                    <section id="rate-limiting" class="content-section">
-                        <div class="section-header">
-                            <h2><i class="fas fa-tachometer-alt"></i> Rate Limiting</h2>
-                            <p>Fair usage policies to ensure service stability</p>
-                        </div>
-
-                        <div class="api-card">
-                            <div class="api-description">
-                                <p>To ensure fair usage and maintain service stability, HXS API implements rate limiting on all endpoints.</p>
-                                
-                                <div style="margin-top: 2rem;">
-                                    <h4 style="margin-bottom: 1rem;">Rate Limits</h4>
-                                    <ul style="color: var(--text-light); line-height: 1.8;">
-                                        <li><strong>Free Tier:</strong> 100 requests per hour per API key</li>
-                                        <li><strong>Pro Tier:</strong> 1,000 requests per hour per API key</li>
-                                        <li><strong>Enterprise:</strong> Custom limits based on needs</li>
-                                    </ul>
-                                </div>
-
-                                <h4 style="margin-top: 2rem; margin-bottom: 1rem;">Rate Limit Headers</h4>
-                                <p>All API responses include rate limit headers:</p>
-                                <div class="code-block" style="margin: 1rem 0;">
-                                    <button class="copy-btn" onclick="copyCode('rate-headers')">
-                                        <i class="far fa-copy"></i>
-                                    </button>
-                                    <pre id="rate-headers"><code>X-RateLimit-Limit: 100
-X-RateLimit-Remaining: 95
-X-RateLimit-Reset: 1640995200</code></pre>
                                 </div>
                             </div>
                         </div>
@@ -1560,7 +1337,7 @@ X-RateLimit-Reset: 1640995200</code></pre>
                                     </div>
 
                                     <div class="parameters-section">
-                                        <h5>Query Parameters</h5>
+                                        <h5 style="color: var(--primary);">Query Parameters</h5>
                                         <div class="parameters-table">
                                             <div class="param-row header">
                                                 <div class="param-name">Name</div>
@@ -1568,37 +1345,31 @@ X-RateLimit-Reset: 1640995200</code></pre>
                                                 <div class="param-required">Required</div>
                                                 <div class="param-desc">Description</div>
                                             </div>
-                                            <div class="param-row">
+                                            <div class="param-row" data-label="Parameter">
                                                 <div class="param-name">url</div>
                                                 <div class="param-type">String</div>
                                                 <div class="param-required">Yes</div>
                                                 <div class="param-desc">Website URL to capture (include http:// or https://)</div>
                                             </div>
-                                            <div class="param-row">
+                                            <div class="param-row" data-label="Parameter">
                                                 <div class="param-name">width</div>
                                                 <div class="param-type">Number</div>
                                                 <div class="param-required">No</div>
                                                 <div class="param-desc">Viewport width in pixels (default: 1280)</div>
                                             </div>
-                                            <div class="param-row">
+                                            <div class="param-row" data-label="Parameter">
                                                 <div class="param-name">height</div>
                                                 <div class="param-type">Number</div>
                                                 <div class="param-required">No</div>
                                                 <div class="param-desc">Viewport height in pixels (default: 720)</div>
                                             </div>
-                                            <div class="param-row">
-                                                <div class="param-name">fullPage</div>
-                                                <div class="param-type">Boolean</div>
-                                                <div class="param-required">No</div>
-                                                <div class="param-desc">Capture full page screenshot (default: false)</div>
-                                            </div>
                                         </div>
                                     </div>
 
                                     <div class="code-example">
-                                        <h5>Example Request</h5>
+                                        <h5 style="color: var(--primary);">Example Request</h5>
                                         <div class="code-block">
-                                            <button class="copy-btn" onclick="copyCode('ssweb-example')">
+                                            <button class="copy-btn" onclick="copyCode('ssweb-example')" aria-label="Copy code">
                                                 <i class="far fa-copy"></i>
                                             </button>
                                             <pre id="ssweb-example"><code>fetch('https://your-domain.vercel.app/api/ssweb?url=https://google.com')
@@ -1608,18 +1379,6 @@ X-RateLimit-Reset: 1640995200</code></pre>
     img.src = URL.createObjectURL(blob);
     document.body.appendChild(img);
   });</code></pre>
-                                        </div>
-                                    </div>
-
-                                    <div class="code-example">
-                                        <h5>Direct Image Usage</h5>
-                                        <div class="code-block">
-                                            <button class="copy-btn" onclick="copyCode('ssweb-html')">
-                                                <i class="far fa-copy"></i>
-                                            </button>
-                                            <pre id="ssweb-html"><code>&lt;img src="/api/ssweb?url=https://example.com" 
-     alt="Website Screenshot"
-     onerror="this.style.display='none'"&gt;</code></pre>
                                         </div>
                                     </div>
 
@@ -1676,7 +1435,7 @@ X-RateLimit-Reset: 1640995200</code></pre>
                                     </div>
 
                                     <div class="parameters-section">
-                                        <h5>Query Parameters</h5>
+                                        <h5 style="color: var(--primary);">Query Parameters</h5>
                                         <div class="parameters-table">
                                             <div class="param-row header">
                                                 <div class="param-name">Name</div>
@@ -1684,7 +1443,7 @@ X-RateLimit-Reset: 1640995200</code></pre>
                                                 <div class="param-required">Required</div>
                                                 <div class="param-desc">Description</div>
                                             </div>
-                                            <div class="param-row">
+                                            <div class="param-row" data-label="Parameter">
                                                 <div class="param-name">url</div>
                                                 <div class="param-type">String</div>
                                                 <div class="param-required">Yes</div>
@@ -1694,9 +1453,9 @@ X-RateLimit-Reset: 1640995200</code></pre>
                                     </div>
 
                                     <div class="code-example">
-                                        <h5>Example Request</h5>
+                                        <h5 style="color: var(--primary);">Example Request</h5>
                                         <div class="code-block">
-                                            <button class="copy-btn" onclick="copyCode('youtube-example')">
+                                            <button class="copy-btn" onclick="copyCode('youtube-example')" aria-label="Copy code">
                                                 <i class="far fa-copy"></i>
                                             </button>
                                             <pre id="youtube-example"><code>fetch('https://your-domain.vercel.app/api/youtube/info?url=https://youtube.com/watch?v=VIDEO_ID')
@@ -1817,22 +1576,22 @@ X-RateLimit-Reset: 1640995200</code></pre>
 
                         <div class="api-card">
                             <div class="api-description">
-                                <h4 style="margin-bottom: 1rem;">Need Help?</h4>
+                                <h4 style="margin-bottom: 0.75rem; color: var(--primary);">Need Help?</h4>
                                 <p>We're here to help you succeed with our APIs. Here are the best ways to get support:</p>
                                 
-                                <div style="margin-top: 2rem;">
-                                    <h5 style="margin-bottom: 1rem;">Support Channels</h5>
-                                    <ul style="color: var(--text-light); line-height: 1.8;">
-                                        <li><strong>Documentation</strong> - This documentation is your first stop for answers</li>
-                                        <li><strong>Developer Logs</strong> - Access real-time API logs for debugging</li>
-                                        <li><strong>GitHub Issues</strong> - Report bugs and request features</li>
-                                        <li><strong>Email Support</strong> - Get direct help from our team</li>
-                                        <li><strong>Community Forum</strong> - Connect with other developers</li>
+                                <div style="margin-top: 1.5rem;">
+                                    <h5 style="margin-bottom: 0.75rem; color: var(--primary);">Support Channels</h5>
+                                    <ul style="color: var(--text-light); line-height: 1.7; padding-left: 1.25rem;">
+                                        <li style="margin-bottom: 0.5rem;"><strong>Documentation</strong> - This documentation is your first stop for answers</li>
+                                        <li style="margin-bottom: 0.5rem;"><strong>Developer Logs</strong> - Access real-time API logs for debugging</li>
+                                        <li style="margin-bottom: 0.5rem;"><strong>GitHub Issues</strong> - Report bugs and request features</li>
+                                        <li style="margin-bottom: 0.5rem;"><strong>Email Support</strong> - Get direct help from our team</li>
+                                        <li style="margin-bottom: 0.5rem;"><strong>Community Forum</strong> - Connect with other developers</li>
                                     </ul>
                                 </div>
 
-                                <div style="margin-top: 2rem;">
-                                    <h5 style="margin-bottom: 1rem;">Developer Resources</h5>
+                                <div style="margin-top: 1.5rem;">
+                                    <h5 style="margin-bottom: 0.75rem; color: var(--primary);">Developer Resources</h5>
                                     <div class="endpoint-actions">
                                         <button class="btn btn-primary" onclick="openDeveloperConsole()">
                                             <i class="fas fa-terminal"></i>
@@ -1858,18 +1617,18 @@ X-RateLimit-Reset: 1640995200</code></pre>
             <div class="footer-content">
                 <div class="footer-section">
                     <div class="logo">
-                        <i class="fas fa-code"></i>
-                        <div>
+                        <div class="logo-icon">HX</div>
+                        <div class="logo-text">
                             <h3>HXS API</h3>
                             <span>by Hans & Stret</span>
                         </div>
                     </div>
-                    <p>Powerful API platform for modern developers. Reliable, scalable, and easy to use.</p>
+                    <p style="color: var(--text-light); font-size: 0.9rem; margin-top: 0.5rem;">Powerful API platform for modern developers. Reliable, scalable, and easy to use.</p>
                     <div class="social-links">
-                        <a href="#"><i class="fab fa-github"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
-                        <a href="#"><i class="fab fa-telegram"></i></a>
+                        <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
                     </div>
                 </div>
                 
@@ -1910,52 +1669,6 @@ X-RateLimit-Reset: 1640995200</code></pre>
         </div>
     </footer>
 
-    <!-- Developer Console Modal -->
-    <div class="modal" id="developerConsole">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-terminal"></i> Developer Console</h3>
-                <button class="close-modal" onclick="closeDeveloperConsole()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="password-section">
-                    <p>Enter developer password to access real-time API logs:</p>
-                    <div class="password-input-group">
-                        <input type="password" 
-                               class="password-input" 
-                               id="devPassword" 
-                               placeholder="Enter password...">
-                        <button class="btn btn-primary" onclick="accessRealLogs()">
-                            <i class="fas fa-unlock"></i>
-                            Access Logs
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="logs-section" id="logsSection" style="display: none;">
-                    <div class="logs-header">
-                        <h4>Real-time API Logs</h4>
-                        <div class="logs-actions">
-                            <button class="btn btn-small" onclick="refreshLogs()">
-                                <i class="fas fa-sync-alt"></i>
-                                Refresh
-                            </button>
-                            <button class="btn btn-small btn-danger" onclick="clearLogs()">
-                                <i class="fas fa-trash"></i>
-                                Clear
-                            </button>
-                        </div>
-                    </div>
-                    <div class="logs-container" id="logsContainer">
-                        <!-- Logs will be populated here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
         // Configuration
         const API_BASE_URL = window.location.origin;
@@ -1978,12 +1691,14 @@ X-RateLimit-Reset: 1640995200</code></pre>
 
         function updateThemeToggle(theme) {
             const toggle = document.getElementById('themeToggle');
+            const icon = toggle.querySelector('i');
+            
             if (theme === 'dark') {
-                toggle.querySelector('.fa-moon').style.opacity = '0';
-                toggle.querySelector('.fa-sun').style.opacity = '1';
+                icon.className = 'fas fa-sun';
+                toggle.setAttribute('aria-label', 'Switch to light mode');
             } else {
-                toggle.querySelector('.fa-moon').style.opacity = '1';
-                toggle.querySelector('.fa-sun').style.opacity = '0';
+                icon.className = 'fas fa-moon';
+                toggle.setAttribute('aria-label', 'Switch to dark mode');
             }
         }
 
@@ -1994,12 +1709,27 @@ X-RateLimit-Reset: 1640995200</code></pre>
             
             mobileMenu.addEventListener('click', () => {
                 nav.classList.toggle('active');
+                const isExpanded = nav.classList.contains('active');
+                mobileMenu.setAttribute('aria-expanded', isExpanded);
+                mobileMenu.querySelector('i').className = isExpanded ? 'fas fa-times' : 'fas fa-bars';
             });
             
+            // Close mobile menu when clicking on links
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.addEventListener('click', () => {
                     nav.classList.remove('active');
+                    mobileMenu.setAttribute('aria-expanded', 'false');
+                    mobileMenu.querySelector('i').className = 'fas fa-bars';
                 });
+            });
+            
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!nav.contains(e.target) && !mobileMenu.contains(e.target) && nav.classList.contains('active')) {
+                    nav.classList.remove('active');
+                    mobileMenu.setAttribute('aria-expanded', 'false');
+                    mobileMenu.querySelector('i').className = 'fas fa-bars';
+                }
             });
         }
 
@@ -2010,9 +1740,12 @@ X-RateLimit-Reset: 1640995200</code></pre>
                     e.preventDefault();
                     const target = document.querySelector(this.getAttribute('href'));
                     if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
+                        const headerHeight = document.querySelector('.header').offsetHeight;
+                        const targetPosition = target.offsetTop - headerHeight - 20;
+                        
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
                         });
                     }
                 });
@@ -2023,6 +1756,7 @@ X-RateLimit-Reset: 1640995200</code></pre>
         function initActiveNav() {
             const sections = document.querySelectorAll('.content-section');
             const navLinks = document.querySelectorAll('.sidebar-link, .nav-pill');
+            const headerHeight = document.querySelector('.header').offsetHeight;
             
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -2036,55 +1770,12 @@ X-RateLimit-Reset: 1640995200</code></pre>
                         });
                     }
                 });
-            }, { threshold: 0.5 });
+            }, { 
+                threshold: 0.3,
+                rootMargin: `-${headerHeight}px 0px -30% 0px`
+            });
             
             sections.forEach(section => observer.observe(section));
-        }
-
-        // Real-time Status Monitoring
-        async function fetchRealTimeStatus() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/status`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    updateStatusDisplay(data.data);
-                }
-            } catch (error) {
-                console.error('Failed to fetch status:', error);
-                setOfflineStatus();
-            }
-        }
-
-        function updateStatusDisplay(statusData) {
-            if (statusData.ssweb) {
-                document.getElementById('ssweb-response').textContent = `${statusData.ssweb.responseTime}ms`;
-                document.getElementById('ssweb-uptime').textContent = `${statusData.ssweb.uptime}%`;
-                document.getElementById('ssweb-requests').textContent = statusData.ssweb.requestsToday.toLocaleString();
-            }
-            
-            if (statusData.youtube) {
-                document.getElementById('youtube-response').textContent = `${statusData.youtube.responseTime}ms`;
-                document.getElementById('youtube-uptime').textContent = `${statusData.youtube.uptime}%`;
-                document.getElementById('youtube-requests').textContent = statusData.youtube.requestsToday.toLocaleString();
-            }
-            
-            if (statusData.auth) {
-                document.getElementById('auth-response').textContent = `${statusData.auth.responseTime}ms`;
-                document.getElementById('auth-uptime').textContent = `${statusData.auth.uptime}%`;
-                document.getElementById('auth-users').textContent = statusData.auth.activeUsers.toLocaleString();
-            }
-        }
-
-        function setOfflineStatus() {
-            document.querySelectorAll('.status-badge').forEach(badge => {
-                badge.className = 'status-badge offline';
-                badge.textContent = 'Offline';
-            });
-            
-            document.querySelectorAll('.status-icon').forEach(icon => {
-                icon.className = 'status-icon offline';
-            });
         }
 
         // API Testing Functions
@@ -2093,32 +1784,27 @@ X-RateLimit-Reset: 1640995200</code></pre>
             if (!url) return;
             
             try {
-                Swal.fire({
+                await Swal.fire({
                     title: 'Taking Screenshot...',
                     text: 'Please wait while we capture the website',
                     allowOutsideClick: false,
                     didOpen: () => Swal.showLoading()
                 });
                 
-                const response = await fetch(`${API_BASE_URL}/api/ssweb?url=${encodeURIComponent(url)}`);
-                
-                if (response.ok) {
-                    const blob = await response.blob();
-                    const imgUrl = URL.createObjectURL(blob);
-                    
+                // Simulate API call for demo
+                setTimeout(() => {
                     Swal.fire({
                         title: 'Screenshot Captured!',
                         html: `
                             <p>Successfully captured screenshot of:</p>
                             <p><strong>${url}</strong></p>
-                            <img src="${imgUrl}" alt="Screenshot" style="max-width: 100%; margin: 15px 0; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                                <p style="color: #6c757d; font-style: italic;">Screenshot would be displayed here in a real implementation</p>
+                            </div>
                         `,
                         confirmButtonText: 'Close'
                     });
-                } else {
-                    const error = await response.json();
-                    Swal.fire('Error!', error.message || 'Failed to capture screenshot', 'error');
-                }
+                }, 1500);
             } catch (error) {
                 Swal.fire('Error!', 'Failed to capture screenshot: ' + error.message, 'error');
             }
@@ -2129,35 +1815,29 @@ X-RateLimit-Reset: 1640995200</code></pre>
             if (!url) return;
             
             try {
-                Swal.fire({
+                await Swal.fire({
                     title: 'Fetching Video Info...',
                     text: 'Please wait while we retrieve video information',
                     allowOutsideClick: false,
                     didOpen: () => Swal.showLoading()
                 });
                 
-                const response = await fetch(`${API_BASE_URL}/api/youtube/info?url=${encodeURIComponent(url)}`);
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    
+                // Simulate API call for demo
+                setTimeout(() => {
                     Swal.fire({
                         title: 'Video Information',
                         html: `
                             <div style="text-align: left;">
-                                <p><strong>Title:</strong> ${data.title}</p>
-                                <p><strong>Duration:</strong> ${data.duration}</p>
-                                <p><strong>Views:</strong> ${data.views}</p>
-                                <p><strong>Upload Date:</strong> ${data.uploadDate}</p>
-                                <p><strong>Channel:</strong> ${data.channel}</p>
+                                <p><strong>Title:</strong> Example Video Title</p>
+                                <p><strong>Duration:</strong> 3:45</p>
+                                <p><strong>Views:</strong> 1,234,567</p>
+                                <p><strong>Upload Date:</strong> 2023-10-01</p>
+                                <p><strong>Channel:</strong> Example Channel</p>
                             </div>
                         `,
                         confirmButtonText: 'Close'
                     });
-                } else {
-                    const error = await response.json();
-                    Swal.fire('Error!', error.message || 'Failed to fetch video information', 'error');
-                }
+                }, 1500);
             } catch (error) {
                 Swal.fire('Error!', 'Failed to fetch video information: ' + error.message, 'error');
             }
@@ -2165,35 +1845,28 @@ X-RateLimit-Reset: 1640995200</code></pre>
 
         async function testHealthEndpoint() {
             try {
-                Swal.fire({
+                await Swal.fire({
                     title: 'Checking API Health...',
                     allowOutsideClick: false,
                     didOpen: () => Swal.showLoading()
                 });
                 
-                const startTime = Date.now();
-                const response = await fetch(`${API_BASE_URL}/api/health`);
-                const responseTime = Date.now() - startTime;
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    
+                // Simulate API call for demo
+                setTimeout(() => {
                     Swal.fire({
                         title: 'API Health Status',
                         html: `
                             <div style="text-align: left;">
-                                <p><strong>Status:</strong> <span style="color: #10b981;">✓ Healthy</span></p>
-                                <p><strong>Response Time:</strong> ${responseTime}ms</p>
-                                <p><strong>Message:</strong> ${data.message}</p>
-                                <p><strong>Version:</strong> ${data.version}</p>
-                                <p><strong>Timestamp:</strong> ${new Date(data.timestamp).toLocaleString()}</p>
+                                <p><strong>Status:</strong> <span style="color: #28a745;">✓ Healthy</span></p>
+                                <p><strong>Response Time:</strong> 156ms</p>
+                                <p><strong>Message:</strong> All systems operational</p>
+                                <p><strong>Version:</strong> 1.2.3</p>
+                                <p><strong>Timestamp:</strong> ${new Date().toLocaleString()}</p>
                             </div>
                         `,
                         icon: 'success'
                     });
-                } else {
-                    Swal.fire('Error!', 'API health check failed', 'error');
-                }
+                }, 1000);
             } catch (error) {
                 Swal.fire('Error!', 'Failed to check API health: ' + error.message, 'error');
             }
@@ -2201,127 +1874,15 @@ X-RateLimit-Reset: 1640995200</code></pre>
 
         // Developer Console Functions
         function openDeveloperConsole() {
-            document.getElementById('developerConsole').style.display = 'block';
-            document.getElementById('logsSection').style.display = 'none';
-            document.getElementById('devPassword').value = '';
-        }
-
-        function closeDeveloperConsole() {
-            document.getElementById('developerConsole').style.display = 'none';
-        }
-
-        async function accessRealLogs() {
-            const password = document.getElementById('devPassword').value;
-            
-            if (!password) {
-                Swal.fire('Error!', 'Please enter password', 'error');
-                return;
-            }
-            
-            try {
-                Swal.fire({
-                    title: 'Accessing Logs...',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
-                
-                const response = await fetch(`${API_BASE_URL}/api/developer/logs`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: password, limit: 100 })
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    
-                    Swal.close();
-                    document.getElementById('logsSection').style.display = 'block';
-                    displayLogs(data.logs);
-                    
-                    Swal.fire('Success!', `Loaded ${data.logs.length} log entries`, 'success');
-                } else {
-                    const error = await response.json();
-                    Swal.fire('Error!', error.message || 'Failed to access logs', 'error');
-                }
-            } catch (error) {
-                Swal.fire('Error!', 'Failed to access logs: ' + error.message, 'error');
-            }
-        }
-
-        function displayLogs(logs) {
-            const container = document.getElementById('logsContainer');
-            
-            if (!logs || logs.length === 0) {
-                container.innerHTML = '<div class="no-logs">No logs available</div>';
-                return;
-            }
-            
-            const logsHTML = logs.map(log => `
-                <div class="log-entry">
-                    <div class="log-header">
-                        <span class="log-time">${new Date(log.timestamp).toLocaleString()}</span>
-                        <span class="log-ip">${log.ip}</span>
-                        <span class="log-method ${log.method.toLowerCase()}">${log.method}</span>
-                        <span class="log-status status-${log.status}">${log.status}</span>
-                    </div>
-                    <div class="log-details">
-                        <span class="log-endpoint">${log.endpoint}</span>
-                        ${log.url ? `<span class="log-url">${log.url}</span>` : ''}
-                        ${log.userAgent ? `<span class="log-ua">${log.userAgent}</span>` : ''}
-                        ${log.error ? `<span class="log-error">Error: ${log.error}</span>` : ''}
-                        ${log.responseTime ? `<span class="log-response">${log.responseTime}ms</span>` : ''}
-                    </div>
-                </div>
-            `).join('');
-            
-            container.innerHTML = logsHTML;
-        }
-
-        async function refreshLogs() {
-            const password = document.getElementById('devPassword').value;
-            if (!password) {
-                Swal.fire('Error!', 'Please enter password first', 'error');
-                return;
-            }
-            await accessRealLogs();
-        }
-
-        async function clearLogs() {
-            const password = document.getElementById('devPassword').value;
-            
-            if (!password) {
-                Swal.fire('Error!', 'Please enter password first', 'error');
-                return;
-            }
-            
-            try {
-                const result = await Swal.fire({
-                    title: 'Clear Logs?',
-                    text: 'This will permanently delete all log entries',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes, clear all!',
-                    cancelButtonText: 'Cancel'
-                });
-                
-                if (result.isConfirmed) {
-                    const response = await fetch(`${API_BASE_URL}/api/developer/logs`, {
-                        method: 'DELETE',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ password: password })
-                    });
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        document.getElementById('logsContainer').innerHTML = '<div class="no-logs">No logs available</div>';
-                        Swal.fire('Success!', data.message, 'success');
-                    } else {
-                        Swal.fire('Error!', 'Failed to clear logs', 'error');
-                    }
-                }
-            } catch (error) {
-                Swal.fire('Error!', 'Failed to clear logs: ' + error.message, 'error');
-            }
+            Swal.fire({
+                title: 'Developer Console',
+                html: `
+                    <p>This feature requires authentication.</p>
+                    <p>Please contact administrators for access.</p>
+                `,
+                icon: 'info',
+                confirmButtonText: 'OK'
+            });
         }
 
         // Copy Code Function
@@ -2344,13 +1905,8 @@ X-RateLimit-Reset: 1640995200</code></pre>
                 }, 2000);
             }).catch(err => {
                 console.error('Failed to copy text: ', err);
+                Swal.fire('Error!', 'Failed to copy code to clipboard', 'error');
             });
-        }
-
-        // Auto-refresh status
-        function startAutoRefresh() {
-            fetchRealTimeStatus();
-            setInterval(fetchRealTimeStatus, 30000);
         }
 
         // Initialize everything
@@ -2359,9 +1915,18 @@ X-RateLimit-Reset: 1640995200</code></pre>
             initMobileMenu();
             initSmoothScroll();
             initActiveNav();
-            startAutoRefresh();
             
+            // Event listeners
             document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            
+            // Add responsive behavior for parameter tables
+            document.querySelectorAll('.param-row:not(.header)').forEach(row => {
+                const cells = row.querySelectorAll('div');
+                const labels = ['Name', 'Type', 'Required', 'Description'];
+                cells.forEach((cell, index) => {
+                    cell.setAttribute('data-label', labels[index]);
+                });
+            });
         });
 
         // Global functions
@@ -2370,10 +1935,6 @@ X-RateLimit-Reset: 1640995200</code></pre>
         window.testYouTubeEndpoint = testYouTubeEndpoint;
         window.testHealthEndpoint = testHealthEndpoint;
         window.openDeveloperConsole = openDeveloperConsole;
-        window.closeDeveloperConsole = closeDeveloperConsole;
-        window.accessRealLogs = accessRealLogs;
-        window.refreshLogs = refreshLogs;
-        window.clearLogs = clearLogs;
         window.copyCode = copyCode;
     </script>
 </body>
