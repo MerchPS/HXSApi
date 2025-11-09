@@ -1,7 +1,3 @@
-// In-memory storage untuk gambar
-const imageCache = new Map();
-const CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 jam
-
 // SSWeb implementation
 const ssweb = {
     _static: Object.freeze({
@@ -65,22 +61,6 @@ function getDomainFromUrl(url) {
     }
 }
 
-// Cleanup cache yang expired
-function cleanupCache() {
-    const now = Date.now();
-    for (const [key, value] of imageCache.entries()) {
-        if (now - value.timestamp > CACHE_DURATION) {
-            imageCache.delete(key);
-        }
-    }
-}
-
-// Jalankan cleanup setiap jam
-setInterval(cleanupCache, 60 * 60 * 1000);
-
-// Export cache untuk digunakan di file lain
-export { imageCache };
-
 export default async function handler(req, res) {
     const startTime = Date.now();
     
@@ -101,7 +81,7 @@ export default async function handler(req, res) {
     }
     
     try {
-        const { url } = req.query;
+        const { url, format = 'json' } = req.query;
         
         if (!url) {
             return res.status(400).json({
@@ -122,48 +102,60 @@ export default async function handler(req, res) {
 
         const buffer = await ssweb.capture(url);
         const responseTime = Date.now() - startTime;
-
-        // Simpan ke memory cache dengan ID unik
-        const imageId = `ss_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-        imageCache.set(imageId, {
-            data: buffer.toString('base64'),
-            timestamp: Date.now(),
-            url: url
-        });
-        
-        const imageUrl = `https://hxs-apis.vercel.app/api/img/${imageId}`;
-        
-        // Generate response data dengan URL
         const domain = getDomainFromUrl(url);
+
+        // FORMAT 1: Langsung return image (untuk bot WA)
+        if (format === 'image' || format === 'raw') {
+            res.setHeader('Content-Type', 'image/jpeg');
+            res.setHeader('Content-Length', buffer.length);
+            res.setHeader('Cache-Control', 'public, max-age=3600');
+            res.setHeader('X-Screenshot-Of', url);
+            res.setHeader('X-Response-Time', `${responseTime}ms`);
+            return res.send(buffer);
+        }
+
+        // FORMAT 2: Base64 (untuk bot WA yang butuh base64)
+        if (format === 'base64') {
+            const base64Image = buffer.toString('base64');
+            return res.json({
+                status: true,
+                base64: base64Image,
+                domain: domain,
+                url: url,
+                size: buffer.length,
+                response_time: responseTime
+            });
+        }
+
+        // FORMAT 3: JSON dengan semua options (default)
+        const base64Image = buffer.toString('base64');
+        const dataUrl = `data:image/jpeg;base64,${base64Image}`;
+        const imageUrl = `${getBaseUrl(req)}/api/ssweb?url=${encodeURIComponent(url)}&format=image`;
+        
         const responseData = {
             status: true,
-            data: [
-                {
-                    title: `Screenshot of ${domain}`,
-                    link: imageUrl,
-                    developer: `${domain} Development Team`,
-                    image: imageUrl,
-                    domain: domain,
-                    url: url,
-                    timestamp: new Date().toISOString(),
-                    format: 'jpeg',
-                    size: buffer.length,
-                    dimensions: '1280x720',
-                    expires_in: '2 hours',
-                    image_id: imageId,
-                    download_info: `Image URL: ${imageUrl} (expires in 2 hours)`
-                }
-            ],
-            meta: {
-                response_time: responseTime,
-                credits: "HXS API - Home & Start",
-                version: "1.0.0",
-                cache_info: `Cached ${imageCache.size} images`,
-                usage: `Use the 'image' field directly: <img src='${imageUrl}' />`
+            data: {
+                // Untuk bot WA (pilih salah satu)
+                buffer_size: buffer.length,
+                base64: base64Image, // Langsung bisa dipakai
+                image_url: imageUrl, // URL langsung ke image
+                data_url: dataUrl,   // Data URL
+                
+                // Info tambahan
+                domain: domain,
+                url: url,
+                timestamp: new Date().toISOString(),
+                format: 'jpeg',
+                dimensions: '1280x720',
+                response_time: responseTime
+            },
+            usage: {
+                for_bot: "Gunakan 'base64' field dan convert ke Buffer",
+                for_web: "Gunakan 'image_url' atau 'data_url'",
+                example: "Buffer.from(data.base64, 'base64')"
             }
         };
 
-        // Return JSON dengan image URL
         res.setHeader('Content-Type', 'application/json');
         res.setHeader('X-Response-Time', `${responseTime}ms`);
         return res.json(responseData);
@@ -180,4 +172,11 @@ export default async function handler(req, res) {
             status: false
         });
     }
+}
+
+// Helper untuk mendapatkan base URL
+function getBaseUrl(req) {
+    const host = req.headers['x-forwarded-host'] || req.headers['host'];
+    const protocol = req.headers['x-forwarded-proto'] || 'https';
+    return `${protocol}://${host}`;
 }
