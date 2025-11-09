@@ -1,14 +1,6 @@
 import axios from 'axios';
 
 const yt = {
-  static: Object.freeze({
-    baseUrl: 'https://api.ytdl.workers.dev',
-    headers: {
-      'accept': '*/*',
-      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-    }
-  }),
-  
   log(m) { console.log(`[yt-downloader] ${m}`) },
   
   // Extract video ID from URL
@@ -28,45 +20,74 @@ const yt = {
     return null;
   },
   
-  // Get audio buffer directly
-  async getAudioBuffer(url, format = 'mp3') {
+  // Get download info from yt5s
+  async getDownloadInfo(url) {
     try {
       const videoId = this.extractVideoId(url);
       if (!videoId) {
         throw new Error('Tidak dapat mengekstrak Video ID dari URL');
       }
       
-      this.log(`Downloading audio for video ID: ${videoId}`);
+      this.log(`Getting download info for: ${videoId}`);
       
-      // Use ytdl worker API that returns file directly
-      const downloadUrl = `https://api.ytdl.workers.dev/api/info?url=https://www.youtube.com/watch?v=${videoId}`;
+      // Step 1: Get download page
+      const pageResponse = await axios.get(`https://yt5s.io/en`, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
+      });
+      
+      // Step 2: Get download links
+      const apiResponse = await axios.post(`https://yt5s.io/en/api/convert`, {
+        v: videoId,
+        f: 'mp3'
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Origin': 'https://yt5s.io',
+          'Referer': 'https://yt5s.io/en'
+        }
+      });
+      
+      if (apiResponse.data && apiResponse.data.durl) {
+        return {
+          downloadUrl: apiResponse.data.durl,
+          filename: apiResponse.data.title ? `${apiResponse.data.title}.mp3` : `youtube_${videoId}.mp3`,
+          filesize: apiResponse.data.size || 0,
+          duration: apiResponse.data.duration || 0,
+          videoId: videoId
+        };
+      }
+      
+      throw new Error('Tidak dapat mendapatkan link download');
+      
+    } catch (error) {
+      this.log(`Error: ${error.message}`);
+      throw error;
+    }
+  },
+  
+  // Download file buffer
+  async downloadFile(downloadUrl) {
+    try {
+      this.log(`Downloading file from: ${downloadUrl}`);
       
       const response = await axios.get(downloadUrl, {
-        headers: this.static.headers,
-        responseType: 'arraybuffer', // Important for binary data
-        timeout: 60000 // 60 seconds timeout
+        responseType: 'arraybuffer',
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Referer': 'https://yt5s.io/'
+        },
+        timeout: 60000,
+        maxContentLength: 50 * 1024 * 1024, // 50MB max
       });
       
       if (response.status !== 200) {
-        throw new Error(`Download failed with status: ${response.status}`);
+        throw new Error(`Download failed: ${response.status}`);
       }
       
-      // Convert to buffer
-      const buffer = Buffer.from(response.data);
-      
-      if (buffer.length === 0) {
-        throw new Error('Downloaded file is empty');
-      }
-      
-      return {
-        buffer: buffer,
-        filename: `youtube_${videoId}.${format}`,
-        filesize: buffer.length,
-        duration: 0,
-        format: format,
-        videoId: videoId
-      };
-      
+      return Buffer.from(response.data);
     } catch (error) {
       this.log(`Download error: ${error.message}`);
       throw error;
@@ -114,20 +135,13 @@ export default async function handler(req, res) {
       });
     }
     
-    // Clean URL - remove everything after ?
+    // Clean URL
     const cleanUrl = url.split('?')[0];
-    yt.log(`Processing URL: ${cleanUrl}`);
+    yt.log(`Processing: ${cleanUrl}`);
     
-    // Validate YouTube URL
-    const youtubePatterns = [
-      /youtu\.be\/[a-zA-Z0-9_-]+/,
-      /youtube\.com\/watch\?v=[a-zA-Z0-9_-]+/,
-      /youtube\.com\/shorts\/[a-zA-Z0-9_-]+/
-    ];
-    
-    const isValidUrl = youtubePatterns.some(pattern => pattern.test(cleanUrl));
-    
-    if (!isValidUrl) {
+    // Validate URL
+    const videoId = yt.extractVideoId(cleanUrl);
+    if (!videoId) {
       return res.status(400).json({
         success: false,
         error: {
@@ -138,45 +152,72 @@ export default async function handler(req, res) {
       });
     }
     
-    const audioInfo = await yt.getAudioBuffer(cleanUrl, 'mp3');
+    // Get download info
+    const downloadInfo = await yt.getDownloadInfo(cleanUrl);
+    
+    // Download the file
+    const fileBuffer = await yt.downloadFile(downloadInfo.downloadUrl);
+    
     const responseTime = Date.now() - startTime;
     
     // Set headers for file download
     res.setHeader('Content-Type', 'audio/mpeg');
-    res.setHeader('Content-Disposition', `attachment; filename="${audioInfo.filename}"`);
-    res.setHeader('Content-Length', audioInfo.buffer.length);
+    res.setHeader('Content-Disposition', `attachment; filename="${downloadInfo.filename}"`);
+    res.setHeader('Content-Length', fileBuffer.length);
     res.setHeader('X-Response-Time', `${responseTime}ms`);
-    res.setHeader('X-File-Size', audioInfo.filesize);
-    res.setHeader('X-Video-ID', audioInfo.videoId);
+    res.setHeader('X-File-Size', fileBuffer.length);
+    res.setHeader('X-Video-ID', videoId);
+    res.setHeader('X-Duration', downloadInfo.duration);
     
-    // Send the file buffer directly
-    return res.send(audioInfo.buffer);
+    yt.log(`Download successful: ${fileBuffer.length} bytes`);
+    
+    // Send file buffer directly
+    return res.send(fileBuffer);
     
   } catch (error) {
     const responseTime = Date.now() - startTime;
     
-    console.error('YouTube MP3 Download Error:', error.message);
+    console.error('YouTube MP3 Error:', error.message);
+    
+    let errorMessage = 'Gagal mendownload audio';
+    let statusCode = 500;
+    
+    if (error.message.includes('URL YouTube tidak valid')) {
+      errorMessage = 'URL YouTube tidak valid';
+      statusCode = 400;
+    } else if (error.message.includes('Tidak dapat mendapatkan link download')) {
+      errorMessage = 'Video tidak dapat didownload';
+      statusCode = 404;
+    } else if (error.message.includes('timeout')) {
+      errorMessage = 'Timeout: Download terlalu lama';
+      statusCode = 408;
+    }
     
     const errorResponse = {
       success: false,
       error: {
-        message: 'Gagal mendownload audio',
+        message: errorMessage,
         type: 'DOWNLOAD_ERROR',
-        status: 500,
+        status: statusCode,
         timestamp: new Date().toISOString(),
         details: error.message
       },
       meta: {
         response_time: responseTime,
         credits: "HXS YouTube API - Home & Start",
-        version: "1.0.0"
+        version: "1.0.0",
+        troubleshooting: [
+          'Pastikan URL YouTube valid',
+          'Video mungkin tidak tersedia',
+          'Coba video lain',
+          'Coba lagi nanti'
+        ]
       }
     };
     
     res.setHeader('X-Response-Time', `${responseTime}ms`);
-    return res.status(500).json(errorResponse);
+    return res.status(statusCode).json(errorResponse);
   }
 }
 
-// Export function untuk penggunaan langsung
 export { yt };
