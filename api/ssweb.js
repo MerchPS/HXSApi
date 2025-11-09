@@ -1,3 +1,5 @@
+import fetch from 'node-fetch';
+
 // SSWeb implementation
 const ssweb = {
     _static: Object.freeze({
@@ -64,7 +66,7 @@ function getDomainFromUrl(url) {
 export default async function handler(req, res) {
     const startTime = Date.now();
     
-    // Set CORS headers
+    // Set CORS headers (Vercel juga handle di vercel.json)
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -104,7 +106,7 @@ export default async function handler(req, res) {
         const responseTime = Date.now() - startTime;
         const domain = getDomainFromUrl(url);
 
-        // FORMAT 1: Langsung return image (untuk bot WA)
+        // FORMAT 1: Langsung return image
         if (format === 'image' || format === 'raw') {
             res.setHeader('Content-Type', 'image/jpeg');
             res.setHeader('Content-Length', buffer.length);
@@ -114,7 +116,7 @@ export default async function handler(req, res) {
             return res.send(buffer);
         }
 
-        // FORMAT 2: Base64 (untuk bot WA yang butuh base64)
+        // FORMAT 2: Base64 (untuk bot WA)
         if (format === 'base64') {
             const base64Image = buffer.toString('base64');
             return res.json({
@@ -130,16 +132,14 @@ export default async function handler(req, res) {
         // FORMAT 3: JSON dengan semua options (default)
         const base64Image = buffer.toString('base64');
         const dataUrl = `data:image/jpeg;base64,${base64Image}`;
-        const imageUrl = `${getBaseUrl(req)}/api/ssweb?url=${encodeURIComponent(url)}&format=image`;
         
         const responseData = {
             status: true,
             data: {
-                // Untuk bot WA (pilih salah satu)
+                // Untuk bot WA
                 buffer_size: buffer.length,
-                base64: base64Image, // Langsung bisa dipakai
-                image_url: imageUrl, // URL langsung ke image
-                data_url: dataUrl,   // Data URL
+                base64: base64Image,
+                data_url: dataUrl,
                 
                 // Info tambahan
                 domain: domain,
@@ -151,7 +151,7 @@ export default async function handler(req, res) {
             },
             usage: {
                 for_bot: "Gunakan 'base64' field dan convert ke Buffer",
-                for_web: "Gunakan 'image_url' atau 'data_url'",
+                for_web: "Gunakan 'data_url' untuk embed langsung",
                 example: "Buffer.from(data.base64, 'base64')"
             }
         };
@@ -172,11 +172,4 @@ export default async function handler(req, res) {
             status: false
         });
     }
-}
-
-// Helper untuk mendapatkan base URL
-function getBaseUrl(req) {
-    const host = req.headers['x-forwarded-host'] || req.headers['host'];
-    const protocol = req.headers['x-forwarded-proto'] || 'https';
-    return `${protocol}://${host}`;
 }
