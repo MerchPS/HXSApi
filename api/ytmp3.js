@@ -2,83 +2,81 @@ import axios from 'axios';
 
 const yt = {
   static: Object.freeze({
-    baseUrl: 'https://cnv.cx',
+    baseUrl: 'https://ytdlp.online',
     headers: {
-      'accept-encoding': 'gzip, deflate, br, zstd',
-      'origin': 'https://frame.y2meta-uk.com',
-      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0'
+      'accept': 'application/json, text/plain, */*',
+      'accept-encoding': 'gzip, deflate, br',
+      'content-type': 'application/json',
+      'origin': 'https://ytdlp.online',
+      'referer': 'https://ytdlp.online/',
+      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     }
   }),
   
   log(m) { console.log(`[yt-downloader] ${m}`) },
   
-  resolveConverterPayload(link, f = '128k') {
-    const a = ['128k', '320k', '144p', '240p', '360p', '720p', '1080p']
-    if (!a.includes(f)) throw Error(`invalid format. available: ${a.join(', ')}`)
-    const t = f.endsWith('k') ? 'mp3' : 'mp4'
-    const b = t === 'mp3' ? parseInt(f) + '' : '128'
-    const v = t === 'mp4' ? parseInt(f) + '' : '720'
-    return { link, format: t, audioBitrate: b, videoQuality: v, filenameStyle: 'pretty', vCodec: 'h264' }
-  },
-  
-  sanitizeFileName(n) {
-    const e = n.match(/\.[^.]+$/)[0]
-    const f = n.replace(new RegExp(`\\${e}$`), '').replaceAll(/[^A-Za-z0-9]/g, '_').replace(/_+/g, '_').toLowerCase()
-    return f + e
-  },
-  
-  async getKey() {
-    try {
-      const r = await fetch(this.static.baseUrl + '/v2/sanity/key', { 
-        headers: this.static.headers 
-      })
-      if (!r.ok) throw Error(`${r.status} ${r.statusText}`)
-      return await r.json()
-    } catch (error) {
-      throw new Error(`Failed to get key: ${error.message}`)
+  // Extract video ID from URL
+  extractVideoId(url) {
+    const patterns = [
+      /youtu\.be\/([a-zA-Z0-9_-]+)/,
+      /youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/,
+      /youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/
+    ];
+    
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
     }
+    return null;
   },
   
-  async convert(u, f) {
+  // Clean URL and get video info
+  async getDownloadInfo(url, format = 'mp3') {
     try {
-      const { key } = await this.getKey()
-      const p = this.resolveConverterPayload(u, f)
-      const h = { key, ...this.static.headers }
-      
-      const r = await fetch(this.static.baseUrl + '/v2/converter', { 
-        headers: h, 
-        method: 'POST', 
-        body: new URLSearchParams(p) 
-      })
-      
-      if (!r.ok) throw Error(`${r.status} ${r.statusText}`)
-      return await r.json()
-    } catch (error) {
-      throw new Error(`Conversion failed: ${error.message}`)
-    }
-  },
-  
-  async getDownloadInfo(u, f) {
-    try {
-      this.log(`Getting download info for: ${u} with format: ${f}`)
-      
-      const result = await this.convert(u, f)
-      
-      if (!result.url) {
-        throw new Error('No download URL received from converter')
+      const videoId = this.extractVideoId(url);
+      if (!videoId) {
+        throw new Error('Tidak dapat mengekstrak Video ID dari URL');
       }
       
-      return {
-        downloadUrl: result.url,
-        filename: this.sanitizeFileName(result.filename || 'download'),
-        format: f.endsWith('k') ? 'mp3' : 'mp4',
-        quality: f,
-        filesize: result.filesize || 0,
-        duration: result.duration || 0
+      this.log(`Processing video ID: ${videoId} for format: ${format}`);
+      
+      // Use ytdlp.online API
+      const payload = {
+        url: `https://www.youtube.com/watch?v=${videoId}`,
+        format: format
+      };
+      
+      const response = await axios.post(`${this.static.baseUrl}/api/download`, payload, {
+        headers: this.static.headers,
+        timeout: 30000
+      });
+      
+      if (response.data && response.data.success) {
+        return {
+          downloadUrl: response.data.download_url,
+          filename: response.data.filename || `youtube_${videoId}.${format}`,
+          filesize: response.data.filesize || 0,
+          duration: response.data.duration || 0,
+          format: format,
+          quality: format === 'mp3' ? '128k' : '720p',
+          thumbnail: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+          title: response.data.title || 'YouTube Audio',
+          videoId: videoId
+        };
+      } else {
+        throw new Error(response.data?.message || 'Failed to get download info');
       }
+      
     } catch (error) {
-      throw new Error(`Download info failed: ${error.message}`)
+      this.log(`Error: ${error.message}`);
+      throw error;
     }
+  },
+  
+  sanitizeFileName(filename) {
+    return filename.replace(/[^a-zA-Z0-9.-]/g, '_').replace(/_+/g, '_');
   }
 }
 
@@ -106,7 +104,7 @@ export default async function handler(req, res) {
   }
   
   try {
-    let { url, quality = '128k' } = req.method === 'GET' ? req.query : req.body;
+    let { url } = req.method === 'GET' ? req.query : req.body;
     
     if (!url) {
       return res.status(400).json({
@@ -114,23 +112,30 @@ export default async function handler(req, res) {
         error: {
           message: 'Parameter url diperlukan',
           type: 'VALIDATION_ERROR',
-          status: 400,
-          details: 'Gunakan parameter: url=youtube_url&quality=128k'
+          status: 400
         },
         meta: {
-          available_qualities: ['128k', '320k'],
-          example: '/api/ytmp3?url=https://youtu.be/VIDEO_ID&quality=320k'
+          example: '/api/ytmp3?url=https://youtu.be/VIDEO_ID',
+          note: 'URL akan otomatis dibersihkan dari parameter tambahan'
         }
       });
     }
     
-    // Clean URL - remove extra parameters
+    // Clean URL - remove everything after ?
     const cleanUrl = url.split('?')[0];
     yt.log(`Original URL: ${url}`);
     yt.log(`Cleaned URL: ${cleanUrl}`);
     
     // Validate YouTube URL
-    if (!cleanUrl.match(/(youtu\.be|youtube\.com)/)) {
+    const youtubePatterns = [
+      /youtu\.be\/[a-zA-Z0-9_-]+/,
+      /youtube\.com\/watch\?v=[a-zA-Z0-9_-]+/,
+      /youtube\.com\/shorts\/[a-zA-Z0-9_-]+/
+    ];
+    
+    const isValidUrl = youtubePatterns.some(pattern => pattern.test(cleanUrl));
+    
+    if (!isValidUrl) {
       return res.status(400).json({
         success: false,
         error: {
@@ -141,26 +146,14 @@ export default async function handler(req, res) {
         meta: {
           example_formats: [
             'https://youtu.be/VIDEO_ID',
-            'https://www.youtube.com/watch?v=VIDEO_ID'
+            'https://www.youtube.com/watch?v=VIDEO_ID',
+            'https://youtube.com/shorts/VIDEO_ID'
           ]
         }
       });
     }
     
-    // Validate quality
-    const validQualities = ['128k', '320k'];
-    if (!validQualities.includes(quality)) {
-      return res.status(400).json({
-        success: false,
-        error: {
-          message: `Quality tidak valid. Gunakan: ${validQualities.join(', ')}`,
-          type: 'VALIDATION_ERROR',
-          status: 400
-        }
-      });
-    }
-    
-    const downloadInfo = await yt.getDownloadInfo(cleanUrl, quality);
+    const downloadInfo = await yt.getDownloadInfo(cleanUrl, 'mp3');
     const responseTime = Date.now() - startTime;
     
     // Generate response data
@@ -173,6 +166,9 @@ export default async function handler(req, res) {
         quality: downloadInfo.quality,
         filesize: downloadInfo.filesize,
         duration: downloadInfo.duration,
+        title: downloadInfo.title,
+        thumbnail: downloadInfo.thumbnail,
+        video_id: downloadInfo.videoId,
         type: 'audio',
         timestamp: new Date().toISOString()
       },
@@ -182,7 +178,7 @@ export default async function handler(req, res) {
         version: "1.0.0",
         usage: {
           direct_download: `Klik link download_url untuk mengunduh langsung`,
-          stream: `Gunakan download_url sebagai audio source di web/mobile`,
+          stream: `Gunakan download_url sebagai audio source`,
           note: "Link download berlaku untuk waktu terbatas"
         }
       }
@@ -195,25 +191,29 @@ export default async function handler(req, res) {
   } catch (error) {
     const responseTime = Date.now() - startTime;
     
-    console.error('YouTube MP3 Error:', error.message);
+    console.error('YouTube MP3 Error:', error.response?.data || error.message);
     
     // Handle specific errors
     let errorMessage = error.message;
     let errorType = 'API_ERROR';
     let statusCode = 500;
     
-    if (error.message.includes('invalid format') || error.message.includes('invalid URL')) {
-      errorMessage = 'URL YouTube tidak valid atau format tidak didukung';
+    if (error.message.includes('Video ID')) {
+      errorMessage = 'URL YouTube tidak valid';
       errorType = 'VALIDATION_ERROR';
       statusCode = 400;
-    } else if (error.message.includes('404') || error.message.includes('Not Found')) {
+    } else if (error.response?.status === 404 || error.message.includes('not found')) {
       errorMessage = 'Video tidak ditemukan atau tidak dapat diakses';
       errorType = 'NOT_FOUND_ERROR';
       statusCode = 404;
-    } else if (error.message.includes('Failed to get key')) {
-      errorMessage = 'Service sedang maintenance, coba lagi nanti';
-      errorType = 'SERVICE_ERROR';
-      statusCode = 503;
+    } else if (error.code === 'ECONNABORTED') {
+      errorMessage = 'Timeout: Server mengambil waktu terlalu lama';
+      errorType = 'TIMEOUT_ERROR';
+      statusCode = 408;
+    } else if (error.response?.status === 429) {
+      errorMessage = 'Terlalu banyak request, coba lagi nanti';
+      errorType = 'RATE_LIMIT_ERROR';
+      statusCode = 429;
     }
     
     const errorResponse = {
@@ -230,9 +230,9 @@ export default async function handler(req, res) {
         version: "1.0.0",
         troubleshooting: [
           'Pastikan URL YouTube valid dan publik',
-          'Coba tanpa parameter ?si= di URL',
-          'Video mungkin tidak mengizinkan download',
-          'Coba quality yang berbeda'
+          'Coba URL pendek: https://youtu.be/VIDEO_ID',
+          'Video mungkin tidak tersedia untuk download',
+          'Coba lagi dalam beberapa menit'
         ]
       }
     };
