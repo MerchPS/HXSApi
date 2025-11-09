@@ -1,4 +1,4 @@
-// In-memory storage untuk gambar (sementara)
+// In-memory storage untuk gambar
 const imageCache = new Map();
 const CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 jam
 
@@ -78,6 +78,9 @@ function cleanupCache() {
 // Jalankan cleanup setiap jam
 setInterval(cleanupCache, 60 * 60 * 1000);
 
+// Export cache untuk digunakan di file lain
+export { imageCache };
+
 export default async function handler(req, res) {
     const startTime = Date.now();
     
@@ -88,28 +91,6 @@ export default async function handler(req, res) {
     
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
-    }
-    
-    // Handle image serving dari cache
-    if (req.method === 'GET' && req.url.includes('/img/')) {
-        const imageId = req.url.split('/').pop();
-        
-        if (!imageId || !imageCache.has(imageId)) {
-            return res.status(404).json({
-                success: false,
-                message: 'Image not found or expired'
-            });
-        }
-        
-        const cached = imageCache.get(imageId);
-        const buffer = Buffer.from(cached.data);
-        
-        res.setHeader('Content-Type', 'image/jpeg');
-        res.setHeader('Content-Length', buffer.length);
-        res.setHeader('Cache-Control', 'public, max-age=3600');
-        res.setHeader('X-Image-Id', imageId);
-        
-        return res.send(buffer);
     }
     
     if (req.method !== 'GET') {
@@ -150,7 +131,7 @@ export default async function handler(req, res) {
             url: url
         });
         
-        const imageUrl = `https://hxs-apis.vercel.app/api/ssweb/img/${imageId}`;
+        const imageUrl = `https://hxs-apis.vercel.app/api/img/${imageId}`;
         
         // Generate response data dengan URL
         const domain = getDomainFromUrl(url);
