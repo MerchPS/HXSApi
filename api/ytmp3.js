@@ -2,183 +2,83 @@ import axios from 'axios';
 
 const yt = {
   static: Object.freeze({
+    baseUrl: 'https://cnv.cx',
     headers: {
-      'accept': 'application/json, text/plain, */*',
-      'accept-encoding': 'gzip, deflate, br',
-      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      'referer': 'https://ytmp3.nu/',
-      'origin': 'https://ytmp3.nu'
+      'accept-encoding': 'gzip, deflate, br, zstd',
+      'origin': 'https://frame.y2meta-uk.com',
+      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0'
     }
   }),
   
   log(m) { console.log(`[yt-downloader] ${m}`) },
   
-  // Extract video ID from various YouTube URL formats
-  extractVideoId(url) {
-    const patterns = [
-      /youtu\.be\/([^?&]+)/,
-      /youtube\.com\/watch\?v=([^?&]+)/,
-      /youtube\.com\/shorts\/([^?&]+)/,
-      /youtube\.com\/embed\/([^?&]+)/
-    ];
-    
-    for (const pattern of patterns) {
-      const match = url.match(pattern);
-      if (match && match[1]) {
-        return match[1];
-      }
-    }
-    return null;
+  resolveConverterPayload(link, f = '128k') {
+    const a = ['128k', '320k', '144p', '240p', '360p', '720p', '1080p']
+    if (!a.includes(f)) throw Error(`invalid format. available: ${a.join(', ')}`)
+    const t = f.endsWith('k') ? 'mp3' : 'mp4'
+    const b = t === 'mp3' ? parseInt(f) + '' : '128'
+    const v = t === 'mp4' ? parseInt(f) + '' : '720'
+    return { link, format: t, audioBitrate: b, videoQuality: v, filenameStyle: 'pretty', vCodec: 'h264' }
   },
   
-  // Clean URL and get video ID
-  cleanUrl(url) {
-    const videoId = this.extractVideoId(url);
-    if (!videoId) {
-      throw new Error('Tidak dapat mengekstrak Video ID dari URL');
-    }
-    return {
-      videoId: videoId,
-      cleanUrl: `https://www.youtube.com/watch?v=${videoId}`
-    };
+  sanitizeFileName(n) {
+    const e = n.match(/\.[^.]+$/)[0]
+    const f = n.replace(new RegExp(`\\${e}$`), '').replaceAll(/[^A-Za-z0-9]/g, '_').replace(/_+/g, '_').toLowerCase()
+    return f + e
   },
   
-  async getDownloadInfo(url, format = 'mp3') {
+  async getKey() {
     try {
-      const { videoId, cleanUrl } = this.cleanUrl(url);
-      this.log(`Video ID: ${videoId}`);
-      
-      // Try multiple services
-      const services = [
-        this.tryYtMp3Nu.bind(this),
-        this.tryY2Mate.bind(this),
-        this.tryOnlineVideoConverter.bind(this)
-      ];
-      
-      let result;
-      let lastError;
-      
-      for (const service of services) {
-        try {
-          this.log(`Trying service: ${service.name}`);
-          result = await service(videoId, cleanUrl, format);
-          if (result) {
-            this.log(`Service ${service.name} success`);
-            break;
-          }
-        } catch (error) {
-          lastError = error;
-          this.log(`Service ${service.name} failed: ${error.message}`);
-          continue;
-        }
-      }
-      
-      if (!result) {
-        throw new Error(lastError?.message || 'Semua service gagal');
-      }
-      
-      return result;
-      
+      const r = await fetch(this.static.baseUrl + '/v2/sanity/key', { 
+        headers: this.static.headers 
+      })
+      if (!r.ok) throw Error(`${r.status} ${r.statusText}`)
+      return await r.json()
     } catch (error) {
-      this.log(`Error: ${error.message}`);
-      throw error;
+      throw new Error(`Failed to get key: ${error.message}`)
     }
   },
   
-  // Service 1: ytmp3.nu
-  async tryYtMp3Nu(videoId, cleanUrl, format) {
+  async convert(u, f) {
     try {
-      const response = await axios.post('https://ytmp3.nu/api/convert', {
-        v: videoId,
-        f: format === 'mp3' ? 'mp3' : 'mp4'
-      }, {
-        headers: {
-          ...this.static.headers,
-          'content-type': 'application/json'
-        },
-        timeout: 10000
-      });
+      const { key } = await this.getKey()
+      const p = this.resolveConverterPayload(u, f)
+      const h = { key, ...this.static.headers }
       
-      if (response.data && response.data.durl) {
-        return {
-          downloadUrl: response.data.durl,
-          filename: response.data.title ? `${response.data.title}.${format}` : `download.${format}`,
-          filesize: response.data.size || 0,
-          duration: response.data.duration || 0,
-          format: format,
-          quality: format === 'mp3' ? '128k' : '720p',
-          thumbnail: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
-          title: response.data.title || 'YouTube Video'
-        };
-      }
-      throw new Error('Invalid response from service');
+      const r = await fetch(this.static.baseUrl + '/v2/converter', { 
+        headers: h, 
+        method: 'POST', 
+        body: new URLSearchParams(p) 
+      })
+      
+      if (!r.ok) throw Error(`${r.status} ${r.statusText}`)
+      return await r.json()
     } catch (error) {
-      throw new Error(`ytmp3.nu: ${error.message}`);
+      throw new Error(`Conversion failed: ${error.message}`)
     }
   },
   
-  // Service 2: y2mate alternative
-  async tryY2Mate(videoId, cleanUrl, format) {
+  async getDownloadInfo(u, f) {
     try {
-      // Get conversion info first
-      const infoResponse = await axios.post('https://api.y2mate.download/api/info', {
-        url: cleanUrl,
-        format: format
-      }, {
-        headers: this.static.headers,
-        timeout: 10000
-      });
+      this.log(`Getting download info for: ${u} with format: ${f}`)
       
-      if (infoResponse.data && infoResponse.data.download_url) {
-        return {
-          downloadUrl: infoResponse.data.download_url,
-          filename: infoResponse.data.filename || `download.${format}`,
-          filesize: infoResponse.data.filesize || 0,
-          duration: infoResponse.data.duration || 0,
-          format: format,
-          quality: format === 'mp3' ? '128k' : '720p',
-          thumbnail: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
-          title: infoResponse.data.title || 'YouTube Video'
-        };
-      }
-      throw new Error('Invalid response from service');
-    } catch (error) {
-      throw new Error(`y2mate: ${error.message}`);
-    }
-  },
-  
-  // Service 3: OnlineVideoConverter alternative
-  async tryOnlineVideoConverter(videoId, cleanUrl, format) {
-    try {
-      const response = await axios.get(`https://onlinevideoconverter.pro/api/convert`, {
-        params: {
-          url: cleanUrl,
-          format: format
-        },
-        headers: this.static.headers,
-        timeout: 10000
-      });
+      const result = await this.convert(u, f)
       
-      if (response.data && response.data.url) {
-        return {
-          downloadUrl: response.data.url,
-          filename: response.data.filename || `download.${format}`,
-          filesize: response.data.filesize || 0,
-          duration: response.data.duration || 0,
-          format: format,
-          quality: format === 'mp3' ? '128k' : '720p',
-          thumbnail: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
-          title: response.data.title || 'YouTube Video'
-        };
+      if (!result.url) {
+        throw new Error('No download URL received from converter')
       }
-      throw new Error('Invalid response from service');
+      
+      return {
+        downloadUrl: result.url,
+        filename: this.sanitizeFileName(result.filename || 'download'),
+        format: f.endsWith('k') ? 'mp3' : 'mp4',
+        quality: f,
+        filesize: result.filesize || 0,
+        duration: result.duration || 0
+      }
     } catch (error) {
-      throw new Error(`onlinevideoconverter: ${error.message}`);
+      throw new Error(`Download info failed: ${error.message}`)
     }
-  },
-  
-  sanitizeFileName(filename) {
-    return filename.replace(/[^a-zA-Z0-9.-]/g, '_').replace(/_+/g, '_');
   }
 }
 
@@ -206,7 +106,7 @@ export default async function handler(req, res) {
   }
   
   try {
-    let { url } = req.method === 'GET' ? req.query : req.body;
+    let { url, quality = '128k' } = req.method === 'GET' ? req.query : req.body;
     
     if (!url) {
       return res.status(400).json({
@@ -214,20 +114,53 @@ export default async function handler(req, res) {
         error: {
           message: 'Parameter url diperlukan',
           type: 'VALIDATION_ERROR',
-          status: 400
+          status: 400,
+          details: 'Gunakan parameter: url=youtube_url&quality=128k'
         },
         meta: {
-          example: '/api/ytmp3?url=https://youtu.be/VIDEO_ID',
-          supported_formats: ['youtu.be/VIDEO_ID', 'youtube.com/watch?v=VIDEO_ID']
+          available_qualities: ['128k', '320k'],
+          example: '/api/ytmp3?url=https://youtu.be/VIDEO_ID&quality=320k'
         }
       });
     }
     
-    // Test dengan URL fix dulu
-    const testUrl = 'https://youtu.be/lT4zmbhNE-M'; // URL fix tanpa parameter
+    // Clean URL - remove extra parameters
+    const cleanUrl = url.split('?')[0];
+    yt.log(`Original URL: ${url}`);
+    yt.log(`Cleaned URL: ${cleanUrl}`);
     
-    this.log(`Processing URL: ${url}`);
-    const downloadInfo = await yt.getDownloadInfo(testUrl, 'mp3');
+    // Validate YouTube URL
+    if (!cleanUrl.match(/(youtu\.be|youtube\.com)/)) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          message: 'URL YouTube tidak valid',
+          type: 'VALIDATION_ERROR',
+          status: 400
+        },
+        meta: {
+          example_formats: [
+            'https://youtu.be/VIDEO_ID',
+            'https://www.youtube.com/watch?v=VIDEO_ID'
+          ]
+        }
+      });
+    }
+    
+    // Validate quality
+    const validQualities = ['128k', '320k'];
+    if (!validQualities.includes(quality)) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          message: `Quality tidak valid. Gunakan: ${validQualities.join(', ')}`,
+          type: 'VALIDATION_ERROR',
+          status: 400
+        }
+      });
+    }
+    
+    const downloadInfo = await yt.getDownloadInfo(cleanUrl, quality);
     const responseTime = Date.now() - startTime;
     
     // Generate response data
@@ -240,20 +173,17 @@ export default async function handler(req, res) {
         quality: downloadInfo.quality,
         filesize: downloadInfo.filesize,
         duration: downloadInfo.duration,
-        title: downloadInfo.title,
-        thumbnail: downloadInfo.thumbnail,
         type: 'audio',
-        timestamp: new Date().toISOString(),
-        video_id: yt.extractVideoId(url)
+        timestamp: new Date().toISOString()
       },
       meta: {
         response_time: responseTime,
-        credits: "HXS YouTube API - Home & Start", 
+        credits: "HXS YouTube API - Home & Start",
         version: "1.0.0",
         usage: {
           direct_download: `Klik link download_url untuk mengunduh langsung`,
-          stream: `Gunakan download_url sebagai audio source`,
-          note: "Link download mungkin berlaku terbatas"
+          stream: `Gunakan download_url sebagai audio source di web/mobile`,
+          note: "Link download berlaku untuk waktu terbatas"
         }
       }
     };
@@ -272,18 +202,18 @@ export default async function handler(req, res) {
     let errorType = 'API_ERROR';
     let statusCode = 500;
     
-    if (error.message.includes('Video ID')) {
-      errorMessage = 'URL YouTube tidak valid';
+    if (error.message.includes('invalid format') || error.message.includes('invalid URL')) {
+      errorMessage = 'URL YouTube tidak valid atau format tidak didukung';
       errorType = 'VALIDATION_ERROR';
       statusCode = 400;
-    } else if (error.message.includes('Semua service gagal')) {
-      errorMessage = 'Semua service download sedang tidak tersedia';
-      errorType = 'SERVICE_UNAVAILABLE';
+    } else if (error.message.includes('404') || error.message.includes('Not Found')) {
+      errorMessage = 'Video tidak ditemukan atau tidak dapat diakses';
+      errorType = 'NOT_FOUND_ERROR';
+      statusCode = 404;
+    } else if (error.message.includes('Failed to get key')) {
+      errorMessage = 'Service sedang maintenance, coba lagi nanti';
+      errorType = 'SERVICE_ERROR';
       statusCode = 503;
-    } else if (error.message.includes('timeout')) {
-      errorMessage = 'Timeout: Proses terlalu lama';
-      errorType = 'TIMEOUT_ERROR';
-      statusCode = 408;
     }
     
     const errorResponse = {
@@ -300,9 +230,9 @@ export default async function handler(req, res) {
         version: "1.0.0",
         troubleshooting: [
           'Pastikan URL YouTube valid dan publik',
+          'Coba tanpa parameter ?si= di URL',
           'Video mungkin tidak mengizinkan download',
-          'Coba URL pendek: https://youtu.be/VIDEO_ID',
-          'Coba lagi dalam beberapa menit'
+          'Coba quality yang berbeda'
         ]
       }
     };
