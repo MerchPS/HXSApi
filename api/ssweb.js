@@ -1,41 +1,6 @@
-import { addLog } from '../lib/logger.js';
-import { incrementRequest } from '../lib/requestCounter.js';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Buat folder temporary untuk menyimpan gambar
-const tempDir = path.join(__dirname, 'temp');
-if (!fs.existsSync(tempDir)) {
-    fs.mkdirSync(tempDir, { recursive: true });
-}
-
-// Cleanup function untuk hapus file lama
-function cleanupOldFiles() {
-    const now = Date.now();
-    const maxAge = 2 * 60 * 60 * 1000; // 2 jam
-    
-    try {
-        const files = fs.readdirSync(tempDir);
-        files.forEach(file => {
-            const filePath = path.join(tempDir, file);
-            const stats = fs.statSync(filePath);
-            
-            if (now - stats.mtime.getTime() > maxAge) {
-                fs.unlinkSync(filePath);
-                console.log(`Deleted old file: ${file}`);
-            }
-        });
-    } catch (error) {
-        console.error('Cleanup error:', error.message);
-    }
-}
-
-// Jalankan cleanup setiap 30 menit
-setInterval(cleanupOldFiles, 30 * 60 * 1000);
+// In-memory storage untuk gambar (sementara)
+const imageCache = new Map();
+const CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 jam
 
 // SSWeb implementation
 const ssweb = {
@@ -100,61 +65,21 @@ function getDomainFromUrl(url) {
     }
 }
 
-// Helper function untuk generate title
-function generateTitle(url) {
-    const domain = getDomainFromUrl(url);
-    return `Screenshot of ${domain}`;
-}
-
-// Helper function untuk generate developer info
-function generateDeveloperInfo(url) {
-    const domain = getDomainFromUrl(url);
-    return `${domain} Development Team`;
-}
-
-// Function untuk save buffer ke file
-function saveImageToTemp(buffer) {
-    const filename = `ss_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.jpeg`;
-    const filepath = path.join(tempDir, filename);
-    
-    fs.writeFileSync(filepath, buffer);
-    return filename;
-}
-
-// Function untuk serve static image
-export async function serveImage(req, res) {
-    const { filename } = req.query;
-    
-    if (!filename) {
-        return res.status(400).json({ error: 'Filename required' });
-    }
-    
-    // Security: hanya allow alphanumeric, underscore, dan dot
-    if (!/^[a-zA-Z0-9_.-]+\.jpeg$/.test(filename)) {
-        return res.status(400).json({ error: 'Invalid filename' });
-    }
-    
-    const filepath = path.join(tempDir, filename);
-    
-    try {
-        if (!fs.existsSync(filepath)) {
-            return res.status(404).json({ error: 'Image not found or expired' });
+// Cleanup cache yang expired
+function cleanupCache() {
+    const now = Date.now();
+    for (const [key, value] of imageCache.entries()) {
+        if (now - value.timestamp > CACHE_DURATION) {
+            imageCache.delete(key);
         }
-        
-        res.setHeader('Content-Type', 'image/jpeg');
-        res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache 1 jam
-        res.sendFile(filepath);
-        
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to serve image' });
     }
 }
+
+// Jalankan cleanup setiap jam
+setInterval(cleanupCache, 60 * 60 * 1000);
 
 export default async function handler(req, res) {
     const startTime = Date.now();
-    const clientIP = req.headers['x-forwarded-for'] || 
-                    req.headers['x-real-ip'] || 
-                    req.connection.remoteAddress;
     
     // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -165,23 +90,29 @@ export default async function handler(req, res) {
         return res.status(200).end();
     }
     
-    // Handle image serving
-    if (req.method === 'GET' && req.url.includes('/api/img/')) {
-        const filename = req.url.split('/').pop();
-        req.query = { filename };
-        return serveImage(req, res);
+    // Handle image serving dari cache
+    if (req.method === 'GET' && req.url.includes('/img/')) {
+        const imageId = req.url.split('/').pop();
+        
+        if (!imageId || !imageCache.has(imageId)) {
+            return res.status(404).json({
+                success: false,
+                message: 'Image not found or expired'
+            });
+        }
+        
+        const cached = imageCache.get(imageId);
+        const buffer = Buffer.from(cached.data);
+        
+        res.setHeader('Content-Type', 'image/jpeg');
+        res.setHeader('Content-Length', buffer.length);
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+        res.setHeader('X-Image-Id', imageId);
+        
+        return res.send(buffer);
     }
     
     if (req.method !== 'GET') {
-        addLog({
-            ip: clientIP,
-            method: req.method,
-            endpoint: '/api/ssweb',
-            status: 405,
-            userAgent: req.headers['user-agent'],
-            error: 'Method not allowed'
-        });
-        
         return res.status(405).json({
             success: false,
             message: 'Method not allowed'
@@ -192,15 +123,6 @@ export default async function handler(req, res) {
         const { url } = req.query;
         
         if (!url) {
-            addLog({
-                ip: clientIP,
-                method: 'GET',
-                endpoint: '/api/ssweb',
-                status: 400,
-                userAgent: req.headers['user-agent'],
-                error: 'Missing URL parameter'
-            });
-            
             return res.status(400).json({
                 success: false,
                 message: 'Parameter url diperlukan'
@@ -211,35 +133,24 @@ export default async function handler(req, res) {
         try {
             new URL(url);
         } catch (error) {
-            addLog({
-                ip: clientIP,
-                method: 'GET',
-                endpoint: '/api/ssweb',
-                status: 400,
-                userAgent: req.headers['user-agent'],
-                error: 'Invalid URL format',
-                url: url
-            });
-            
             return res.status(400).json({
                 success: false,
                 message: 'Format URL tidak valid'
             });
         }
 
-        // Increment request counter - TIDAK blocking
-        incrementRequest('/api/ssweb').then(requestStats => {
-            console.log('Request counter updated:', requestStats);
-        }).catch(error => {
-            console.error('Error updating request counter:', error);
-        });
-
         const buffer = await ssweb.capture(url);
         const responseTime = Date.now() - startTime;
 
-        // Simpan ke temporary file dan dapatkan URL
-        const filename = saveImageToTemp(buffer);
-        const imageUrl = `https://hxs-apis.vercel.app/api/img/${filename}`;
+        // Simpan ke memory cache dengan ID unik
+        const imageId = `ss_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        imageCache.set(imageId, {
+            data: buffer.toString('base64'),
+            timestamp: Date.now(),
+            url: url
+        });
+        
+        const imageUrl = `https://hxs-apis.vercel.app/api/ssweb/img/${imageId}`;
         
         // Generate response data dengan URL
         const domain = getDomainFromUrl(url);
@@ -247,9 +158,9 @@ export default async function handler(req, res) {
             status: true,
             data: [
                 {
-                    title: generateTitle(url),
+                    title: `Screenshot of ${domain}`,
                     link: imageUrl,
-                    developer: generateDeveloperInfo(url),
+                    developer: `${domain} Development Team`,
                     image: imageUrl,
                     domain: domain,
                     url: url,
@@ -258,6 +169,7 @@ export default async function handler(req, res) {
                     size: buffer.length,
                     dimensions: '1280x720',
                     expires_in: '2 hours',
+                    image_id: imageId,
                     download_info: `Image URL: ${imageUrl} (expires in 2 hours)`
                 }
             ],
@@ -265,20 +177,10 @@ export default async function handler(req, res) {
                 response_time: responseTime,
                 credits: "HXS API - Home & Start",
                 version: "1.0.0",
-                usage: `Use the 'image' field directly in your HTML: <img src='${imageUrl}' />`
+                cache_info: `Cached ${imageCache.size} images`,
+                usage: `Use the 'image' field directly: <img src='${imageUrl}' />`
             }
         };
-
-        addLog({
-            ip: clientIP,
-            method: 'GET',
-            endpoint: '/api/ssweb',
-            status: 200,
-            userAgent: req.headers['user-agent'],
-            url: url,
-            responseTime: responseTime,
-            filename: filename
-        });
 
         // Return JSON dengan image URL
         res.setHeader('Content-Type', 'application/json');
@@ -288,15 +190,7 @@ export default async function handler(req, res) {
     } catch (error) {
         const responseTime = Date.now() - startTime;
         
-        addLog({
-            ip: clientIP,
-            method: 'GET',
-            endpoint: '/api/ssweb',
-            status: 500,
-            userAgent: req.headers['user-agent'],
-            error: error.message,
-            responseTime: responseTime
-        });
+        console.error('SSWeb Error:', error.message);
         
         return res.status(500).json({
             success: false,
