@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "SSWeb API for Vercel",
   "main": "api/ssweb.js",
+  "type": "module",
   "scripts": {
     "dev": "vercel dev"
   },
