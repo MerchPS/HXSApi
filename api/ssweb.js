@@ -2,6 +2,40 @@ import { addLog } from '../lib/logger.js';
 import { incrementRequest } from '../lib/requestCounter.js';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Buat folder temporary untuk menyimpan gambar
+const tempDir = path.join(__dirname, 'temp');
+if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir, { recursive: true });
+}
+
+// Cleanup function untuk hapus file lama
+function cleanupOldFiles() {
+    const now = Date.now();
+    const maxAge = 2 * 60 * 60 * 1000; // 2 jam
+    
+    try {
+        const files = fs.readdirSync(tempDir);
+        files.forEach(file => {
+            const filePath = path.join(tempDir, file);
+            const stats = fs.statSync(filePath);
+            
+            if (now - stats.mtime.getTime() > maxAge) {
+                fs.unlinkSync(filePath);
+                console.log(`Deleted old file: ${file}`);
+            }
+        });
+    } catch (error) {
+        console.error('Cleanup error:', error.message);
+    }
+}
+
+// Jalankan cleanup setiap 30 menit
+setInterval(cleanupOldFiles, 30 * 60 * 1000);
 
 // SSWeb implementation
 const ssweb = {
@@ -56,6 +90,66 @@ const ssweb = {
     }
 }
 
+// Helper function untuk extract domain dari URL
+function getDomainFromUrl(url) {
+    try {
+        const domain = new URL(url).hostname;
+        return domain.replace('www.', '');
+    } catch {
+        return 'website';
+    }
+}
+
+// Helper function untuk generate title
+function generateTitle(url) {
+    const domain = getDomainFromUrl(url);
+    return `Screenshot of ${domain}`;
+}
+
+// Helper function untuk generate developer info
+function generateDeveloperInfo(url) {
+    const domain = getDomainFromUrl(url);
+    return `${domain} Development Team`;
+}
+
+// Function untuk save buffer ke file
+function saveImageToTemp(buffer) {
+    const filename = `ss_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.jpeg`;
+    const filepath = path.join(tempDir, filename);
+    
+    fs.writeFileSync(filepath, buffer);
+    return filename;
+}
+
+// Function untuk serve static image
+export async function serveImage(req, res) {
+    const { filename } = req.query;
+    
+    if (!filename) {
+        return res.status(400).json({ error: 'Filename required' });
+    }
+    
+    // Security: hanya allow alphanumeric, underscore, dan dot
+    if (!/^[a-zA-Z0-9_.-]+\.jpeg$/.test(filename)) {
+        return res.status(400).json({ error: 'Invalid filename' });
+    }
+    
+    const filepath = path.join(tempDir, filename);
+    
+    try {
+        if (!fs.existsSync(filepath)) {
+            return res.status(404).json({ error: 'Image not found or expired' });
+        }
+        
+        res.setHeader('Content-Type', 'image/jpeg');
+        res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache 1 jam
+        res.sendFile(filepath);
+        
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to serve image' });
+    }
+}
+
 export default async function handler(req, res) {
     const startTime = Date.now();
     const clientIP = req.headers['x-forwarded-for'] || 
@@ -69,6 +163,13 @@ export default async function handler(req, res) {
     
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
+    }
+    
+    // Handle image serving
+    if (req.method === 'GET' && req.url.includes('/api/img/')) {
+        const filename = req.url.split('/').pop();
+        req.query = { filename };
+        return serveImage(req, res);
     }
     
     if (req.method !== 'GET') {
@@ -136,13 +237,38 @@ export default async function handler(req, res) {
         const buffer = await ssweb.capture(url);
         const responseTime = Date.now() - startTime;
 
-        // Langsung kirim sebagai image - LEBIH CEPAT!
-        res.setHeader('Content-Type', 'image/jpeg');
-        res.setHeader('Content-Length', buffer.length);
-        res.setHeader('X-Response-Time', `${responseTime}ms`);
-        res.setHeader('X-Screenshot-Of', url);
-        res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache 1 jam
+        // Simpan ke temporary file dan dapatkan URL
+        const filename = saveImageToTemp(buffer);
+        const imageUrl = `https://hxs-apis.vercel.app/api/img/${filename}`;
         
+        // Generate response data dengan URL
+        const domain = getDomainFromUrl(url);
+        const responseData = {
+            status: true,
+            data: [
+                {
+                    title: generateTitle(url),
+                    link: imageUrl,
+                    developer: generateDeveloperInfo(url),
+                    image: imageUrl,
+                    domain: domain,
+                    url: url,
+                    timestamp: new Date().toISOString(),
+                    format: 'jpeg',
+                    size: buffer.length,
+                    dimensions: '1280x720',
+                    expires_in: '2 hours',
+                    download_info: `Image URL: ${imageUrl} (expires in 2 hours)`
+                }
+            ],
+            meta: {
+                response_time: responseTime,
+                credits: "HXS API - Home & Start",
+                version: "1.0.0",
+                usage: `Use the 'image' field directly in your HTML: <img src='${imageUrl}' />`
+            }
+        };
+
         addLog({
             ip: clientIP,
             method: 'GET',
@@ -150,10 +276,14 @@ export default async function handler(req, res) {
             status: 200,
             userAgent: req.headers['user-agent'],
             url: url,
-            responseTime: responseTime
+            responseTime: responseTime,
+            filename: filename
         });
 
-        return res.send(buffer);
+        // Return JSON dengan image URL
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('X-Response-Time', `${responseTime}ms`);
+        return res.json(responseData);
         
     } catch (error) {
         const responseTime = Date.now() - startTime;
