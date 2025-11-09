@@ -532,11 +532,18 @@
                 <div class="accordion-content">
                     <div class="accordion-content-inner">
                         <div class="section-description">
-                            <p>HXS API menyediakan layanan untuk mengambil screenshot dari website secara mudah dan cepat. API ini dirancang untuk developer yang membutuhkan fitur capture website dengan kualitas tinggi.</p>
+                            <p>HXS API menyediakan layanan untuk mengambil screenshot dari website secara mudah dan cepat. API ini sangat cocok untuk:</p>
+                            <ul>
+                                <li><strong>🤖 Bot WhatsApp</strong> - Fitur screenshot website langsung dari chat</li>
+                                <li><strong>🌐 Web Applications</strong> - Embed screenshot di website</li>
+                                <li><strong>📱 Mobile Apps</strong> - Generate website preview</li>
+                                <li><strong>🔧 Tools & Utilities</strong> - Website monitoring dan analysis</li>
+                            </ul>
                         </div>
                         
                         <div class="note">
-                            <strong><i class="fas fa-lightbulb"></i> Catatan:</strong> Semua endpoint mendukung CORS dan dapat diakses dari domain mana pun.
+                            <strong><i class="fab fa-whatsapp"></i> Khusus Bot WhatsApp:</strong> 
+                            Gunakan endpoint <code>/api/ssweb?format=base64</code> untuk hasil terbaik. Response base64 dapat langsung di-convert ke Buffer dan dikirim sebagai gambar.
                         </div>
                     </div>
                 </div>
@@ -544,49 +551,49 @@
         </div>
 
         <!-- SSWeb API Section -->
-<div class="accordion">
-    <div class="accordion-item">
-        <div class="accordion-header">
-            <div class="accordion-title">
-                <div class="accordion-icon">
-                    <i class="fas fa-camera"></i>
+        <div class="accordion">
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <div class="accordion-title">
+                        <div class="accordion-icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        SSWeb API - Website Screenshot
+                    </div>
+                    <div class="accordion-arrow">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
                 </div>
-                SSWeb API - Website Screenshot
-            </div>
-            <div class="accordion-arrow">
-                <i class="fas fa-chevron-down"></i>
-            </div>
-        </div>
-        <div class="accordion-content">
-            <div class="accordion-content-inner">
-                <div class="section-description">
-                    <p>Endpoint untuk mengambil screenshot dari website tertentu. Mendukung berbagai format response untuk keperluan yang berbeda.</p>
-                </div>
-                
-                <!-- Endpoint 1: JSON Response -->
-                <div class="endpoint">
-                    <div class="endpoint-header">
-                        <span class="method">GET</span>
-                        <span class="url">/api/ssweb?url=https://example.com</span>
-                    </div>
-                    
-                    <div class="parameter">
-                        <span class="param-name">url</span>
-                        <span class="param-required">*required</span>
-                        <p>URL lengkap website yang akan di-screenshot (harus termasuk protocol http:// atau https://)</p>
-                    </div>
+                <div class="accordion-content">
+                    <div class="accordion-content-inner">
+                        <div class="section-description">
+                            <p>Endpoint untuk mengambil screenshot dari website tertentu. Mendukung berbagai format response untuk keperluan yang berbeda.</p>
+                        </div>
+                        
+                        <!-- Endpoint 1: JSON Response -->
+                        <div class="endpoint">
+                            <div class="endpoint-header">
+                                <span class="method">GET</span>
+                                <span class="url">/api/ssweb?url=https://example.com</span>
+                            </div>
+                            
+                            <div class="parameter">
+                                <span class="param-name">url</span>
+                                <span class="param-required">*required</span>
+                                <p>URL lengkap website yang akan di-screenshot (harus termasuk protocol http:// atau https://)</p>
+                            </div>
 
-                    <div class="parameter">
-                        <span class="param-name">format</span>
-                        <span class="param-optional">optional</span>
-                        <p>Format response: <code>json</code> (default), <code>base64</code>, <code>image</code></p>
-                    </div>
+                            <div class="parameter">
+                                <span class="param-name">format</span>
+                                <span class="param-optional">optional</span>
+                                <p>Format response: <code>json</code> (default), <code>base64</code>, <code>image</code></p>
+                            </div>
 
-                    <h4><i class="fas fa-check-circle"></i> Response Success:</h4>
-                    <div class="response">
-                        <span class="status-code status-200">200 OK</span>
-                        <div class="code-block">
-                            <pre>{
+                            <h4><i class="fas fa-check-circle"></i> Response Success:</h4>
+                            <div class="response">
+                                <span class="status-code status-200">200 OK</span>
+                                <div class="code-block">
+                                    <pre>{
   "status": true,
   "data": {
     "base64": "base64_encoded_string...",
@@ -596,15 +603,15 @@
     "response_time": 2450
   }
 }</pre>
-                            <button class="copy-btn">Copy</button>
-                        </div>
-                    </div>
+                                    <button class="copy-btn">Copy</button>
+                                </div>
+                            </div>
 
-                    <!-- WhatsApp Bot Usage -->
-                    <h4><i class="fab fa-whatsapp"></i> Penggunaan untuk Bot WhatsApp:</h4>
-                    <div class="response">
-                        <div class="code-block">
-                            <pre>// Method 1: Menggunakan Base64 (Recommended)
+                            <!-- WhatsApp Bot Usage -->
+                            <h4><i class="fab fa-whatsapp"></i> Penggunaan untuk Bot WhatsApp:</h4>
+                            <div class="response">
+                                <div class="code-block">
+                                    <pre>// Method 1: Menggunakan Base64 (Recommended)
 let handler = async (m, { conn, args }) => {
     try {
         if (!args[0]) return m.reply('❌ Masukkan URL\nContoh: .ssweb https://google.com');
@@ -636,15 +643,15 @@ handler.help = ['ssweb <url>'];
 handler.command = ['ssweb', 'screenshot'];
 handler.tags = ['tools'];
 export default handler;</pre>
-                            <button class="copy-btn">Copy</button>
-                        </div>
-                    </div>
+                                    <button class="copy-btn">Copy</button>
+                                </div>
+                            </div>
 
-                    <!-- Method 2: Direct Image -->
-                    <h4><i class="fas fa-code"></i> Alternatif Lain:</h4>
-                    <div class="response">
-                        <div class="code-block">
-                            <pre>// Method 2: Menggunakan Direct Image URL
+                            <!-- Method 2: Direct Image -->
+                            <h4><i class="fas fa-code"></i> Alternatif Lain:</h4>
+                            <div class="response">
+                                <div class="code-block">
+                                    <pre>// Method 2: Menggunakan Direct Image URL
 let handler = async (m, { conn, args }) => {
     try {
         if (!args[0]) return m.reply('❌ Masukkan URL');
@@ -663,41 +670,41 @@ let handler = async (m, { conn, args }) => {
         m.reply(`❌ Error: ${e.message}`);
     }
 }</pre>
-                            <button class="copy-btn">Copy</button>
+                                    <button class="copy-btn">Copy</button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
 
-                <!-- Endpoint 2: Direct Image -->
-                <div class="endpoint">
-                    <div class="endpoint-header">
-                        <span class="method">GET</span>
-                        <span class="url">/api/ssimg?url=https://example.com</span>
-                    </div>
-                    
-                    <div class="parameter">
-                        <span class="param-name">url</span>
-                        <span class="param-required">*required</span>
-                        <p>URL website untuk screenshot langsung (tanpa JSON wrapper)</p>
-                    </div>
+                        <!-- Endpoint 2: Direct Image -->
+                        <div class="endpoint">
+                            <div class="endpoint-header">
+                                <span class="method">GET</span>
+                                <span class="url">/api/ssimg?url=https://example.com</span>
+                            </div>
+                            
+                            <div class="parameter">
+                                <span class="param-name">url</span>
+                                <span class="param-required">*required</span>
+                                <p>URL website untuk screenshot langsung (tanpa JSON wrapper)</p>
+                            </div>
 
-                    <h4><i class="fas fa-check-circle"></i> Response Success:</h4>
-                    <div class="response">
-                        <span class="status-code status-200">200 OK</span>
-                        <p>Mengembalikan gambar langsung dalam format JPEG</p>
-                        <div class="code-block">
-                            <pre>Content-Type: image/jpeg
+                            <h4><i class="fas fa-check-circle"></i> Response Success:</h4>
+                            <div class="response">
+                                <span class="status-code status-200">200 OK</span>
+                                <p>Mengembalikan gambar langsung dalam format JPEG</p>
+                                <div class="code-block">
+                                    <pre>Content-Type: image/jpeg
 Content-Length: [size_in_bytes]
 X-Response-Time: [time]ms
 X-Screenshot-Of: [url]</pre>
-                            <button class="copy-btn">Copy</button>
-                        </div>
-                    </div>
+                                    <button class="copy-btn">Copy</button>
+                                </div>
+                            </div>
 
-                    <h4><i class="fas fa-mobile-alt"></i> Penggunaan di Web:</h4>
-                    <div class="response">
-                        <div class="code-block">
-                            <pre>// Langsung di tag img HTML
+                            <h4><i class="fas fa-mobile-alt"></i> Penggunaan di Web:</h4>
+                            <div class="response">
+                                <div class="code-block">
+                                    <pre>// Langsung di tag img HTML
 &lt;img src="https://hxs-apis.vercel.app/api/ssimg?url=https://google.com" 
      alt="Google Screenshot" 
      width="600"&gt;
@@ -706,28 +713,105 @@ X-Screenshot-Of: [url]</pre>
 .screenshot {
     background-image: url('https://hxs-apis.vercel.app/api/ssimg?url=https://example.com');
 }</pre>
-                            <button class="copy-btn">Copy</button>
+                                    <button class="copy-btn">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Examples Section -->
+                        <div class="note">
+                            <strong><i class="fas fa-rocket"></i> Contoh Cepat:</strong>
+                            <br><br>
+                            <strong>Untuk Bot WA (Recommended):</strong>
+                            <code>https://hxs-apis.vercel.app/api/ssweb?url=https://google.com&format=base64</code>
+                            <br><br>
+                            <strong>Untuk Web/Testing:</strong>
+                            <code>https://hxs-apis.vercel.app/api/ssimg?url=https://google.com</code>
+                            <br><br>
+                            <strong>JSON Full Response:</strong>
+                            <code>https://hxs-apis.vercel.app/api/ssweb?url=https://google.com</code>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Quick Examples Section -->
-                <div class="note">
-                    <strong><i class="fas fa-rocket"></i> Contoh Cepat:</strong>
-                    <br><br>
-                    <strong>Untuk Bot WA (Recommended):</strong>
-                    <code>https://hxs-apis.vercel.app/api/ssweb?url=https://google.com&format=base64</code>
-                    <br><br>
-                    <strong>Untuk Web/Testing:</strong>
-                    <code>https://hxs-apis.vercel.app/api/ssimg?url=https://google.com</code>
-                    <br><br>
-                    <strong>JSON Full Response:</strong>
-                    <code>https://hxs-apis.vercel.app/api/ssweb?url=https://google.com</code>
+        <!-- Status & Health API Section -->
+        <div class="accordion">
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <div class="accordion-title">
+                        <div class="accordion-icon">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                        Status & Health API
+                    </div>
+                    <div class="accordion-arrow">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-content-inner">
+                        <div class="section-description">
+                            <p>Endpoint untuk memantau status dan kesehatan API.</p>
+                        </div>
+                        
+                        <div class="endpoint">
+                            <div class="endpoint-header">
+                                <span class="method">GET</span>
+                                <span class="url">/api/status</span>
+                            </div>
+                            
+                            <h4><i class="fas fa-check-circle"></i> Response Success:</h4>
+                            <div class="response">
+                                <span class="status-code status-200">200 OK</span>
+                                <div class="code-block">
+                                    <pre>{
+  "success": true,
+  "message": "HXS SSWeb API is running",
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "version": "1.0.0",
+  "endpoints": {
+    "/api/ssweb": "Screenshot with JSON response",
+    "/api/ssimg": "Direct image response",
+    "/api/status": "API status"
+  }
+}</pre>
+                                    <button class="copy-btn">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="endpoint">
+                            <div class="endpoint-header">
+                                <span class="method">GET</span>
+                                <span class="url">/api/health</span>
+                            </div>
+                            
+                            <h4><i class="fas fa-check-circle"></i> Response Success:</h4>
+                            <div class="response">
+                                <span class="status-code status-200">200 OK</span>
+                                <div class="code-block">
+                                    <pre>{
+  "success": true,
+  "status": "healthy",
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "uptime": 12345.67,
+  "memory": {
+    "rss": 12345678,
+    "heapTotal": 8765432,
+    "heapUsed": 5432109,
+    "external": 123456
+  }
+}</pre>
+                                    <button class="copy-btn">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
         <!-- Error Handling Section -->
         <div class="accordion">
@@ -755,7 +839,8 @@ X-Screenshot-Of: [url]</pre>
                                 <div class="code-block">
                                     <pre>{
   "success": false,
-  "message": "Deskripsi error yang mudah dipahami"
+  "message": "Deskripsi error yang mudah dipahami",
+  "error": "Detail error (jika ada)"
 }</pre>
                                     <button class="copy-btn">Copy</button>
                                 </div>
@@ -767,6 +852,106 @@ X-Screenshot-Of: [url]</pre>
                                 <p><span class="status-code status-400">400</span> Bad Request - Parameter tidak valid atau tidak lengkap</p>
                                 <p><span class="status-code status-405">405</span> Method Not Allowed - Method HTTP tidak didukung</p>
                                 <p><span class="status-code status-500">500</span> Internal Server Error - Kesalahan server internal</p>
+                            </div>
+
+                            <h4><i class="fas fa-code"></i> Contoh Error Handling di Bot WA:</h4>
+                            <div class="response">
+                                <div class="code-block">
+                                    <pre>let handler = async (m, { conn, args }) => {
+    try {
+        if (!args[0]) return m.reply('❌ Masukkan URL website');
+        
+        const apiUrl = `https://hxs-apis.vercel.app/api/ssweb?url=${encodeURIComponent(args[0])}&format=base64`;
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        
+        if (!data.status) {
+            // Handle API error
+            return m.reply(`❌ API Error: ${data.message}`);
+        }
+        
+        // Process successful response
+        const buffer = Buffer.from(data.base64, 'base64');
+        await conn.sendMessage(m.chat, { image: buffer }, { quoted: m });
+        
+    } catch (error) {
+        // Handle network errors
+        console.error('Error:', error);
+        m.reply('❌ Gagal mengambil screenshot. Coba lagi nanti.');
+    }
+}</pre>
+                                    <button class="copy-btn">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Best Practices Section -->
+        <div class="accordion">
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <div class="accordion-title">
+                        <div class="accordion-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        Best Practices & Tips
+                    </div>
+                    <div class="accordion-arrow">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-content-inner">
+                        <div class="section-description">
+                            <p>Rekomendasi dan tips untuk penggunaan API yang optimal dalam berbagai skenario.</p>
+                        </div>
+                        
+                        <div class="endpoint">
+                            <h4><i class="fab fa-whatsapp"></i> Untuk Bot WhatsApp:</h4>
+                            <div class="response">
+                                <ul>
+                                    <li><strong>Gunakan format=base64</strong> - Lebih reliable dan cepat untuk bot</li>
+                                    <li><strong>Handle errors dengan try-catch</strong> - Berikan feedback yang jelas ke user</li>
+                                    <li><strong>Tambahkan progress message</strong> - Beri tahu user bahwa proses sedang berjalan</li>
+                                    <li><strong>Validasi URL</strong> - Pastikan URL yang dimasukkan valid</li>
+                                    <li><strong>Gunakan timeout</strong> - Set timeout untuk menghindari blocking terlalu lama</li>
+                                </ul>
+                            </div>
+
+                            <h4><i class="fas fa-globe"></i> Untuk Web Development:</h4>
+                            <div class="response">
+                                <ul>
+                                    <li><strong>Gunakan /api/ssimg</strong> - Untuk embed langsung di tag img</li>
+                                    <li><strong>Cache results</strong> - Screenshot bisa di-cache untuk performa</li>
+                                    <li><strong>Handle loading states</strong> - Tampilkan loading saat mengambil screenshot</li>
+                                    <li><strong>Fallback mechanism</strong> - Siapkan fallback jika API down</li>
+                                    <li><strong>Optimize images</strong> - Compress gambar jika diperlukan</li>
+                                </ul>
+                            </div>
+
+                            <h4><i class="fas fa-bolt"></i> Performance Tips:</h4>
+                            <div class="response">
+                                <ul>
+                                    <li>Response time biasanya 2-5 detik tergantung website</li>
+                                    <li>Gunakan format yang sesuai dengan kebutuhan</li>
+                                    <li>Hindari spam requests ke API yang sama dalam waktu singkat</li>
+                                    <li>Gunakan error handling yang robust</li>
+                                    <li>Monitor API health secara berkala</li>
+                                </ul>
+                            </div>
+
+                            <h4><i class="fas fa-shield-alt"></i> Security Considerations:</h4>
+                            <div class="response">
+                                <ul>
+                                    <li>Validasi semua input URL</li>
+                                    <li>Gunakan HTTPS untuk semua requests</li>
+                                    <li>Implement rate limiting jika diperlukan</li>
+                                    <li>Monitor suspicious activities</li>
+                                    <li>Keep API keys secure</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -805,6 +990,42 @@ Access-Control-Allow-Headers: Content-Type</pre>
                         
                         <div class="note">
                             <strong><i class="fas fa-info-circle"></i> Catatan:</strong> API dapat diakses dari domain mana pun (*) dan mendukung preflight OPTIONS requests untuk keamanan CORS.
+                        </div>
+
+                        <h4><i class="fas fa-code"></i> Contoh CORS Implementation:</h4>
+                        <div class="response">
+                            <div class="code-block">
+                                <pre>// Frontend JavaScript
+async function takeScreenshot(url) {
+    try {
+        const response = await fetch(`https://hxs-apis.vercel.app/api/ssweb?url=${encodeURIComponent(url)}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error taking screenshot:', error);
+        throw error;
+    }
+}
+
+// Usage
+takeScreenshot('https://google.com')
+    .then(data => {
+        if (data.status) {
+            const img = document.createElement('img');
+            img.src = 'data:image/jpeg;base64,' + data.data.base64;
+            document.body.appendChild(img);
+        }
+    })
+    .catch(error => {
+        console.error('Failed:', error);
+    });</pre>
+                                <button class="copy-btn">Copy</button>
+                            </div>
                         </div>
                     </div>
                 </div>
