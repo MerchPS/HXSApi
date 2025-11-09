@@ -2,48 +2,108 @@ import axios from 'axios';
 
 const yt = {
   static: Object.freeze({
-    baseUrl: 'https://ytdlp.online',
+    baseUrl: 'https://api.yt-dlp.download',
     headers: {
       'accept': 'application/json, text/plain, */*',
       'accept-encoding': 'gzip, deflate, br',
       'content-type': 'application/json',
-      'origin': 'https://ytdlp.online',
-      'referer': 'https://ytdlp.online/',
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
     }
   }),
   
   log(m) { console.log(`[yt-downloader] ${m}`) },
   
+  // Clean URL from extra parameters
+  cleanUrl(url) {
+    try {
+      // Remove everything after ?si= parameters
+      let cleanUrl = url.split('?')[0];
+      
+      // If it's youtu.be short URL, ensure it's proper
+      if (cleanUrl.includes('youtu.be/')) {
+        const videoId = cleanUrl.split('youtu.be/')[1];
+        if (videoId) {
+          cleanUrl = `https://youtu.be/${videoId}`;
+        }
+      }
+      
+      // If it's youtube.com URL, ensure it's proper
+      if (cleanUrl.includes('youtube.com/watch?v=')) {
+        const urlParams = new URL(cleanUrl);
+        const videoId = urlParams.searchParams.get('v');
+        if (videoId) {
+          cleanUrl = `https://www.youtube.com/watch?v=${videoId}`;
+        }
+      }
+      
+      this.log(`Cleaned URL: ${cleanUrl}`);
+      return cleanUrl;
+    } catch (error) {
+      this.log(`Error cleaning URL: ${error.message}`);
+      return url.split('?')[0]; // Fallback: just remove parameters
+    }
+  },
+  
   async getDownloadInfo(url, format = 'mp3') {
     try {
-      this.log(`Fetching download info for: ${url}`);
+      const cleanUrl = this.cleanUrl(url);
+      this.log(`Fetching download info for: ${cleanUrl}`);
       
-      const payload = {
-        url: url,
-        format: format,
-        quality: format === 'mp3' ? '320' : '720'
-      };
+      // Try multiple API endpoints
+      const endpoints = [
+        {
+          url: 'https://api.yt-dlp.download/api/info',
+          method: 'POST',
+          payload: { url: cleanUrl, format: format }
+        },
+        {
+          url: 'https://ytapi.download/api/info',
+          method: 'POST', 
+          payload: { url: cleanUrl, format: format }
+        }
+      ];
       
-      const response = await axios.post(`${this.static.baseUrl}/api/download`, payload, {
-        headers: this.static.headers,
-        timeout: 30000
-      });
+      let response;
+      let lastError;
       
-      if (response.data && response.data.success) {
-        return {
-          downloadUrl: response.data.download_url,
-          filename: response.data.filename || `download.${format}`,
-          filesize: response.data.filesize || 0,
-          duration: response.data.duration || 0,
-          format: format,
-          quality: format === 'mp3' ? '320k' : '720p',
-          thumbnail: response.data.thumbnail,
-          title: response.data.title
-        };
-      } else {
-        throw new Error(response.data?.message || 'Failed to get download info');
+      for (const endpoint of endpoints) {
+        try {
+          this.log(`Trying endpoint: ${endpoint.url}`);
+          response = await axios({
+            method: endpoint.method,
+            url: endpoint.url,
+            data: endpoint.payload,
+            headers: this.static.headers,
+            timeout: 15000
+          });
+          
+          if (response.data && response.data.success) {
+            break;
+          }
+        } catch (error) {
+          lastError = error;
+          this.log(`Endpoint failed: ${error.message}`);
+          continue;
+        }
       }
+      
+      if (!response || !response.data.success) {
+        throw new Error(lastError?.message || 'All API endpoints failed');
+      }
+      
+      const data = response.data;
+      
+      return {
+        downloadUrl: data.download_url || data.url,
+        filename: data.filename || `download.${format}`,
+        filesize: data.filesize || data.size || 0,
+        duration: data.duration || 0,
+        format: format,
+        quality: format === 'mp3' ? '320k' : '720p',
+        thumbnail: data.thumbnail,
+        title: data.title,
+        description: data.description
+      };
       
     } catch (error) {
       this.log(`Error: ${error.message}`);
@@ -80,7 +140,7 @@ export default async function handler(req, res) {
   }
   
   try {
-    let { url, quality = '320k' } = req.method === 'GET' ? req.query : req.body;
+    let { url } = req.method === 'GET' ? req.query : req.body;
     
     if (!url) {
       return res.status(400).json({
@@ -88,18 +148,25 @@ export default async function handler(req, res) {
         error: {
           message: 'Parameter url diperlukan',
           type: 'VALIDATION_ERROR',
-          status: 400,
-          details: 'Gunakan parameter: url=youtube_url'
+          status: 400
         },
         meta: {
           example: '/api/ytmp3?url=https://youtu.be/VIDEO_ID',
-          supported_platforms: ['YouTube', 'YouTube Music']
+          note: 'URL akan otomatis dibersihkan dari parameter tambahan'
         }
       });
     }
     
-    // Validate YouTube URL
-    if (!url.match(/(youtu\.be|youtube\.com|youtube\.com\/watch\?v=)/)) {
+    // Validate YouTube URL pattern
+    const youtubePatterns = [
+      /youtu\.be\/[a-zA-Z0-9_-]+/,
+      /youtube\.com\/watch\?v=[a-zA-Z0-9_-]+/,
+      /youtube\.com\/shorts\/[a-zA-Z0-9_-]+/
+    ];
+    
+    const isValidUrl = youtubePatterns.some(pattern => pattern.test(url));
+    
+    if (!isValidUrl) {
       return res.status(400).json({
         success: false,
         error: {
@@ -112,7 +179,8 @@ export default async function handler(req, res) {
             'https://youtu.be/VIDEO_ID',
             'https://www.youtube.com/watch?v=VIDEO_ID',
             'https://youtube.com/shorts/VIDEO_ID'
-          ]
+          ],
+          note: 'Parameter seperti ?si= akan otomatis dihapus'
         }
       });
     }
@@ -133,7 +201,9 @@ export default async function handler(req, res) {
         title: downloadInfo.title,
         thumbnail: downloadInfo.thumbnail,
         type: 'audio',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        original_url: url,
+        cleaned_url: yt.cleanUrl(url)
       },
       meta: {
         response_time: responseTime,
@@ -142,8 +212,7 @@ export default async function handler(req, res) {
         usage: {
           direct_download: `Klik link download_url untuk mengunduh langsung`,
           stream: `Gunakan download_url sebagai audio source`,
-          html_audio: `<audio controls><source src="${downloadInfo.downloadUrl}" type="audio/mpeg"></audio>`,
-          note: "Link download berlaku untuk waktu terbatas (biasanya 6-24 jam)"
+          note: "Link download berlaku untuk waktu terbatas"
         }
       }
     };
@@ -158,22 +227,26 @@ export default async function handler(req, res) {
     console.error('YouTube MP3 Error:', error.response?.data || error.message);
     
     // Handle specific errors
-    let errorMessage = error.message;
+    let errorMessage = 'Gagal mengambil informasi download';
     let errorType = 'API_ERROR';
     let statusCode = 500;
     
-    if (error.response?.status === 404 || error.message.includes('not found')) {
+    if (error.message.includes('not found') || error.response?.status === 404) {
       errorMessage = 'Video tidak ditemukan atau tidak dapat diakses';
       errorType = 'NOT_FOUND_ERROR';
       statusCode = 404;
-    } else if (error.response?.status === 400 || error.message.includes('invalid')) {
-      errorMessage = 'URL YouTube tidak valid atau format tidak didukung';
+    } else if (error.message.includes('invalid') || error.response?.status === 400) {
+      errorMessage = 'URL YouTube tidak valid';
       errorType = 'VALIDATION_ERROR';
       statusCode = 400;
-    } else if (error.code === 'ECONNABORTED') {
+    } else if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
       errorMessage = 'Timeout: Server mengambil waktu terlalu lama';
       errorType = 'TIMEOUT_ERROR';
       statusCode = 408;
+    } else if (error.message.includes('All API endpoints failed')) {
+      errorMessage = 'Semua service download sedang sibuk, coba lagi nanti';
+      errorType = 'SERVICE_UNAVAILABLE';
+      statusCode = 503;
     }
     
     const errorResponse = {
@@ -188,7 +261,12 @@ export default async function handler(req, res) {
         response_time: responseTime,
         credits: "HXS YouTube API - Home & Start",
         version: "1.0.0",
-        supported_platforms: ['YouTube', 'YouTube Music']
+        troubleshooting: [
+          'Pastikan URL YouTube valid',
+          'Coba tanpa parameter ?si=',
+          'Video mungkin tidak tersedia untuk download',
+          'Coba lagi dalam beberapa menit'
+        ]
       }
     };
     
